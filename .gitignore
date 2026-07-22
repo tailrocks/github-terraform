@@ -1,7 +1,40 @@
-.terraform/
-.terraform.lock.hcl
-.tfstate
-.tfstate.*
+# OpenTofu state and plan artifacts — NEVER commit
+*.tfstate
+*.tfstate.*
+*.tfplan
 crash.log
+crash.*.log
+
+# OpenTofu working directory (lock file IS committed)
+.terraform/
+.terraform.tfstate.lock.info
+
+# Variable files — may contain secrets or internal structure
+*.tfvars
+*.tfvars.json
+*.auto.tfvars
+*.auto.tfvars.json
+!terraform.tfvars.example
+
+# Override files — local-only config
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+
+# Credentials and environment
+.env
+.env.*
+.envrc
+*.pem
+*.key
+*.p12
+*.pfx
+
+# Editor/tool local state
+.idea/
+.vscode/
+*.swp
+.DS_Store
 .terraformrc
 terraform.rc

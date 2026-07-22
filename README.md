@@ -1,45 +1,53 @@
 # TailRocks GitHub Org OpenTofu (Private)
 
-Baseline repository for managing TailRocks GitHub Organization secrets with OpenTofu and 1Password CLI.
+Manage TailRocks GitHub organization settings with OpenTofu: repository merge policy, branch/tag rulesets, and (optionally) organization Actions secrets via 1Password.
 
 ## Scope
 
+### Repository standard (all managed repos)
+
+Matches `jackin-project/jackin-github-terraform`:
+
+| Setting | Value |
+|---|---|
+| Merge commits | disabled |
+| Squash merge | enabled (`PR_TITLE` / `PR_BODY`) |
+| Rebase merge | disabled |
+| Allow update branch | enabled |
+| Delete branch on merge | enabled |
+| Default branch ruleset `protect-main` | active (public repos) |
+| Tag ruleset `protect-tags` | active (public repos) |
+
+Private repos on the free org plan still get merge policy; rulesets need public visibility or a paid plan (`tailrocks-sqldiff` is private today → merge policy only).
+
+### Organization secrets (optional)
+
 - Manage GitHub organization-level Actions secrets.
 - Read secret material from 1Password via `external` provider + `op` CLI.
-- Start with `private` visibility by default.
+- Default visibility: `private`.
+
+## Managed repositories
+
+See `var.managed_repositories` in `variables.tf` (22 repos today: velnor estate + packaging + java libs + skills/marketplace/sqldiff).
 
 ## Prerequisites
 
 - OpenTofu 1.7+
-- `op` CLI installed and authenticated (service account preferred in CI)
-- `jq`
-- GitHub API token with organization admin scope for Actions secrets
+- GitHub token with org admin + repo admin scopes (`GITHUB_TOKEN`, or `TF_VAR_github_token`)
+- For secrets: `op` CLI + `jq`, and authenticated 1Password (service account preferred in CI)
 
-## 1Password CLI setup (CI)
-
-Use service account token for non-interactive runs:
+## Configure
 
 ```sh
-export OP_SERVICE_ACCOUNT_TOKEN="..."
+cp terraform.tfvars.example terraform.tfvars   # optional overrides
+export GITHUB_TOKEN="<org admin token>"
 ```
 
-Then verify:
-
-```sh
-op account list
-```
-
-## Configure secrets map
-
-Populate `locals.org_secrets` in `locals.tf` with one entry per GitHub secret:
+Optional secrets map in `locals.tf`:
 
 ```hcl
 locals {
   org_secrets = {
-    GITHUB_WEBHOOK_SECRET = {
-      item  = "org-credentials"
-      field = "webhook_secret"
-    }
     NPM_TOKEN = {
       item  = "org-credentials"
       field = "npm_token"
@@ -48,26 +56,7 @@ locals {
 }
 ```
 
-Key naming convention:
-- secret name in map key -> GitHub secret name
-- `item` -> 1Password item name in `var.op_vault`
-- `field` -> 1Password field key to read
-
-## Configure variables
-
-Copy example vars:
-
-```sh
-cp terraform.tfvars.example terraform.tfvars
-```
-
-Then set runtime secrets securely via env:
-
-```sh
-export TF_VAR_github_token="<org github token>"
-```
-
-## Bootstrap
+## Bootstrap / apply
 
 ```sh
 cd /Users/donbeave/Projects/tailrocks/github-terraform
@@ -76,7 +65,14 @@ tofu plan
 tofu apply
 ```
 
+Existing repos are imported via `imports.tf` on first apply.
+
+## Required status checks
+
+Fill `repo_required_status_checks` in `variables.tf` when aggregator check names are stable per repo (bare check-run name, not `workflow / job` UI label). Empty map = rulesets without required checks.
+
 ## Notes
 
-- In provider 6.x for GitHub, this module uses `value` for secret text.
-- This repo is intentionally state-light in secret examples until TailRocks secrets are provided.
+- Provider 6.x org secrets use `value` for secret text.
+- `lifecycle.prevent_destroy` on managed repos stops IaC deletion only — UI deletion still possible for owners.
+- Never commit `*.tfstate`, `*.tfvars`, or tokens.

@@ -1,7 +1,8 @@
-github_organization = "tailrocks"
-op_vault            = "TailRocks"
-secret_visibility   = "private"
+# Optional overrides. Defaults live in variables.tf.
+# github_organization = "tailrocks"
+# op_vault            = "TailRocks"
+# secret_visibility   = "private"
 
-# Provide actual token values via environment variables when running OpenTofu:
-# export TF_VAR_github_token=...
-# export OP_SERVICE_ACCOUNT_TOKEN=...
+# Prefer env auth (never commit real tokens):
+#   export GITHUB_TOKEN=...
+#   export OP_SERVICE_ACCOUNT_TOKEN=...
