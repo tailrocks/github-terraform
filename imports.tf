@@ -17,6 +17,11 @@ import {
 }
 
 import {
+  to = github_actions_runner_group.velnor_trusted
+  id = "3"
+}
+
+import {
   to = github_repository.managed_settings["velnor"]
   id = "velnor"
 }

@@ -64,6 +64,30 @@ variable "managed_repositories" {
   ]
 }
 
+variable "velnor_runner_group_repositories" {
+  description = "Repositories allowed to schedule jobs on the velnor-trusted Actions runner group."
+  type        = set(string)
+  default = [
+    "holla",
+    "parallax",
+    "parallax-telemetry-playground",
+    "pg-bigdecimal",
+    "ruxel",
+    "schemalane",
+    "tablerock",
+    "termrock",
+    "tracing-request-level",
+    "velnor",
+    "velnor-actions-fixture",
+    "velnor-apt",
+  ]
+
+  validation {
+    condition     = length(setsubtract(var.velnor_runner_group_repositories, toset(var.managed_repositories))) == 0
+    error_message = "velnor_runner_group_repositories must be a subset of managed_repositories."
+  }
+}
+
 variable "ruleset_repositories" {
   description = "Public repositories that receive the protect-main and protect-tags rulesets. Kept explicit so for_each keys are known before import/apply."
   type        = list(string)
