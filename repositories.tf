@@ -40,10 +40,7 @@ resource "github_repository" "managed_settings" {
 # Rulesets require public (or paid-private) repos on free GitHub org plans.
 # Private free-org repos only get merge policy above.
 locals {
-  ruleset_repositories = toset([
-    for name, repo in github_repository.managed_settings :
-    name if repo.visibility != "private"
-  ])
+  ruleset_repositories = toset(var.ruleset_repositories)
 }
 
 resource "github_repository_ruleset" "protect_main" {

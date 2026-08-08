@@ -34,6 +34,7 @@ variable "managed_repositories" {
   default = [
     "velnor",
     "velnor-apt",
+    "velnor-actions",
     "tablerock",
     "velnor-actions-fixture",
     "holla",
@@ -52,9 +53,53 @@ variable "managed_repositories" {
     "graphql-java-datetime",
     "jambalaya",
     "tailrocks-skills",
-    "tailrocks-marketplace",
     "tailrocks-sqldiff",
+    "github-terraform",
+    "tailrocks-logo",
+    "dumper",
+    "pgquill",
+    "renovate-rust",
+    "review-crucible",
+    "rust-best-practices",
   ]
+}
+
+variable "ruleset_repositories" {
+  description = "Public repositories that receive the protect-main and protect-tags rulesets. Kept explicit so for_each keys are known before import/apply."
+  type        = list(string)
+  default = [
+    "velnor",
+    "velnor-apt",
+    "velnor-actions",
+    "tablerock",
+    "velnor-actions-fixture",
+    "holla",
+    "termrock",
+    "parallax",
+    "tracing-request-level",
+    "pg-bigdecimal",
+    "holla-apt",
+    "homebrew-holla",
+    "parallax-telemetry-playground",
+    "ruxel",
+    "homebrew-tablerock",
+    "schemalane",
+    "homebrew-parallax",
+    "tailrocks-gradle-conventions",
+    "graphql-java-datetime",
+    "jambalaya",
+    "tailrocks-skills",
+    "dumper",
+    "pgquill",
+    "renovate-rust",
+    "review-crucible",
+    "rust-best-practices",
+  ]
+
+  validation {
+    condition     = length(setsubtract(toset(var.ruleset_repositories), toset(var.managed_repositories))) == 0
+    error_message = "ruleset_repositories must be a subset of managed_repositories."
+  }
 }
 
 # Per-repository list of status check contexts that must pass before a PR
