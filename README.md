@@ -1,8 +1,21 @@
 # TailRocks GitHub Org OpenTofu (Private)
 
-Manage TailRocks GitHub organization settings with OpenTofu: repository merge policy, branch/tag rulesets, and (optionally) organization Actions secrets via 1Password.
+Manage TailRocks GitHub organization settings with OpenTofu: organization and Actions policy, repository merge policy, branch/tag rulesets, and (optionally) organization Actions secrets via 1Password.
 
 ## Scope
+
+### Organization standard
+
+- Organization profile and member repository/page creation policy.
+- Organization-wide GitHub Actions availability and action allow policy.
+- Default `GITHUB_TOKEN` workflow permissions and PR-review approval policy.
+- Existing live values are adopted first. Security tightening happens only after
+  every managed workflow declares its required permissions.
+
+GitHub does not expose organization package-creation visibility or package
+visibility changes through the REST API or the Terraform GitHub provider. An
+organization owner must manage those settings in **Organization settings →
+Packages**. Making a package public is irreversible.
 
 ### Repository standard (all managed repos)
 

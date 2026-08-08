@@ -14,11 +14,11 @@ output "organization" {
 }
 
 output "managed_repositories" {
-  value = sort(keys(github_repository.managed_settings))
+  value       = sort(keys(github_repository.managed_settings))
   description = "Repositories under merge-policy management."
 }
 
 output "ruleset_repositories" {
-  value = sort(tolist(local.ruleset_repositories))
+  value       = sort(tolist(local.ruleset_repositories))
   description = "Public repositories that also receive protect-main / protect-tags rulesets."
 }
