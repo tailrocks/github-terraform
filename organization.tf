@@ -43,3 +43,14 @@ resource "github_actions_organization_workflow_permissions" "tailrocks" {
   default_workflow_permissions     = "write"
   can_approve_pull_request_reviews = true
 }
+
+resource "github_actions_runner_group" "velnor_trusted" {
+  name                       = "velnor-trusted"
+  visibility                 = "selected"
+  allows_public_repositories = true
+  restricted_to_workflows    = false
+  selected_repository_ids = [
+    for name in var.velnor_runner_group_repositories :
+    github_repository.managed_settings[name].repo_id
+  ]
+}
