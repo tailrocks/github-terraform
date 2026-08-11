@@ -133,5 +133,10 @@ variable "ruleset_repositories" {
 variable "repo_required_status_checks" {
   description = "Map of repository name to required status check contexts for protect-main."
   type        = map(list(string))
-  default     = {}
+  default = {
+    tailrocks-skills = [
+      "validate",
+      "templates-macos",
+    ]
+  }
 }
