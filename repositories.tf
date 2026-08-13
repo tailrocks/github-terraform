@@ -66,6 +66,7 @@ resource "github_repository_ruleset" "protect_main" {
       # strict_required_status_checks_policy when checks are configured.
       required_approving_review_count = 0
       dismiss_stale_reviews_on_push   = true
+      require_last_push_approval      = false
     }
 
     dynamic "required_status_checks" {
