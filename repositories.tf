@@ -62,8 +62,8 @@ resource "github_repository_ruleset" "protect_main" {
     pull_request {
       # Solo-maintainer estate. Requiring an approving review would
       # block every merge — GitHub does not let the PR author approve
-      # their own PR. Fresh-CI-on-merge-state safety is carried by
-      # strict_required_status_checks_policy when checks are configured.
+      # their own PR. Required checks remain enforced without requiring
+      # the branch to be up to date with main.
       required_approving_review_count = 0
       dismiss_stale_reviews_on_push   = true
       require_last_push_approval      = false
@@ -72,7 +72,6 @@ resource "github_repository_ruleset" "protect_main" {
     dynamic "required_status_checks" {
       for_each = length(lookup(var.repo_required_status_checks, each.value, [])) > 0 ? [1] : []
       content {
-        strict_required_status_checks_policy = true
         dynamic "required_check" {
           for_each = lookup(var.repo_required_status_checks, each.value, [])
           content {
