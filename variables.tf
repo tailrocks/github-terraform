@@ -44,11 +44,13 @@ variable "managed_repositories" {
     "pg-bigdecimal",
     "holla-apt",
     "homebrew-holla",
+    "homebrew-ruxel",
     "parallax-telemetry-playground",
     "ruxel",
     "homebrew-tablerock",
     "schemalane",
     "homebrew-parallax",
+    "cloudflare-tofu",
     "tailrocks-gradle-conventions",
     "graphql-java-datetime",
     "jambalaya",
@@ -104,6 +106,7 @@ variable "ruleset_repositories" {
     "pg-bigdecimal",
     "holla-apt",
     "homebrew-holla",
+    "homebrew-ruxel",
     "parallax-telemetry-playground",
     "ruxel",
     "homebrew-tablerock",
@@ -129,14 +132,29 @@ variable "ruleset_repositories" {
 # Per-repository list of status check contexts that must pass before a PR
 # can merge into the default branch. Context names are the bare check-run
 # name field (not the `<workflow> / <job>` display string). Repos absent
-# from this map have no required status checks yet.
+# from this map have no required status checks yet. The map preserves the
+# live check names while protect-main omits the strict freshness requirement.
 variable "repo_required_status_checks" {
   description = "Map of repository name to required status check contexts for protect-main."
   type        = map(list(string))
   default = {
-    tailrocks-skills = [
-      "validate",
-      "templates-macos",
-    ]
+    holla                         = ["ci-required", "DCO"]
+    holla-apt                     = ["ci-required", "DCO"]
+    homebrew-holla                = ["ci-required", "DCO"]
+    homebrew-parallax             = ["ci-required", "DCO"]
+    homebrew-ruxel                = ["ci-required", "DCO"]
+    homebrew-tablerock            = ["ci-required", "DCO"]
+    parallax                      = ["ci-required", "DCO"]
+    parallax-telemetry-playground = ["ci-required", "DCO"]
+    pg-bigdecimal                 = ["ci-required", "DCO"]
+    ruxel                         = ["ci-required", "DCO"]
+    schemalane                    = ["ci-required", "DCO"]
+    tablerock                     = ["ci-required", "DCO"]
+    tailrocks-skills              = ["ci-required", "DCO"]
+    termrock                      = ["ci-required", "DCO"]
+    tracing-request-level         = ["ci-required", "DCO"]
+    velnor                        = ["ci-required", "DCO"]
+    velnor-actions-fixture        = ["ci-required", "DCO"]
+    velnor-apt                    = ["ci-required", "DCO"]
   }
 }

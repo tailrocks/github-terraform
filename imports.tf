@@ -82,6 +82,16 @@ import {
 }
 
 import {
+  to = github_repository.managed_settings["homebrew-ruxel"]
+  id = "homebrew-ruxel"
+}
+
+import {
+  to = github_repository.managed_settings["cloudflare-tofu"]
+  id = "cloudflare-tofu"
+}
+
+import {
   to = github_repository.managed_settings["parallax-telemetry-playground"]
   id = "parallax-telemetry-playground"
 }
@@ -324,6 +334,11 @@ import {
 import {
   to = github_repository_ruleset.protect_tags["homebrew-parallax"]
   id = "homebrew-parallax:19573018"
+}
+
+import {
+  to = github_repository_ruleset.protect_main["homebrew-ruxel"]
+  id = "homebrew-ruxel:20788282"
 }
 
 import {
