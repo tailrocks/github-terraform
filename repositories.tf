@@ -58,6 +58,15 @@ resource "github_repository_ruleset" "protect_main" {
     }
   }
 
+  # Role-based emergency bypass so org/repo administrators can merge
+  # when required checks are unavailable (e.g. Velnor itself is down).
+  # Ordinary PRs still need DCO/ci-required; only Administrator can skip.
+  bypass_actors {
+    actor_id    = 5
+    actor_type  = "RepositoryRole"
+    bypass_mode = "always"
+  }
+
   rules {
     pull_request {
       # Solo-maintainer estate. Requiring an approving review would
