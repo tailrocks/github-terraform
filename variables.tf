@@ -238,6 +238,8 @@ variable "velnor_runner_group_repositories" {
   description = "Repositories allowed to schedule jobs on the velnor-trusted Actions runner group."
   type        = set(string)
   default = [
+    "cloudflare-tofu",
+    "github-terraform",
     "holla",
     "parallax",
     "parallax-telemetry-playground",
