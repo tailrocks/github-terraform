@@ -194,7 +194,7 @@ variable "managed_repositories" {
     "termpane" = {
       disposition     = "FullRuleset"
       visibility      = "public"
-      required_checks = []
+      required_checks = ["DCO", "Policy", "ci-required"]
     }
     "termrock" = {
       disposition     = "FullRuleset"
