@@ -51,6 +51,6 @@ resource "github_actions_runner_group" "velnor_trusted" {
   restricted_to_workflows    = false
   selected_repository_ids = [
     for name in var.velnor_runner_group_repositories :
-    github_repository.managed_settings[name].repo_id
+    module.repository_policy.repository_ids[name]
   ]
 }
