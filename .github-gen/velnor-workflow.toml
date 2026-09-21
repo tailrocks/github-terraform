@@ -2,7 +2,7 @@ schema = 1
 
 [generator]
 repository = "tailrocks/github-terraform"
-revision = "a83de766d9f54f553e9e77b01330135cdd9108d2"
+revision = "4fa7a3a85f141a6bb95bc9bdf0eef9e3ddde165d"
 
 
 [policy]
