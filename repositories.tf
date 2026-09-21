@@ -1,117 +1,25 @@
 # Managed repository settings + rulesets.
-# Standard mirrors jackin-project/jackin-github-terraform:
-# squash-only merges, delete head branch, allow update branch,
-# protect default branch + all tags.
+# Authoritative canonical module: modules/repository-policy
+# Enforces squash-only merges, delete head branch, allow update branch,
+# protect default branch + all tags with zero standing bypasses.
 
-resource "github_repository" "managed_settings" {
-  for_each = toset(var.managed_repositories)
+module "repository_policy" {
+  source = "./modules/repository-policy"
 
-  name = each.value
-
-  allow_merge_commit          = false
-  allow_squash_merge          = true
-  allow_rebase_merge          = false
-  squash_merge_commit_title   = "PR_TITLE"
-  squash_merge_commit_message = "PR_BODY"
-  allow_update_branch         = true
-  delete_branch_on_merge      = true
-
-  lifecycle {
-    prevent_destroy = true
-    ignore_changes = [
-      description,
-      homepage_url,
-      has_issues,
-      has_projects,
-      has_wiki,
-      has_discussions,
-      visibility,
-      archived,
-      topics,
-      vulnerability_alerts,
-      allow_auto_merge,
-      web_commit_signoff_required,
-      pages,
-      security_and_analysis,
-    ]
-  }
+  repository_policies = var.managed_repositories
 }
 
-# Rulesets require public (or paid-private) repos on free GitHub org plans.
-# Private free-org repos only get merge policy above.
-locals {
-  ruleset_repositories = toset(var.ruleset_repositories)
+moved {
+  from = github_repository.managed_settings
+  to   = module.repository_policy.github_repository.managed_settings
 }
 
-resource "github_repository_ruleset" "protect_main" {
-  for_each = local.ruleset_repositories
-
-  repository  = each.value
-  name        = "protect-main"
-  target      = "branch"
-  enforcement = "active"
-
-  conditions {
-    ref_name {
-      include = ["~DEFAULT_BRANCH"]
-      exclude = []
-    }
-  }
-
-  # Role-based emergency bypass so org/repo administrators can merge
-  # when required checks are unavailable (e.g. Velnor itself is down).
-  # Ordinary PRs still need DCO/ci-required; only Administrator can skip.
-  bypass_actors {
-    actor_id    = 5
-    actor_type  = "RepositoryRole"
-    bypass_mode = "always"
-  }
-
-  rules {
-    pull_request {
-      # Solo-maintainer estate. Requiring an approving review would
-      # block every merge — GitHub does not let the PR author approve
-      # their own PR. Required checks remain enforced without requiring
-      # the branch to be up to date with main.
-      required_approving_review_count = 0
-      dismiss_stale_reviews_on_push   = true
-      require_last_push_approval      = false
-    }
-
-    dynamic "required_status_checks" {
-      for_each = length(lookup(var.repo_required_status_checks, each.value, [])) > 0 ? [1] : []
-      content {
-        dynamic "required_check" {
-          for_each = lookup(var.repo_required_status_checks, each.value, [])
-          content {
-            context = required_check.value
-          }
-        }
-      }
-    }
-
-    non_fast_forward = true
-    deletion         = true
-  }
+moved {
+  from = github_repository_ruleset.protect_main
+  to   = module.repository_policy.github_repository_ruleset.protect_main
 }
 
-resource "github_repository_ruleset" "protect_tags" {
-  for_each = local.ruleset_repositories
-
-  repository  = each.value
-  name        = "protect-tags"
-  target      = "tag"
-  enforcement = "active"
-
-  conditions {
-    ref_name {
-      include = ["~ALL"]
-      exclude = []
-    }
-  }
-
-  rules {
-    non_fast_forward = true
-    deletion         = true
-  }
+moved {
+  from = github_repository_ruleset.protect_tags
+  to   = module.repository_policy.github_repository_ruleset.protect_tags
 }
