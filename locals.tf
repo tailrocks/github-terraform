@@ -8,5 +8,11 @@ locals {
   #     field = "webhook_secret"
   #   }
   # }
-  org_secrets = {}
+  org_secrets = {
+    CARGO_REGISTRY_TOKEN = {
+      item    = "crates.io"
+      section = "security"
+      field   = "publish-new token"
+    }
+  }
 }
