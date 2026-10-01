@@ -4,7 +4,7 @@ data "external" "onepassword_secret" {
   program = ["bash", "${path.module}/scripts/op_read_secret.sh"]
 
   query = {
-    vault   = var.op_vault
+    vault   = lookup(each.value, "vault", var.op_vault)
     item    = each.value.item
     field   = each.value.field
     section = lookup(each.value, "section", "")

@@ -10,6 +10,7 @@ locals {
   # }
   org_secrets = {
     CARGO_REGISTRY_TOKEN = {
+      vault   = "Private"
       item    = "crates.io"
       section = "security"
       field   = "publish-new token"
