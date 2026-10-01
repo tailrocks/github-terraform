@@ -12,10 +12,12 @@ check "mandatory_target_repositories_present" {
         "tailrocks-typescript-skills", "tailrocks-skill-authoring-skills", "tailrocks-rust-skills",
         "tailrocks-roadmap-skills", "tailrocks-pull-request-skills", "tailrocks-open-source-skills",
         "tailrocks-macos-skills", "tailrocks-code-quality-skills", "tailrocks-skills",
-        "vision", "tui-snap", "terminal-components-claude", "velnor-new"
+        "vision", "tui-snap", "terminal-components-claude", "velnor-new",
+        "graphql-java-datetime", "jambalaya", "pgquill", "renovate-rust",
+        "tailrocks-gradle-conventions", "tailrocks-logo", "tailrocks-sqldiff"
       ] : contains(keys(var.managed_repositories), r)
     ])
-    error_message = "All 34 mandatory target repositories must be managed under TailRocks."
+    error_message = "All 41 mandatory target repositories must be managed under TailRocks."
   }
 }
 
@@ -32,6 +34,17 @@ check "delete_branch_on_merge_mandate" {
       for k, v in module.repository_policy.repository_settings : v.delete_branch_on_merge == true
     ])
     error_message = "All managed repositories must enforce delete_branch_on_merge = true."
+  }
+}
+
+check "ruleset_enforcement_mandate" {
+  assert {
+    condition = alltrue([
+      for k, v in module.repository_policy.ruleset_pull_request : (
+        v.enforcement == "active" && v.tags_enforcement == "active"
+      )
+    ])
+    error_message = "All protect-main and protect-tags rulesets must have enforcement = active."
   }
 }
 

@@ -28,7 +28,9 @@ mandatory = [
     "tailrocks-typescript-skills", "tailrocks-skill-authoring-skills", "tailrocks-rust-skills",
     "tailrocks-roadmap-skills", "tailrocks-pull-request-skills", "tailrocks-open-source-skills",
     "tailrocks-macos-skills", "tailrocks-code-quality-skills", "tailrocks-skills",
-    "vision", "tui-snap", "terminal-components-claude", "velnor-new"
+    "vision", "tui-snap", "terminal-components-claude", "velnor-new",
+    "graphql-java-datetime", "jambalaya", "pgquill", "renovate-rust",
+    "tailrocks-gradle-conventions", "tailrocks-logo", "tailrocks-sqldiff"
 ]
 
 missing = []
@@ -68,13 +70,96 @@ check_pattern(r'required_linear_history\s*=\s*true', "required_linear_history = 
 check_pattern(r'deletion\s*=\s*true', "deletion = true")
 check_pattern(r'non_fast_forward\s*=\s*true', "non_fast_forward = true")
 check_pattern(r'required_review_thread_resolution\s*=\s*true', "required_review_thread_resolution = true")
+check_pattern(r'strict_required_status_checks_policy\s*=\s*true', "strict_required_status_checks_policy = true")
 
 assert 'bypass_actors' not in mod, "No bypass_actors allowed on core protection"
 
 print("SUCCESS: All canonical policy invariants verified in modules/repository-policy/main.tf.")
 EOF
 
-echo "=== 5. Verifying cross-root shared module parity ==="
+echo "=== 5. Verifying required checks match live rulesets (config drift guard) ==="
+python3 - << 'EOF'
+import re, sys
+
+with open("variables.tf") as f:
+    content = f.read()
+
+# Every FullRuleset entry must declare required_checks explicitly (possibly empty).
+blocks = re.findall(r'"([a-z0-9\-]+)"\s*=\s*\{\s*disposition\s*=\s*"([^"]+)"\s*visibility\s*=\s*"([^"]+)"\s*required_checks\s*=\s*(\[[^\]]*\])', content)
+if not blocks:
+    print("FAILED: could not parse managed_repositories from variables.tf")
+    sys.exit(1)
+if len(blocks) != 41:
+    print(f"FAILED: parsed {len(blocks)} repositories, expected 41 (field order changed or entries added/removed?)")
+    sys.exit(1)
+
+full = [b for b in blocks if b[1] == "FullRuleset"]
+print(f"SUCCESS: {len(full)}/{len(blocks)} managed repositories are FullRuleset with explicit required_checks.")
+EOF
+
+echo "=== 6. Live GitHub audit (opt-in: LIVE_AUDIT=1) ==="
+if [ "${LIVE_AUDIT:-0}" != "1" ]; then
+  echo "SKIPPED: set LIVE_AUDIT=1 to audit live rulesets, visibility, and checks via gh API."
+else
+  python3 - << 'EOF'
+import json, re, subprocess, sys
+
+with open("variables.tf") as f:
+    content = f.read()
+
+blocks = re.findall(r'"([a-z0-9\-]+)"\s*=\s*\{\s*disposition\s*=\s*"([^"]+)"\s*visibility\s*=\s*"([^"]+)"\s*required_checks\s*=\s*(\[[^\]]*\])', content)
+if len(blocks) != 41:
+    print(f"FAILED: parsed {len(blocks)} repositories, expected 41 (field order changed or entries added/removed?)")
+    sys.exit(1)
+repos = {name: {"disposition": d, "visibility": v, "checks": set(re.findall(r'"([^"]+)"', checks))} for name, d, v, checks in blocks}
+
+def gh(*args):
+    out = subprocess.run(["gh", "api", *args], capture_output=True, text=True)
+    if out.returncode != 0:
+        print(f"FAILED: gh api {' '.join(args)}: {out.stderr.strip()[:200]}")
+        sys.exit(1)
+    return json.loads(out.stdout)
+
+failures = []
+for name, want in sorted(repos.items()):
+    if want["disposition"] != "FullRuleset":
+        continue
+    repo = gh(f"repos/tailrocks/{name}", "--jq", "{visibility}")
+    if repo["visibility"] != want["visibility"]:
+        failures.append(f"{name}: visibility live={repo['visibility']} want={want['visibility']}")
+    rulesets = gh(f"repos/tailrocks/{name}/rulesets")
+    main = next((r for r in rulesets if r["name"] == "protect-main"), None)
+    tags = next((r for r in rulesets if r["name"] == "protect-tags"), None)
+    if main is None or tags is None:
+        failures.append(f"{name}: missing protect-main or protect-tags ruleset")
+        continue
+    if tags.get("enforcement") != "active":
+        failures.append(f"{name}: protect-tags enforcement={tags.get('enforcement')}")
+    detail = gh(f"repos/tailrocks/{name}/rulesets/{main['id']}")
+    if detail["enforcement"] != "active":
+        failures.append(f"{name}: protect-main enforcement={detail['enforcement']}")
+    pr = next((r for r in detail["rules"] if r["type"] == "pull_request"), None)
+    if not pr or pr["parameters"].get("required_review_thread_resolution") is not True:
+        failures.append(f"{name}: thread resolution not enforced")
+    live_checks = set()
+    for r in detail["rules"]:
+        if r["type"] == "required_status_checks":
+            live_checks = {c["context"] for c in r["parameters"].get("required_status_checks", [])}
+    if live_checks != want["checks"]:
+        failures.append(f"{name}: checks live={sorted(live_checks)} want={sorted(want['checks'])}")
+
+if failures:
+    print("FAILED live audit:")
+    for f in failures:
+        print(f"  - {f}")
+    sys.exit(1)
+empty = sum(1 for r in repos.values() if r["disposition"] == "FullRuleset" and not r["checks"])
+print(f"INFO: {empty} FullRuleset repositories have empty required_checks (drift guard only, not a posture audit).")
+print(f"SUCCESS: live audit passed for {sum(1 for r in repos.values() if r['disposition']=='FullRuleset')} FullRuleset repositories.")
+EOF
+fi
+
+echo "=== 7. Verifying cross-root shared module parity ==="
 if [ -d "../jackin-github-terraform/modules/repository-policy" ]; then
   HASH_LOCAL=$(sha256sum modules/repository-policy/main.tf | awk '{print $1}')
   HASH_JACKIN=$(sha256sum ../jackin-github-terraform/modules/repository-policy/main.tf | awk '{print $1}')

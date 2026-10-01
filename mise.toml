@@ -7,17 +7,25 @@ lockfile = true
 [tasks."tofu:plan"]
 description = "Run tofu plan"
 run = """
+set -eu
 export OP_ACCOUNT='zhokhov.1password.com'
-export OP_SESSION_zhokhov="$(op signin --raw)"
-export GITHUB_TOKEN="$(op read 'op://tailrocks/GitHub/tokens/tofu')"
+OP_SESSION_zhokhov="$(op signin --raw)" || { echo "op signin failed, refusing to run" >&2; exit 1; }
+export OP_SESSION_zhokhov
+GITHUB_TOKEN="$(op read 'op://tailrocks/GitHub/tokens/tofu')" || { echo "op read failed, refusing to run" >&2; exit 1; }
+export GITHUB_TOKEN
+[ -n "${GITHUB_TOKEN:-}" ] || { echo "GITHUB_TOKEN is empty, refusing to run" >&2; exit 1; }
 exec tofu plan "$@"
 """
 
 [tasks."tofu:apply"]
 description = "Run tofu apply"
 run = """
+set -eu
 export OP_ACCOUNT='zhokhov.1password.com'
-export OP_SESSION_zhokhov="$(op signin --raw)"
-export GITHUB_TOKEN="$(op read 'op://tailrocks/GitHub/tokens/tofu')"
+OP_SESSION_zhokhov="$(op signin --raw)" || { echo "op signin failed, refusing to run" >&2; exit 1; }
+export OP_SESSION_zhokhov
+GITHUB_TOKEN="$(op read 'op://tailrocks/GitHub/tokens/tofu')" || { echo "op read failed, refusing to run" >&2; exit 1; }
+export GITHUB_TOKEN
+[ -n "${GITHUB_TOKEN:-}" ] || { echo "GITHUB_TOKEN is empty, refusing to run" >&2; exit 1; }
 exec tofu apply "$@"
 """

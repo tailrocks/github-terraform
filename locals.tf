@@ -12,13 +12,8 @@ locals {
   #   }
   # }
   org_secrets = {
-    CARGO_REGISTRY_TOKEN = {
-      vault_uuid   = "xlm7pn5y6d3nfya5xy2os3vtoq" # Private
-      item         = "crates.io"
-      section      = "security"
-      field        = "publish-new token"
-      visibility   = "selected" # termpane is public; private-visibility secrets are invisible to it
-      repositories = ["termpane"]
-    }
+    # CARGO_REGISTRY_TOKEN removed 2026-10-01: termpane 0.1.0 published;
+    # crates.io Trusted Publisher (tailrocks/termpane, release.yml, release)
+    # replaces the bootstrap token path. No org secrets remain.
   }
 }

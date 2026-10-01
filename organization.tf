@@ -1,5 +1,6 @@
-# Organization-wide policy. Values intentionally match the live baseline so
-# importing these resources does not combine adoption with a policy change.
+# Organization-wide policy. Actions permissions and workflow defaults match the
+# live baseline (tightening waits for per-repo workflow audits). New-repository
+# security defaults are intentionally hardened (detection-only, future repos).
 
 resource "github_organization_settings" "tailrocks" {
   billing_email = "thetailrocks@gmail.com"
@@ -23,12 +24,12 @@ resource "github_organization_settings" "tailrocks" {
   members_can_fork_private_repositories = false
   web_commit_signoff_required           = false
 
-  advanced_security_enabled_for_new_repositories               = false
-  dependabot_alerts_enabled_for_new_repositories               = false
-  dependabot_security_updates_enabled_for_new_repositories     = false
-  dependency_graph_enabled_for_new_repositories                = false
-  secret_scanning_enabled_for_new_repositories                 = false
-  secret_scanning_push_protection_enabled_for_new_repositories = false
+  advanced_security_enabled_for_new_repositories               = true
+  dependabot_alerts_enabled_for_new_repositories               = true
+  dependabot_security_updates_enabled_for_new_repositories     = true
+  dependency_graph_enabled_for_new_repositories                = true
+  secret_scanning_enabled_for_new_repositories                 = true
+  secret_scanning_push_protection_enabled_for_new_repositories = true
 }
 
 resource "github_actions_organization_permissions" "tailrocks" {
@@ -41,7 +42,7 @@ resource "github_actions_organization_workflow_permissions" "tailrocks" {
   organization_slug = var.github_organization
 
   default_workflow_permissions     = "write"
-  can_approve_pull_request_reviews = true
+  can_approve_pull_request_reviews = false
 }
 
 resource "github_actions_runner_group" "velnor_trusted" {

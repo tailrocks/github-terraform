@@ -274,6 +274,11 @@ import {
 }
 
 import {
+  to = module.repository_policy.github_repository_ruleset.protect_main["homebrew-velnor"]
+  id = "homebrew-velnor:23746087"
+}
+
+import {
   to = module.repository_policy.github_repository_ruleset.protect_main["jambalaya"]
   id = "jambalaya:19572993"
 }
@@ -319,8 +324,43 @@ import {
 }
 
 import {
+  to = module.repository_policy.github_repository_ruleset.protect_main["tailrocks-code-quality-skills"]
+  id = "tailrocks-code-quality-skills:23746100"
+}
+
+import {
   to = module.repository_policy.github_repository_ruleset.protect_main["tailrocks-gradle-conventions"]
   id = "tailrocks-gradle-conventions:19573041"
+}
+
+import {
+  to = module.repository_policy.github_repository_ruleset.protect_main["tailrocks-macos-skills"]
+  id = "tailrocks-macos-skills:23746097"
+}
+
+import {
+  to = module.repository_policy.github_repository_ruleset.protect_main["tailrocks-open-source-skills"]
+  id = "tailrocks-open-source-skills:23746090"
+}
+
+import {
+  to = module.repository_policy.github_repository_ruleset.protect_main["tailrocks-pull-request-skills"]
+  id = "tailrocks-pull-request-skills:23746082"
+}
+
+import {
+  to = module.repository_policy.github_repository_ruleset.protect_main["tailrocks-roadmap-skills"]
+  id = "tailrocks-roadmap-skills:23746088"
+}
+
+import {
+  to = module.repository_policy.github_repository_ruleset.protect_main["tailrocks-rust-skills"]
+  id = "tailrocks-rust-skills:23746093"
+}
+
+import {
+  to = module.repository_policy.github_repository_ruleset.protect_main["tailrocks-skill-authoring-skills"]
+  id = "tailrocks-skill-authoring-skills:23746086"
 }
 
 import {
@@ -336,6 +376,21 @@ import {
 import {
   to = module.repository_policy.github_repository_ruleset.protect_main["tailrocks-sqldiff"]
   id = "tailrocks-sqldiff:24300485"
+}
+
+import {
+  to = module.repository_policy.github_repository_ruleset.protect_main["tailrocks-typescript-skills"]
+  id = "tailrocks-typescript-skills:23746091"
+}
+
+import {
+  to = module.repository_policy.github_repository_ruleset.protect_main["termpane"]
+  id = "termpane:23746101"
+}
+
+import {
+  to = module.repository_policy.github_repository_ruleset.protect_main["tui-snap"]
+  id = "tui-snap:23746094"
 }
 
 import {
@@ -361,6 +416,11 @@ import {
 import {
   to = module.repository_policy.github_repository_ruleset.protect_main["velnor-apt"]
   id = "velnor-apt:19572991"
+}
+
+import {
+  to = module.repository_policy.github_repository_ruleset.protect_main["vision"]
+  id = "vision:23746084"
 }
 
 # Existing protect-tags ruleset imports
@@ -410,6 +470,11 @@ import {
 }
 
 import {
+  to = module.repository_policy.github_repository_ruleset.protect_tags["homebrew-velnor"]
+  id = "homebrew-velnor:23746066"
+}
+
+import {
   to = module.repository_policy.github_repository_ruleset.protect_tags["jambalaya"]
   id = "jambalaya:19573044"
 }
@@ -455,8 +520,43 @@ import {
 }
 
 import {
+  to = module.repository_policy.github_repository_ruleset.protect_tags["tailrocks-code-quality-skills"]
+  id = "tailrocks-code-quality-skills:23746075"
+}
+
+import {
   to = module.repository_policy.github_repository_ruleset.protect_tags["tailrocks-gradle-conventions"]
   id = "tailrocks-gradle-conventions:19573027"
+}
+
+import {
+  to = module.repository_policy.github_repository_ruleset.protect_tags["tailrocks-macos-skills"]
+  id = "tailrocks-macos-skills:23746063"
+}
+
+import {
+  to = module.repository_policy.github_repository_ruleset.protect_tags["tailrocks-open-source-skills"]
+  id = "tailrocks-open-source-skills:23746068"
+}
+
+import {
+  to = module.repository_policy.github_repository_ruleset.protect_tags["tailrocks-pull-request-skills"]
+  id = "tailrocks-pull-request-skills:23746069"
+}
+
+import {
+  to = module.repository_policy.github_repository_ruleset.protect_tags["tailrocks-roadmap-skills"]
+  id = "tailrocks-roadmap-skills:23746077"
+}
+
+import {
+  to = module.repository_policy.github_repository_ruleset.protect_tags["tailrocks-rust-skills"]
+  id = "tailrocks-rust-skills:23746074"
+}
+
+import {
+  to = module.repository_policy.github_repository_ruleset.protect_tags["tailrocks-skill-authoring-skills"]
+  id = "tailrocks-skill-authoring-skills:23746054"
 }
 
 import {
@@ -472,6 +572,21 @@ import {
 import {
   to = module.repository_policy.github_repository_ruleset.protect_tags["tailrocks-sqldiff"]
   id = "tailrocks-sqldiff:24300486"
+}
+
+import {
+  to = module.repository_policy.github_repository_ruleset.protect_tags["tailrocks-typescript-skills"]
+  id = "tailrocks-typescript-skills:23746078"
+}
+
+import {
+  to = module.repository_policy.github_repository_ruleset.protect_tags["termpane"]
+  id = "termpane:23746073"
+}
+
+import {
+  to = module.repository_policy.github_repository_ruleset.protect_tags["tui-snap"]
+  id = "tui-snap:23746052"
 }
 
 import {
@@ -497,4 +612,9 @@ import {
 import {
   to = module.repository_policy.github_repository_ruleset.protect_tags["velnor-apt"]
   id = "velnor-apt:19572989"
+}
+
+import {
+  to = module.repository_policy.github_repository_ruleset.protect_tags["vision"]
+  id = "vision:23746072"
 }

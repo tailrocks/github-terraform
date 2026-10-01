@@ -1,7 +1,7 @@
 # Optional overrides. Defaults live in variables.tf.
 # github_organization = "tailrocks"
 # op_vault            = "TailRocks"
-# secret_visibility   = "private"
+# secret_visibility   = "selected"
 
 # Prefer env auth (never commit real tokens):
 #   export GITHUB_TOKEN=...
