@@ -6,7 +6,8 @@ schema = 1
 # .github is removed.
 
 # Optional workflow display and policy settings. Omitted values use Velnor defaults.
-# [workflow]
+[workflow]
+default_branch = "main"              # Push branch; required because CI checkouts have no origin/HEAD.
 # name = "CI"                         # Workflow display name.
 # policy = "consumer-v1"              # Only consumer policy; Velnor's reserved policy works only in tailrocks/velnor-new.
 # default_branch = "<branch>"         # Push branch override; omit to use origin/HEAD. Required if origin/HEAD is unavailable.
