@@ -12,10 +12,10 @@ check "mandatory_target_repositories_present" {
         "tailrocks-typescript-skills", "tailrocks-skill-authoring-skills", "tailrocks-rust-skills",
         "tailrocks-roadmap-skills", "tailrocks-pull-request-skills", "tailrocks-open-source-skills",
         "tailrocks-macos-skills", "tailrocks-code-quality-skills", "tailrocks-skills",
-        "vision", "tui-snap"
+        "vision", "tui-snap", "terminal-components-claude", "velnor-new"
       ] : contains(keys(var.managed_repositories), r)
     ])
-    error_message = "All 32 mandatory target repositories must be managed under TailRocks."
+    error_message = "All 34 mandatory target repositories must be managed under TailRocks."
   }
 }
 

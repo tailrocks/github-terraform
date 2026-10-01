@@ -28,7 +28,7 @@ mandatory = [
     "tailrocks-typescript-skills", "tailrocks-skill-authoring-skills", "tailrocks-rust-skills",
     "tailrocks-roadmap-skills", "tailrocks-pull-request-skills", "tailrocks-open-source-skills",
     "tailrocks-macos-skills", "tailrocks-code-quality-skills", "tailrocks-skills",
-    "vision", "tui-snap"
+    "vision", "tui-snap", "terminal-components-claude", "velnor-new"
 ]
 
 missing = []

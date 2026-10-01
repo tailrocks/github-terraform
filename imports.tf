@@ -178,6 +178,11 @@ import {
 }
 
 import {
+  to = module.repository_policy.github_repository.managed_settings["terminal-components-claude"]
+  id = "terminal-components-claude"
+}
+
+import {
   to = module.repository_policy.github_repository.managed_settings["termpane"]
   id = "termpane"
 }
@@ -210,6 +215,11 @@ import {
 import {
   to = module.repository_policy.github_repository.managed_settings["velnor-apt"]
   id = "velnor-apt"
+}
+
+import {
+  to = module.repository_policy.github_repository.managed_settings["velnor-new"]
+  id = "velnor-new"
 }
 
 import {

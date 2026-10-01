@@ -185,6 +185,11 @@ variable "managed_repositories" {
       visibility      = "public"
       required_checks = []
     }
+    "terminal-components-claude" = {
+      disposition     = "FullRuleset"
+      visibility      = "public"
+      required_checks = []
+    }
     "termpane" = {
       disposition     = "FullRuleset"
       visibility      = "public"
@@ -219,6 +224,11 @@ variable "managed_repositories" {
       disposition     = "FullRuleset"
       visibility      = "public"
       required_checks = ["DCO", "Policy", "ci-required"]
+    }
+    "velnor-new" = {
+      disposition     = "FullRuleset"
+      visibility      = "public"
+      required_checks = []
     }
     "vision" = {
       disposition     = "FullRuleset"
