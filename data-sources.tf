@@ -1,12 +1,6 @@
-data "external" "onepassword_secret" {
+data "onepassword_item" "org_secret" {
   for_each = local.org_secrets
 
-  program = ["bash", "${path.module}/scripts/op_read_secret.sh"]
-
-  query = {
-    vault   = lookup(each.value, "vault", var.op_vault)
-    item    = each.value.item
-    field   = each.value.field
-    section = lookup(each.value, "section", "")
-  }
+  vault = each.value.vault_uuid
+  title = each.value.item
 }

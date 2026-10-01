@@ -11,12 +11,6 @@ variable "github_token" {
   default     = null
 }
 
-variable "op_vault" {
-  type        = string
-  description = "1Password vault UUID or name used by op:// paths"
-  default     = "TailRocks"
-}
-
 variable "secret_visibility" {
   type        = string
   description = "Org secret visibility: all, private, or selected"

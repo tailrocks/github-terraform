@@ -7,9 +7,9 @@ terraform {
       version = "~> 6.13"
     }
 
-    external = {
-      source  = "hashicorp/external"
-      version = "~> 2.3"
+    onepassword = {
+      source  = "1password/onepassword"
+      version = "~> 3.3"
     }
   }
 }
