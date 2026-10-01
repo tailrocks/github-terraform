@@ -13,10 +13,12 @@ locals {
   # }
   org_secrets = {
     CARGO_REGISTRY_TOKEN = {
-      vault_uuid = "xlm7pn5y6d3nfya5xy2os3vtoq" # Private
-      item       = "crates.io"
-      section    = "security"
-      field      = "publish-new token"
+      vault_uuid   = "xlm7pn5y6d3nfya5xy2os3vtoq" # Private
+      item         = "crates.io"
+      section      = "security"
+      field        = "publish-new token"
+      visibility   = "selected" # termpane is public; private-visibility secrets are invisible to it
+      repositories = ["termpane"]
     }
   }
 }
