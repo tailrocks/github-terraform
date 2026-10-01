@@ -31,13 +31,13 @@ variable "managed_repositories" {
   }))
   default = {
     "cloudflare-tofu" = {
-      disposition     = "RepoSettingsOnly"
-      visibility      = "private"
+      disposition     = "FullRuleset"
+      visibility      = "public"
       required_checks = []
     }
     "github-terraform" = {
-      disposition     = "RepoSettingsOnly"
-      visibility      = "private"
+      disposition     = "FullRuleset"
+      visibility      = "public"
       required_checks = []
     }
     "graphql-java-datetime" = {
@@ -136,8 +136,8 @@ variable "managed_repositories" {
       required_checks = []
     }
     "tailrocks-logo" = {
-      disposition     = "RepoSettingsOnly"
-      visibility      = "private"
+      disposition     = "FullRuleset"
+      visibility      = "public"
       required_checks = []
     }
     "tailrocks-macos-skills" = {
@@ -176,8 +176,8 @@ variable "managed_repositories" {
       required_checks = ["DCO"]
     }
     "tailrocks-sqldiff" = {
-      disposition     = "RepoSettingsOnly"
-      visibility      = "private"
+      disposition     = "FullRuleset"
+      visibility      = "public"
       required_checks = []
     }
     "tailrocks-typescript-skills" = {

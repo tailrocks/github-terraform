@@ -23,6 +23,16 @@ output "repository_settings" {
   }
 }
 
+output "ruleset_pull_request" {
+  description = "Map of protect-main ruleset pull-request merge gates per repository"
+  value = {
+    for k, v in github_repository_ruleset.protect_main : k => {
+      required_review_thread_resolution = v.rules[0].pull_request[0].required_review_thread_resolution
+      allowed_merge_methods             = v.rules[0].pull_request[0].allowed_merge_methods
+    }
+  }
+}
+
 output "repository_ids" {
   description = "Map of repository name to repository ID"
   value = {
