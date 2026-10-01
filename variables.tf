@@ -13,8 +13,8 @@ variable "github_token" {
 
 variable "secret_visibility" {
   type        = string
-  description = "Org secret visibility: all, private, or selected"
-  default     = "private"
+  description = "Fallback org secret visibility when an entry omits it: all, private, or selected. All managed repos are public, so private hides a secret from everywhere; prefer explicit per-entry visibility."
+  default     = "selected"
 
   validation {
     condition     = contains(["all", "private", "selected"], var.secret_visibility)
@@ -33,12 +33,12 @@ variable "managed_repositories" {
     "cloudflare-tofu" = {
       disposition     = "FullRuleset"
       visibility      = "public"
-      required_checks = []
+      required_checks = ["DCO"]
     }
     "github-terraform" = {
       disposition     = "FullRuleset"
       visibility      = "public"
-      required_checks = []
+      required_checks = ["DCO", "Required"]
     }
     "graphql-java-datetime" = {
       disposition     = "FullRuleset"
@@ -48,12 +48,12 @@ variable "managed_repositories" {
     "holla" = {
       disposition     = "FullRuleset"
       visibility      = "public"
-      required_checks = ["DCO", "ci-required"]
+      required_checks = ["DCO", "Policy", "ci-required"]
     }
     "holla-apt" = {
       disposition     = "FullRuleset"
       visibility      = "public"
-      required_checks = ["DCO", "ci-required"]
+      required_checks = ["DCO", "Policy", "ci-required"]
     }
     "homebrew-holla" = {
       disposition     = "FullRuleset"
@@ -63,22 +63,22 @@ variable "managed_repositories" {
     "homebrew-parallax" = {
       disposition     = "FullRuleset"
       visibility      = "public"
-      required_checks = ["DCO", "ci-required"]
+      required_checks = ["DCO", "Policy", "ci-required"]
     }
     "homebrew-ruxel" = {
       disposition     = "FullRuleset"
       visibility      = "public"
-      required_checks = ["DCO", "ci-required"]
+      required_checks = ["DCO", "Policy", "ci-required"]
     }
     "homebrew-tablerock" = {
       disposition     = "FullRuleset"
       visibility      = "public"
-      required_checks = ["DCO", "ci-required"]
+      required_checks = ["DCO", "Policy", "ci-required"]
     }
     "homebrew-velnor" = {
       disposition     = "FullRuleset"
       visibility      = "public"
-      required_checks = []
+      required_checks = ["DCO", "Policy", "ci-required"]
     }
     "jambalaya" = {
       disposition     = "FullRuleset"
@@ -93,12 +93,12 @@ variable "managed_repositories" {
     "parallax-telemetry-playground" = {
       disposition     = "FullRuleset"
       visibility      = "public"
-      required_checks = ["DCO", "ci-required"]
+      required_checks = ["DCO", "Policy", "ci-required"]
     }
     "pg-bigdecimal" = {
       disposition     = "FullRuleset"
       visibility      = "public"
-      required_checks = ["DCO", "ci-required"]
+      required_checks = ["DCO", "Policy", "ci-required"]
     }
     "pgquill" = {
       disposition     = "FullRuleset"
@@ -113,17 +113,17 @@ variable "managed_repositories" {
     "ruxel" = {
       disposition     = "FullRuleset"
       visibility      = "public"
-      required_checks = ["DCO", "ci-required"]
+      required_checks = ["DCO", "Policy", "ci-required"]
     }
     "schemalane" = {
       disposition     = "FullRuleset"
       visibility      = "public"
-      required_checks = ["DCO", "ci-required"]
+      required_checks = ["DCO", "Policy", "ci-required"]
     }
     "tablerock" = {
       disposition     = "FullRuleset"
       visibility      = "public"
-      required_checks = ["DCO", "ci-required"]
+      required_checks = ["DCO", "Policy", "ci-required"]
     }
     "tailrocks-code-quality-skills" = {
       disposition     = "FullRuleset"
@@ -193,22 +193,22 @@ variable "managed_repositories" {
     "termpane" = {
       disposition     = "FullRuleset"
       visibility      = "public"
-      required_checks = []
+      required_checks = ["DCO", "Required"]
     }
     "termrock" = {
       disposition     = "FullRuleset"
       visibility      = "public"
-      required_checks = ["DCO", "ci-required"]
+      required_checks = ["DCO", "Policy", "ci-required"]
     }
     "tracing-request-level" = {
       disposition     = "FullRuleset"
       visibility      = "public"
-      required_checks = ["DCO", "ci-required"]
+      required_checks = ["DCO", "Policy", "ci-required"]
     }
     "tui-snap" = {
       disposition     = "FullRuleset"
       visibility      = "public"
-      required_checks = []
+      required_checks = ["DCO", "Required"]
     }
     "velnor" = {
       disposition     = "FullRuleset"
@@ -243,7 +243,6 @@ variable "velnor_runner_group_repositories" {
   type        = set(string)
   default = [
     "cloudflare-tofu",
-    "github-terraform",
     "holla",
     "parallax",
     "parallax-telemetry-playground",

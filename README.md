@@ -1,4 +1,4 @@
-# TailRocks GitHub Org OpenTofu (Private)
+# TailRocks GitHub Org OpenTofu (Public)
 
 Manage TailRocks GitHub organization settings with OpenTofu: organization and Actions policy, repository merge policy, branch/tag rulesets, and (optionally) organization Actions secrets via 1Password.
 
@@ -89,6 +89,18 @@ Existing repos are imported via `imports.tf` on first apply.
 ## Required status checks
 
 Fill `repo_required_status_checks` in `variables.tf` when aggregator check names are stable per repo (bare check-run name, not `workflow / job` UI label). Empty map = rulesets without required checks.
+
+## Emergency break-glass
+
+Rulesets have zero standing bypasses, so when required checks are unhealthy (CI/Velnor outage) there is no legitimate merge path. Break-glass, org/repo admin only:
+
+1. In **Settings → Rules → protect-main**, temporarily set enforcement to `disabled` (note the time and reason).
+2. Merge the urgent fix via PR (squash-only merge methods are still enforced by repo settings; linear history and thread resolution are suspended with the ruleset).
+3. Immediately re-enable enforcement to `active`.
+4. Run the live audit (`LIVE_AUDIT=1 bash tests/verify-policy.sh`) to confirm all rulesets are active and match config.
+5. Open a follow-up PR + postmortem note describing what was bypassed and why.
+
+Never leave a ruleset disabled: the live audit fails loudly until it is restored.
 
 ## Notes
 
