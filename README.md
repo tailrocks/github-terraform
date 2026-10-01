@@ -45,15 +45,21 @@ See `var.managed_repositories` in `variables.tf` (22 repos today: velnor estate 
 
 ## Prerequisites
 
-- OpenTofu 1.7+
-- GitHub token with org admin + repo admin scopes (`GITHUB_TOKEN`, or `TF_VAR_github_token`)
+- OpenTofu 1.7+ (or `mise` — see tasks below)
+- GitHub token with org admin + repo admin scopes, stored in 1Password at `op://tailrocks/GitHub/tokens/tofu`
 - For secrets: `op` CLI + `jq`, and authenticated 1Password (service account preferred in CI)
 
 ## Configure
 
 ```sh
 cp terraform.tfvars.example terraform.tfvars   # optional overrides
-export GITHUB_TOKEN="<org admin token>"
+```
+
+Run tofu through the mise tasks so the GitHub token is injected from 1Password (never exported by hand):
+
+```sh
+mise run tofu:plan -- <plan args>
+mise run tofu:apply -- <apply args>
 ```
 
 Optional secrets map in `locals.tf`:

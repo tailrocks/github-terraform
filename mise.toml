@@ -3,3 +3,21 @@ opentofu = "1.12.5"
 
 [settings]
 lockfile = true
+
+[tasks."tofu:plan"]
+description = "tofu plan with GitHub token from 1Password (op://tailrocks/GitHub/tokens/tofu)"
+run = """
+export OP_ACCOUNT='zhokhov.1password.com'
+export OP_SESSION_zhokhov="$(op signin --raw)"
+export GITHUB_TOKEN="$(op read 'op://tailrocks/GitHub/tokens/tofu')"
+exec tofu plan "$@"
+"""
+
+[tasks."tofu:apply"]
+description = "tofu apply with GitHub token from 1Password (op://tailrocks/GitHub/tokens/tofu)"
+run = """
+export OP_ACCOUNT='zhokhov.1password.com'
+export OP_SESSION_zhokhov="$(op signin --raw)"
+export GITHUB_TOKEN="$(op read 'op://tailrocks/GitHub/tokens/tofu')"
+exec tofu apply "$@"
+"""
