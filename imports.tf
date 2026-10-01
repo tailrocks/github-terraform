@@ -229,6 +229,16 @@ import {
 
 # Existing protect-main ruleset imports
 import {
+  to = module.repository_policy.github_repository_ruleset.protect_main["cloudflare-tofu"]
+  id = "cloudflare-tofu:24300473"
+}
+
+import {
+  to = module.repository_policy.github_repository_ruleset.protect_main["github-terraform"]
+  id = "github-terraform:24300477"
+}
+
+import {
   to = module.repository_policy.github_repository_ruleset.protect_main["graphql-java-datetime"]
   id = "graphql-java-datetime:19573065"
 }
@@ -314,8 +324,18 @@ import {
 }
 
 import {
+  to = module.repository_policy.github_repository_ruleset.protect_main["tailrocks-logo"]
+  id = "tailrocks-logo:24300482"
+}
+
+import {
   to = module.repository_policy.github_repository_ruleset.protect_main["tailrocks-skills"]
   id = "tailrocks-skills:19572990"
+}
+
+import {
+  to = module.repository_policy.github_repository_ruleset.protect_main["tailrocks-sqldiff"]
+  id = "tailrocks-sqldiff:24300485"
 }
 
 import {
@@ -344,6 +364,16 @@ import {
 }
 
 # Existing protect-tags ruleset imports
+import {
+  to = module.repository_policy.github_repository_ruleset.protect_tags["cloudflare-tofu"]
+  id = "cloudflare-tofu:24300474"
+}
+
+import {
+  to = module.repository_policy.github_repository_ruleset.protect_tags["github-terraform"]
+  id = "github-terraform:24300478"
+}
+
 import {
   to = module.repository_policy.github_repository_ruleset.protect_tags["graphql-java-datetime"]
   id = "graphql-java-datetime:19573031"
@@ -430,8 +460,18 @@ import {
 }
 
 import {
+  to = module.repository_policy.github_repository_ruleset.protect_tags["tailrocks-logo"]
+  id = "tailrocks-logo:24300484"
+}
+
+import {
   to = module.repository_policy.github_repository_ruleset.protect_tags["tailrocks-skills"]
   id = "tailrocks-skills:19572983"
+}
+
+import {
+  to = module.repository_policy.github_repository_ruleset.protect_tags["tailrocks-sqldiff"]
+  id = "tailrocks-sqldiff:24300486"
 }
 
 import {

@@ -35,6 +35,15 @@ check "delete_branch_on_merge_mandate" {
   }
 }
 
+check "conversation_resolution_mandate" {
+  assert {
+    condition = alltrue([
+      for k, v in module.repository_policy.ruleset_pull_request : v.required_review_thread_resolution == true
+    ])
+    error_message = "All protect-main rulesets must require conversation resolution before merging."
+  }
+}
+
 check "squash_only_merge_mandate" {
   assert {
     condition = alltrue([

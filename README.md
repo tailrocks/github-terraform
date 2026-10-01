@@ -28,10 +28,10 @@ Matches `jackin-project/jackin-github-terraform`:
 | Rebase merge | disabled |
 | Allow update branch | enabled |
 | Delete branch on merge | enabled |
-| Default branch ruleset `protect-main` | active (public repos) |
-| Tag ruleset `protect-tags` | active (public repos) |
+| Default branch ruleset `protect-main` | active (all managed repos) |
+| Tag ruleset `protect-tags` | active (all managed repos) |
 
-Private repos on the free org plan still get merge policy; rulesets need public visibility or a paid plan (`tailrocks-sqldiff` is private today → merge policy only).
+All managed repositories are public, so every repo receives the full ruleset pair. (Rulesets and branch protection are unavailable to private repos on the free org plan, which is why no private repo may stay `RepoSettingsOnly` without losing merge gating.)
 
 ### Organization secrets (optional)
 
@@ -41,7 +41,7 @@ Private repos on the free org plan still get merge policy; rulesets need public 
 
 ## Managed repositories
 
-See `var.managed_repositories` in `variables.tf` (22 repos today: velnor estate + packaging + java libs + skills/marketplace/sqldiff).
+See `var.managed_repositories` in `variables.tf` (41 repos today: velnor estate + packaging + java libs + skills/marketplace + policy/iac).
 
 ## Prerequisites
 
