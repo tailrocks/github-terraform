@@ -87,7 +87,7 @@ jobs:
           MISE_GITHUB_TOKEN: ""
           NODE_AUTH_TOKEN: ""
           NPM_TOKEN: ""
-          VELNOR_ASSET_SHA256: "0000000000000000000000000000000000000000000000000000000000000000"
+          VELNOR_ASSET_SHA256: "bebb7816b6beac04945fb6fa7add17f74f561affbad8fe7ca32c666ce48e89ea"
           VELNOR_ASSET_URL: https://github.com/tailrocks/velnor-new/releases/download/v0.1.0/velnor-actions-0.1.0-x86_64-unknown-linux-gnu
           VELNOR_RELEASE_COMMIT: 95c1d6f0f1056881e42d53846dac8ffccd7aa6a5
         run: "sh -c 'unset ACTIONS_ID_TOKEN_REQUEST_TOKEN ACTIONS_ID_TOKEN_REQUEST_URL ACTIONS_RUNTIME_TOKEN GITHUB_TOKEN MISE_GITHUB_TOKEN GH_TOKEN GH_HOST GH_CONFIG_DIR; mkdir -p \"$RUNNER_TEMP/velnor/bin\" && curl -fsSL --proto '\\''=https'\\'' --tlsv1.2 \"$VELNOR_ASSET_URL\" -o \"$RUNNER_TEMP/velnor/bin/velnor-actions-0.1.0\" && echo \"$VELNOR_ASSET_SHA256  $RUNNER_TEMP/velnor/bin/velnor-actions-0.1.0\" | sha256sum -c - && chmod +x \"$RUNNER_TEMP/velnor/bin/velnor-actions-0.1.0\"'"
@@ -163,7 +163,7 @@ jobs:
           MISE_GITHUB_TOKEN: ""
           NODE_AUTH_TOKEN: ""
           NPM_TOKEN: ""
-          VELNOR_ASSET_SHA256: "0000000000000000000000000000000000000000000000000000000000000000"
+          VELNOR_ASSET_SHA256: "bebb7816b6beac04945fb6fa7add17f74f561affbad8fe7ca32c666ce48e89ea"
           VELNOR_ASSET_URL: https://github.com/tailrocks/velnor-new/releases/download/v0.1.0/velnor-actions-0.1.0-x86_64-unknown-linux-gnu
           VELNOR_RELEASE_COMMIT: 95c1d6f0f1056881e42d53846dac8ffccd7aa6a5
         run: "sh -c 'unset ACTIONS_ID_TOKEN_REQUEST_TOKEN ACTIONS_ID_TOKEN_REQUEST_URL ACTIONS_RUNTIME_TOKEN GITHUB_TOKEN MISE_GITHUB_TOKEN GH_TOKEN GH_HOST GH_CONFIG_DIR; mkdir -p \"$RUNNER_TEMP/velnor/bin\" && curl -fsSL --proto '\\''=https'\\'' --tlsv1.2 \"$VELNOR_ASSET_URL\" -o \"$RUNNER_TEMP/velnor/bin/velnor-actions-0.1.0\" && echo \"$VELNOR_ASSET_SHA256  $RUNNER_TEMP/velnor/bin/velnor-actions-0.1.0\" | sha256sum -c - && chmod +x \"$RUNNER_TEMP/velnor/bin/velnor-actions-0.1.0\"'"
@@ -224,7 +224,7 @@ jobs:
           MISE_GITHUB_TOKEN: ""
           NODE_AUTH_TOKEN: ""
           NPM_TOKEN: ""
-          VELNOR_ASSET_SHA256: "0000000000000000000000000000000000000000000000000000000000000000"
+          VELNOR_ASSET_SHA256: "bebb7816b6beac04945fb6fa7add17f74f561affbad8fe7ca32c666ce48e89ea"
           VELNOR_ASSET_URL: https://github.com/tailrocks/velnor-new/releases/download/v0.1.0/velnor-actions-0.1.0-x86_64-unknown-linux-gnu
           VELNOR_RELEASE_COMMIT: 95c1d6f0f1056881e42d53846dac8ffccd7aa6a5
         run: "sh -c 'unset ACTIONS_ID_TOKEN_REQUEST_TOKEN ACTIONS_ID_TOKEN_REQUEST_URL ACTIONS_RUNTIME_TOKEN GITHUB_TOKEN MISE_GITHUB_TOKEN GH_TOKEN GH_HOST GH_CONFIG_DIR; mkdir -p \"$RUNNER_TEMP/velnor/bin\" && curl -fsSL --proto '\\''=https'\\'' --tlsv1.2 \"$VELNOR_ASSET_URL\" -o \"$RUNNER_TEMP/velnor/bin/velnor-actions-0.1.0\" && echo \"$VELNOR_ASSET_SHA256  $RUNNER_TEMP/velnor/bin/velnor-actions-0.1.0\" | sha256sum -c - && chmod +x \"$RUNNER_TEMP/velnor/bin/velnor-actions-0.1.0\"'"
@@ -314,7 +314,7 @@ jobs:
           MISE_GITHUB_TOKEN: ""
           NODE_AUTH_TOKEN: ""
           NPM_TOKEN: ""
-          VELNOR_ASSET_SHA256: "0000000000000000000000000000000000000000000000000000000000000000"
+          VELNOR_ASSET_SHA256: "bebb7816b6beac04945fb6fa7add17f74f561affbad8fe7ca32c666ce48e89ea"
           VELNOR_ASSET_URL: https://github.com/tailrocks/velnor-new/releases/download/v0.1.0/velnor-actions-0.1.0-x86_64-unknown-linux-gnu
           VELNOR_RELEASE_COMMIT: 95c1d6f0f1056881e42d53846dac8ffccd7aa6a5
         run: "sh -c 'unset ACTIONS_ID_TOKEN_REQUEST_TOKEN ACTIONS_ID_TOKEN_REQUEST_URL ACTIONS_RUNTIME_TOKEN GITHUB_TOKEN MISE_GITHUB_TOKEN GH_TOKEN GH_HOST GH_CONFIG_DIR; mkdir -p \"$RUNNER_TEMP/velnor/bin\" && curl -fsSL --proto '\\''=https'\\'' --tlsv1.2 \"$VELNOR_ASSET_URL\" -o \"$RUNNER_TEMP/velnor/bin/velnor-actions-0.1.0\" && echo \"$VELNOR_ASSET_SHA256  $RUNNER_TEMP/velnor/bin/velnor-actions-0.1.0\" | sha256sum -c - && chmod +x \"$RUNNER_TEMP/velnor/bin/velnor-actions-0.1.0\"'"
