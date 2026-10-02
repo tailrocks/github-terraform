@@ -228,7 +228,7 @@ variable "managed_repositories" {
     "velnor-new" = {
       disposition     = "FullRuleset"
       visibility      = "public"
-      required_checks = []
+      required_checks = ["Required"]
     }
     "vision" = {
       disposition     = "FullRuleset"
