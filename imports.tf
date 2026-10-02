@@ -618,3 +618,13 @@ import {
   to = module.repository_policy.github_repository_ruleset.protect_tags["vision"]
   id = "vision:23746072"
 }
+
+import {
+  to = module.repository_policy.github_repository_ruleset.protect_main["velnor-new"]
+  id = "velnor-new:24396608"
+}
+
+import {
+  to = module.repository_policy.github_repository_ruleset.protect_tags["velnor-new"]
+  id = "velnor-new:24397132"
+}
