@@ -25,9 +25,10 @@ variable "secret_visibility" {
 variable "managed_repositories" {
   description = "Authoritative inventory of managed repositories and their protection dispositions."
   type = map(object({
-    disposition     = string
-    visibility      = string
-    required_checks = list(string)
+    disposition                          = string
+    visibility                           = string
+    required_checks                      = list(string)
+    strict_required_status_checks_policy = optional(bool, true)
   }))
   default = {
     "cloudflare-tofu" = {
@@ -36,9 +37,10 @@ variable "managed_repositories" {
       required_checks = ["DCO"]
     }
     "github-terraform" = {
-      disposition     = "FullRuleset"
-      visibility      = "public"
-      required_checks = ["DCO", "Required"]
+      disposition                          = "FullRuleset"
+      visibility                           = "public"
+      required_checks                      = ["DCO", "Required"]
+      strict_required_status_checks_policy = false
     }
     "graphql-java-datetime" = {
       disposition     = "FullRuleset"
