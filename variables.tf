@@ -31,11 +31,21 @@ variable "managed_repositories" {
   }))
 
   validation {
-    condition     = toset(keys(var.managed_repositories)) == toset(["renovate-rust", "tailrocks-logo", "tailrocks-sqldiff"])
-    error_message = "Only renovate-rust, tailrocks-logo, and tailrocks-sqldiff remain in the TailRocks policy root; all other repository policies are owned by the central control plane."
+    condition     = toset(keys(var.managed_repositories)) == toset(["graphql-java-datetime", "jambalaya", "renovate-rust", "tailrocks-logo", "tailrocks-sqldiff"])
+    error_message = "Only graphql-java-datetime, jambalaya, renovate-rust, tailrocks-logo, and tailrocks-sqldiff remain in the TailRocks policy root; all other repository policies are owned by the central control plane."
   }
 
   default = {
+    "graphql-java-datetime" = {
+      disposition     = "FullRuleset"
+      visibility      = "public"
+      required_checks = ["Policy"]
+    }
+    "jambalaya" = {
+      disposition     = "FullRuleset"
+      visibility      = "public"
+      required_checks = []
+    }
     "renovate-rust" = {
       disposition     = "FullRuleset"
       visibility      = "public"

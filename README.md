@@ -1,6 +1,6 @@
 # TailRocks GitHub Org OpenTofu (Public)
 
-Manage TailRocks GitHub organization settings with OpenTofu: organization and Actions policy, three retained repository-policy exceptions, and (optionally) organization Actions secrets via 1Password.
+Manage TailRocks GitHub organization settings with OpenTofu: organization and Actions policy, five retained repository-policy exceptions, and (optionally) organization Actions secrets via 1Password.
 
 ## Scope
 
@@ -21,11 +21,13 @@ Packages**. Making a package public is irreversible.
 
 Repository merge settings and branch/tag rulesets for the TailRocks fleet are
 being consolidated in the [ChainArgos control-plane root](https://github.com/ChainArgos/github-terraform).
-Do not add other TailRocks repositories to this root. `renovate-rust`,
-`tailrocks-logo`, and `tailrocks-sqldiff` are excluded from central management
-and remain under this root with their existing settings and rulesets unchanged.
-These three currently have no observed CI workflow check context; do not invent
-required status-check overlays for them.
+Do not add other TailRocks repositories to this root. `graphql-java-datetime`,
+`jambalaya`, `renovate-rust`, `tailrocks-logo`, and `tailrocks-sqldiff` are
+excluded from central management and remain under this root with their existing
+settings and rulesets unchanged. `graphql-java-datetime` retains its `Policy`
+check. `jambalaya` has no required-status rule in its live ruleset, so its local
+configuration preserves that state; the other three also remain without
+required CI check contexts.
 
 This root continues to own TailRocks organization settings, Actions permissions,
 the `velnor-trusted` runner group, and organization Actions secrets. The policy
@@ -41,8 +43,8 @@ after the central root has imported and verified the corresponding resources.
 
 ## Managed repositories
 
-`var.managed_repositories` contains only the three retained exceptions listed
-above. The central control-plane root owns the other 38 TailRocks repository
+`var.managed_repositories` contains only the five retained exceptions listed
+above. The central control-plane root owns the other 36 TailRocks repository
 policies. Existing state is forgotten with `destroy = false` only after the
 central root has imported and verified those resources; this root never deletes
 their GitHub objects.
@@ -88,15 +90,17 @@ tofu plan
 tofu apply
 ```
 
-Organization resources and the three retained exceptions are imported via `imports.tf` on first apply.
+Organization resources and the five retained exceptions are imported via `imports.tf` on first apply.
 
 ## Required status checks
 
-Required check contexts and merge safeguards for the 38 centrally managed
-repositories are maintained by the central control-plane root. The three local
-exceptions have no observed CI workflow context; for `renovate-rust`, the DCO
-app status is not a CI workflow result. This root does not invent required
-status checks for any of the three.
+Required check contexts and merge safeguards for the 36 centrally managed
+repositories are maintained by the central control-plane root. The five local
+exceptions retain their observed contexts: `Policy` for
+`graphql-java-datetime`, and none for the other four. In particular,
+`jambalaya`'s existing live ruleset has no required-status rule. For
+`renovate-rust`, the DCO app status is not a CI workflow result; this root does
+not invent new required status checks.
 
 ## Emergency break-glass
 
@@ -105,7 +109,7 @@ Rulesets have zero standing bypasses, so when required checks are unhealthy (CI/
 1. In **Settings → Rules → protect-main**, temporarily set enforcement to `disabled` (note the time and reason).
 2. Merge the urgent fix via PR (squash-only merge methods are still enforced by repo settings; linear history and thread resolution are suspended with the ruleset).
 3. Immediately re-enable enforcement to `active`.
-4. Run the live audit (`LIVE_AUDIT=1 bash tests/verify-policy.sh`) for this root's three exceptions, then run the live audit from the central control-plane root for its 38 repositories.
+4. Run the live audit (`LIVE_AUDIT=1 bash tests/verify-policy.sh`) for this root's five exceptions, then run the live audit from the central control-plane root for its 36 repositories.
 5. Open a follow-up PR + postmortem note describing what was bypassed and why.
 
 Never leave a ruleset disabled: the live audit fails loudly until it is restored.

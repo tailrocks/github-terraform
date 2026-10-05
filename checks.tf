@@ -1,27 +1,33 @@
-# TailRocks retains repository policy only for three documented exclusions.
+# TailRocks retains repository policy only for five documented exclusions.
 # The central control-plane root owns settings and rulesets for all others.
 
 check "legacy_policy_scope_is_exactly_the_documented_exceptions" {
   assert {
     condition = (
-      toset(keys(var.managed_repositories)) == toset(["renovate-rust", "tailrocks-logo", "tailrocks-sqldiff"]) &&
-      toset(module.retained_policy_exceptions.managed_settings_repositories) == toset(["renovate-rust", "tailrocks-logo", "tailrocks-sqldiff"]) &&
-      toset(module.retained_policy_exceptions.full_ruleset_repositories) == toset(["renovate-rust", "tailrocks-logo", "tailrocks-sqldiff"])
+      toset(keys(var.managed_repositories)) == toset(["graphql-java-datetime", "jambalaya", "renovate-rust", "tailrocks-logo", "tailrocks-sqldiff"]) &&
+      toset(module.retained_policy_exceptions.managed_settings_repositories) == toset(["graphql-java-datetime", "jambalaya", "renovate-rust", "tailrocks-logo", "tailrocks-sqldiff"]) &&
+      toset(module.retained_policy_exceptions.full_ruleset_repositories) == toset(["graphql-java-datetime", "jambalaya", "renovate-rust", "tailrocks-logo", "tailrocks-sqldiff"])
     )
-    error_message = "Only renovate-rust, tailrocks-logo, and tailrocks-sqldiff may remain managed by the TailRocks repository-policy root."
+    error_message = "Only graphql-java-datetime, jambalaya, renovate-rust, tailrocks-logo, and tailrocks-sqldiff may remain managed by the TailRocks repository-policy root."
   }
 }
 
 check "retained_policy_exceptions_are_preserved" {
   assert {
     condition = alltrue([
-      for name in ["renovate-rust", "tailrocks-logo", "tailrocks-sqldiff"] :
+      for name, expected_checks in {
+        "graphql-java-datetime" = ["Policy"]
+        "jambalaya"             = []
+        "renovate-rust"         = []
+        "tailrocks-logo"        = []
+        "tailrocks-sqldiff"     = []
+      } :
       var.managed_repositories[name].disposition == "FullRuleset" &&
       var.managed_repositories[name].visibility == "public" &&
-      length(var.managed_repositories[name].required_checks) == 0 &&
+      var.managed_repositories[name].required_checks == expected_checks &&
       module.retained_policy_exceptions.ruleset_pull_request[name].required_review_thread_resolution == true
     ])
-    error_message = "The three excluded repositories must retain their current public/full-ruleset policy without invented status checks."
+    error_message = "The five exclusions must retain their current public/full-ruleset policy and exact required-check contexts."
   }
 }
 

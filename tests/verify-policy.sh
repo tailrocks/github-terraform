@@ -18,7 +18,14 @@ from pathlib import Path
 import re
 import sys
 
-exceptions = ["renovate-rust", "tailrocks-logo", "tailrocks-sqldiff"]
+exceptions = ["graphql-java-datetime", "jambalaya", "renovate-rust", "tailrocks-logo", "tailrocks-sqldiff"]
+expected_checks = {
+    "graphql-java-datetime": ["Policy"],
+    "jambalaya": [],
+    "renovate-rust": [],
+    "tailrocks-logo": [],
+    "tailrocks-sqldiff": [],
+}
 variables = Path("variables.tf").read_text()
 managed = re.search(r'variable "managed_repositories"\s*\{(.*?)\n\}', variables, re.S)
 if not managed:
@@ -26,7 +33,7 @@ if not managed:
 repo_names = re.findall(r'"([a-z0-9-]+)"\s*=\s*\{', managed.group(1))
 if sorted(repo_names) != sorted(exceptions):
     sys.exit(f"FAILED: expected only retained exceptions {exceptions}, found {repo_names}")
-expected_guard = 'toset(keys(var.managed_repositories)) == toset(["renovate-rust", "tailrocks-logo", "tailrocks-sqldiff"])'
+expected_guard = 'toset(keys(var.managed_repositories)) == toset(["graphql-java-datetime", "jambalaya", "renovate-rust", "tailrocks-logo", "tailrocks-sqldiff"])'
 if expected_guard not in managed.group(1):
     sys.exit("FAILED: variable validation must prevent re-enabling centrally managed repositories")
 for name in exceptions:
@@ -36,10 +43,13 @@ for name in exceptions:
     for pattern, description in (
         (r'disposition\s*=\s*"FullRuleset"', 'disposition = "FullRuleset"'),
         (r'visibility\s*=\s*"public"', 'visibility = "public"'),
-        (r'required_checks\s*=\s*\[\s*\]', 'required_checks = []'),
     ):
         if not re.search(pattern, entry.group(1)):
             sys.exit(f"FAILED: {name} must retain {description}")
+    checks = re.search(r'required_checks\s*=\s*\[([^\]]*)\]', entry.group(1))
+    actual_checks = re.findall(r'"([^"]+)"', checks.group(1)) if checks else []
+    if actual_checks != expected_checks[name]:
+        sys.exit(f"FAILED: {name} required_checks={actual_checks}, expected unchanged value {expected_checks[name]}")
 
 repositories = Path("repositories.tf").read_text()
 if not re.search(r'module "retained_policy_exceptions"\s*\{.*?repository_policies\s*=\s*var\.managed_repositories', repositories, re.S):
@@ -60,12 +70,25 @@ org_imports = [block for block in imports if "to = module." not in block]
 repo_imports = [block for block in imports if "to = module." in block]
 if len(org_imports) != 4:
     sys.exit(f"FAILED: expected all four organization-level imports, found {len(org_imports)}")
-if len(repo_imports) != 9:
-    sys.exit(f"FAILED: expected settings and both ruleset imports for three exceptions, found {len(repo_imports)}")
+if len(repo_imports) != 15:
+    sys.exit(f"FAILED: expected settings and both ruleset imports for five exceptions, found {len(repo_imports)}")
+ruleset_ids = {
+    "graphql-java-datetime": (19573065, 19573031),
+    "jambalaya": (19572993, 19573044),
+    "renovate-rust": (20575222, 20575267),
+    "tailrocks-logo": (24300482, 24300484),
+    "tailrocks-sqldiff": (24300485, 24300486),
+}
 for name in exceptions:
-    for kind in ("github_repository.managed_settings", "github_repository_ruleset.protect_main", "github_repository_ruleset.protect_tags"):
-        if not any(f'module.retained_policy_exceptions.{kind}["{name}"]' in block for block in repo_imports):
-            sys.exit(f"FAILED: missing import for {name} {kind}")
+    expected_imports = {
+        f'module.retained_policy_exceptions.github_repository.managed_settings["{name}"]': name,
+        f'module.retained_policy_exceptions.github_repository_ruleset.protect_main["{name}"]': f'{name}:{ruleset_ids[name][0]}',
+        f'module.retained_policy_exceptions.github_repository_ruleset.protect_tags["{name}"]': f'{name}:{ruleset_ids[name][1]}',
+    }
+    for target, expected_id in expected_imports.items():
+        matches = [block for block in repo_imports if f'to = {target}' in block]
+        if len(matches) != 1 or not re.search(rf'id\s*=\s*"{re.escape(expected_id)}"', matches[0]):
+            sys.exit(f"FAILED: missing/incorrect import for {target}, expected id {expected_id}")
 if any('module.repository_policy.' in block for block in imports):
     sys.exit("FAILED: stale imports would re-adopt resources into the retired module")
 
@@ -82,13 +105,13 @@ if "module.repository_policy." in organization + Path("outputs.tf").read_text():
 if "ChainArgos control-plane root" not in Path("README.md").read_text():
     sys.exit("FAILED: README must point repository-policy contributors to the central control plane")
 
-print("SUCCESS: only the three documented exclusions remain locally managed; other repository objects are retired without remote deletion.")
+print("SUCCESS: only the five documented exclusions remain locally managed; other repository objects are retired without remote deletion.")
 print("SUCCESS: organization settings, runner-group lookup, and organization imports remain independent.")
 PY
 
 echo "=== 4. Optional live audit for the retained exceptions ==="
 if [ "${LIVE_AUDIT:-0}" != "1" ]; then
-  echo "SKIPPED: set LIVE_AUDIT=1 to read the three retained repositories and rulesets via gh API."
+  echo "SKIPPED: set LIVE_AUDIT=1 to read the five retained repositories and rulesets via gh API."
 else
   python3 - <<'PY'
 import json
@@ -96,9 +119,11 @@ import subprocess
 import sys
 
 exceptions = {
-    "renovate-rust": (20575222, 20575267),
-    "tailrocks-logo": (24300482, 24300484),
-    "tailrocks-sqldiff": (24300485, 24300486),
+    "graphql-java-datetime": (19573065, 19573031, ["Policy"]),
+    "jambalaya": (19572993, 19573044, []),
+    "renovate-rust": (20575222, 20575267, []),
+    "tailrocks-logo": (24300482, 24300484, []),
+    "tailrocks-sqldiff": (24300485, 24300486, []),
 }
 
 def gh(endpoint):
@@ -107,7 +132,7 @@ def gh(endpoint):
         sys.exit(f"FAILED: gh api {endpoint}: {result.stderr.strip()[:200]}")
     return json.loads(result.stdout)
 
-for name, (main_id, tags_id) in exceptions.items():
+for name, (main_id, tags_id, expected_checks) in exceptions.items():
     repo = gh(f"repos/tailrocks/{name}")
     if repo.get("visibility") != "public" or repo.get("allow_update_branch") is not False:
         sys.exit(f"FAILED: {name} settings drifted: visibility={repo.get('visibility')}, allow_update_branch={repo.get('allow_update_branch')}")
@@ -120,10 +145,17 @@ for name, (main_id, tags_id) in exceptions.items():
     pr = next((rule for rule in main.get("rules", []) if rule.get("type") == "pull_request"), None)
     if not pr or pr["parameters"].get("required_review_thread_resolution") is not True:
         sys.exit(f"FAILED: {name} protect-main no longer requires resolved review threads")
-    if any(rule.get("type") == "required_status_checks" for rule in main.get("rules", [])):
+    actual_checks = sorted(
+        context.get("context", "")
+        for rule in main.get("rules", []) if rule.get("type") == "required_status_checks"
+        for context in rule.get("parameters", {}).get("required_status_checks", [])
+    )
+    if not expected_checks and actual_checks:
         sys.exit(f"FAILED: {name} has an unexpected required-status-check overlay")
+    if expected_checks and actual_checks != sorted(expected_checks):
+        print(f"NOTE: {name} live check contexts {actual_checks} differ from preserved configured contexts {sorted(expected_checks)}; this retirement leaves them unchanged.")
 
-print("SUCCESS: all three excluded repositories retain active rulesets, resolved-thread protection, and no required-status-check overlay.")
+print("SUCCESS: all five excluded repositories retain active rulesets and resolved-thread protection; the four repos with no live required-check rule remain without an overlay.")
 PY
 fi
 

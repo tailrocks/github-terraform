@@ -1,5 +1,5 @@
 # TailRocks organization resources remain here. Repository policy ownership for
-# the 38 centrally managed repos moves to the ChainArgos control plane.
+# the 36 centrally managed repos moves to the ChainArgos control plane.
 
 import {
   to = github_organization_settings.tailrocks
@@ -21,10 +21,20 @@ import {
   id = "3"
 }
 
-# These three repositories remain explicit local exceptions to central policy
+# These five repositories remain explicit local exceptions to central policy
 # ownership; their current settings and rulesets are preserved as-is.
 
 # Managed repository settings import
+
+import {
+  to = module.retained_policy_exceptions.github_repository.managed_settings["graphql-java-datetime"]
+  id = "graphql-java-datetime"
+}
+
+import {
+  to = module.retained_policy_exceptions.github_repository.managed_settings["jambalaya"]
+  id = "jambalaya"
+}
 
 import {
   to = module.retained_policy_exceptions.github_repository.managed_settings["renovate-rust"]
@@ -44,6 +54,16 @@ import {
 # Existing protect-main ruleset import
 
 import {
+  to = module.retained_policy_exceptions.github_repository_ruleset.protect_main["graphql-java-datetime"]
+  id = "graphql-java-datetime:19573065"
+}
+
+import {
+  to = module.retained_policy_exceptions.github_repository_ruleset.protect_main["jambalaya"]
+  id = "jambalaya:19572993"
+}
+
+import {
   to = module.retained_policy_exceptions.github_repository_ruleset.protect_main["renovate-rust"]
   id = "renovate-rust:20575222"
 }
@@ -59,6 +79,16 @@ import {
 }
 
 # Existing protect-tags ruleset import
+
+import {
+  to = module.retained_policy_exceptions.github_repository_ruleset.protect_tags["graphql-java-datetime"]
+  id = "graphql-java-datetime:19573031"
+}
+
+import {
+  to = module.retained_policy_exceptions.github_repository_ruleset.protect_tags["jambalaya"]
+  id = "jambalaya:19573044"
+}
 
 import {
   to = module.retained_policy_exceptions.github_repository_ruleset.protect_tags["renovate-rust"]

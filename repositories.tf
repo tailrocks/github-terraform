@@ -1,4 +1,4 @@
-# Temporary local policy exceptions. The other 38 repositories are owned by
+# Temporary local policy exceptions. The other 36 repositories are owned by
 # the central control-plane root.
 
 module "retained_policy_exceptions" {
@@ -22,7 +22,7 @@ moved {
   to   = module.repository_policy.github_repository_ruleset.protect_tags
 }
 
-# Preserve the three excluded repositories at their new module addresses
+# Preserve the five excluded repositories at their new module addresses
 # without changing their GitHub objects.
 moved {
   from = module.repository_policy.github_repository.managed_settings["renovate-rust"]
@@ -67,6 +67,36 @@ moved {
 moved {
   from = module.repository_policy.github_repository_ruleset.protect_tags["tailrocks-sqldiff"]
   to   = module.retained_policy_exceptions.github_repository_ruleset.protect_tags["tailrocks-sqldiff"]
+}
+
+moved {
+  from = module.repository_policy.github_repository.managed_settings["graphql-java-datetime"]
+  to   = module.retained_policy_exceptions.github_repository.managed_settings["graphql-java-datetime"]
+}
+
+moved {
+  from = module.repository_policy.github_repository_ruleset.protect_main["graphql-java-datetime"]
+  to   = module.retained_policy_exceptions.github_repository_ruleset.protect_main["graphql-java-datetime"]
+}
+
+moved {
+  from = module.repository_policy.github_repository_ruleset.protect_tags["graphql-java-datetime"]
+  to   = module.retained_policy_exceptions.github_repository_ruleset.protect_tags["graphql-java-datetime"]
+}
+
+moved {
+  from = module.repository_policy.github_repository.managed_settings["jambalaya"]
+  to   = module.retained_policy_exceptions.github_repository.managed_settings["jambalaya"]
+}
+
+moved {
+  from = module.repository_policy.github_repository_ruleset.protect_main["jambalaya"]
+  to   = module.retained_policy_exceptions.github_repository_ruleset.protect_main["jambalaya"]
+}
+
+moved {
+  from = module.repository_policy.github_repository_ruleset.protect_tags["jambalaya"]
+  to   = module.retained_policy_exceptions.github_repository_ruleset.protect_tags["jambalaya"]
 }
 
 # Relinquish the prior 41-repository module after central adoption. This only
