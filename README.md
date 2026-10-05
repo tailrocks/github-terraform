@@ -88,7 +88,7 @@ Existing repos are imported via `imports.tf` on first apply.
 
 ## Required status checks
 
-Set each repository's `required_checks` in `managed_repositories` in `variables.tf` to the exact GitHub check-run names. Velnor Actions repositories use `Required`; the Control workflow repositories use `Control / Required`; `github-terraform` also requires `DCO`. All configured checks must pass on the pull request head, but the head does not need to include the latest default-branch commit. Resolved review threads, squash-only merging, and the other branch safeguards remain required for all managed repositories. GitHub's update-branch suggestion is disabled across the inventory.
+Set each repository's `required_checks` in `managed_repositories` in `variables.tf` to its exact GitHub check-run names. Current contexts include `Required`, `Control / Required`, and—where configured—`DCO`, `Policy`, and `ci-required`. `terminal-components-claude` and `velnor-new` require `Required`; `github-terraform` requires `DCO` and `Required`. All configured checks must pass on the pull request head, but the head does not need to include the latest default-branch commit. Resolved review threads, squash-only merging, and the other branch safeguards remain required for all managed repositories. GitHub's update-branch suggestion is disabled across the inventory.
 
 `renovate-rust`, `tailrocks-logo`, `tailrocks-sqldiff`, and `vision` currently have no observed CI workflow check context, so their `required_checks` remain empty until a real CI check is available. The DCO app status on renovate-rust pull requests is not a CI workflow result.
 
