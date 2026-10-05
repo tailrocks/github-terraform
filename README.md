@@ -88,7 +88,7 @@ Existing repos are imported via `imports.tf` on first apply.
 
 ## Required status checks
 
-Set each repository's `required_checks` in `managed_repositories` in `variables.tf` to the exact GitHub check-run names. For `github-terraform`, those checks are `DCO` and `Required`; resolved review threads are also required. Checks must pass on the pull request head, but the head does not need to include the latest default-branch commit.
+Set each repository's `required_checks` in `managed_repositories` in `variables.tf` to the exact GitHub check-run names. For `github-terraform`, those checks are `DCO` and `Required`; resolved review threads are also required. That repository's checks must pass on the pull request head, but the head does not need to include the latest default-branch commit. All other managed repositories retain strict freshness by default.
 
 ## Emergency break-glass
 

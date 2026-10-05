@@ -70,7 +70,10 @@ check_pattern(r'required_linear_history\s*=\s*true', "required_linear_history = 
 check_pattern(r'deletion\s*=\s*true', "deletion = true")
 check_pattern(r'non_fast_forward\s*=\s*true', "non_fast_forward = true")
 check_pattern(r'required_review_thread_resolution\s*=\s*true', "required_review_thread_resolution = true")
-check_pattern(r'strict_required_status_checks_policy\s*=\s*false', "strict_required_status_checks_policy = false")
+check_pattern(
+    r'strict_required_status_checks_policy\s*=\s*var\.repository_policies\[each\.value\]\.strict_required_status_checks_policy',
+    "strict_required_status_checks_policy is configured per repository",
+)
 
 assert 'bypass_actors' not in mod, "No bypass_actors allowed on core protection"
 
@@ -105,6 +108,20 @@ if self_checks != ["DCO", "Required"]:
     print(f"FAILED: github-terraform required_checks={self_checks}, expected ['DCO', 'Required']")
     sys.exit(1)
 
+if not re.search(r'strict_required_status_checks_policy\s*=\s*optional\(bool,\s*true\)', content):
+    print("FAILED: strict_required_status_checks_policy must default to true for existing repository entries.")
+    sys.exit(1)
+
+repo_bodies = re.findall(r'"([a-z0-9\-]+)"\s*=\s*\{([^{}]*)\}', content)
+strict_false_repositories = [
+    name
+    for name, body in repo_bodies
+    if re.search(r'strict_required_status_checks_policy\s*=\s*false', body)
+]
+if strict_false_repositories != ["github-terraform"]:
+    print(f"FAILED: only github-terraform may disable strict freshness; found {strict_false_repositories}")
+    sys.exit(1)
+
 with open("checks.tf") as f:
     checks = f.read()
 if not re.search(
@@ -113,8 +130,14 @@ if not re.search(
 ):
     print("FAILED: github-terraform required_checks invariant must compare list values with tolist().")
     sys.exit(1)
+if not re.search(
+    r'policy\.strict_required_status_checks_policy\s*==\s*\(name\s*!=\s*"github-terraform"\)',
+    checks,
+):
+    print("FAILED: Terraform must preserve strict freshness for every repository except github-terraform.")
+    sys.exit(1)
 
-print("SUCCESS: github-terraform requires the observed DCO and Required checks.")
+print("SUCCESS: github-terraform alone uses current-head checks and requires DCO, Required, and resolved threads.")
 EOF
 
 echo "=== 6. Live GitHub audit (opt-in: LIVE_AUDIT=1) ==="
@@ -131,7 +154,15 @@ blocks = re.findall(r'"([a-z0-9\-]+)"\s*=\s*\{\s*disposition\s*=\s*"([^"]+)"\s*v
 if len(blocks) != 41:
     print(f"FAILED: parsed {len(blocks)} repositories, expected 41 (field order changed or entries added/removed?)")
     sys.exit(1)
-repos = {name: {"disposition": d, "visibility": v, "checks": set(re.findall(r'"([^"]+)"', checks))} for name, d, v, checks in blocks}
+repos = {
+    name: {
+        "disposition": d,
+        "visibility": v,
+        "checks": set(re.findall(r'"([^"]+)"', checks)),
+        "strict": name != "github-terraform",
+    }
+    for name, d, v, checks in blocks
+}
 
 def gh(*args):
     out = subprocess.run(["gh", "api", *args], capture_output=True, text=True)
@@ -172,10 +203,11 @@ for name, want in sorted(repos.items()):
     if name == "github-terraform" and live_checks != {"DCO", "Required"}:
         failures.append(f"github-terraform: live required checks={sorted(live_checks)} want=['DCO', 'Required']")
     if want["checks"] and any(
-        rule["parameters"].get("strict_required_status_checks_policy") is not False
+        rule["parameters"].get("strict_required_status_checks_policy") is not want["strict"]
         for rule in status_rules
     ):
-        failures.append(f"{name}: required checks must not require the branch to be up to date")
+        live_strict = [rule["parameters"].get("strict_required_status_checks_policy") for rule in status_rules]
+        failures.append(f"{name}: strict_required_status_checks_policy live={live_strict} want={want['strict']}")
 
 if failures:
     print("FAILED live audit:")
