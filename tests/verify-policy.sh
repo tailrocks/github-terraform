@@ -28,9 +28,7 @@ mandatory = [
     "tailrocks-typescript-skills", "tailrocks-skill-authoring-skills", "tailrocks-rust-skills",
     "tailrocks-roadmap-skills", "tailrocks-pull-request-skills", "tailrocks-open-source-skills",
     "tailrocks-macos-skills", "tailrocks-code-quality-skills", "tailrocks-skills",
-    "vision", "tui-snap", "terminal-components-claude", "velnor-new",
-    "graphql-java-datetime", "jambalaya", "pgquill", "renovate-rust",
-    "tailrocks-gradle-conventions", "tailrocks-logo", "tailrocks-sqldiff"
+    "vision", "tui-snap", "terminal-components-claude", "velnor-new"
 ]
 
 missing = []
@@ -43,7 +41,17 @@ if missing:
     print(f"FAILED: Missing mandatory repositories in variables.tf: {missing}")
     sys.exit(1)
 
-print(f"SUCCESS: All {len(mandatory)} mandatory TailRocks target repositories are declared.")
+print(f"SUCCESS: All {len(mandatory)} requested TailRocks target repositories are declared.")
+
+extras = [
+    "graphql-java-datetime", "jambalaya", "pgquill", "renovate-rust",
+    "tailrocks-gradle-conventions", "tailrocks-logo", "tailrocks-sqldiff"
+]
+missing_extras = [repo for repo in extras if not re.search(rf'"{re.escape(repo)}"\s*=\s*\{{', content)]
+if missing_extras:
+    print(f"FAILED: Existing extra managed repositories were removed: {missing_extras}")
+    sys.exit(1)
+print(f"INFO: Retaining 7 additional managed repositories outside the requested 34: {', '.join(extras)}")
 EOF
 
 echo "=== 4. Verifying canonical policy invariants in module ==="
@@ -63,7 +71,7 @@ check_pattern(r'allow_merge_commit\s*=\s*false', "allow_merge_commit = false")
 check_pattern(r'allow_rebase_merge\s*=\s*false', "allow_rebase_merge = false")
 check_pattern(r'squash_merge_commit_title\s*=\s*"PR_TITLE"', "squash_merge_commit_title = PR_TITLE")
 check_pattern(r'squash_merge_commit_message\s*=\s*"PR_BODY"', "squash_merge_commit_message = PR_BODY")
-check_pattern(r'allow_update_branch\s*=\s*true', "allow_update_branch = true")
+check_pattern(r'allow_update_branch\s*=\s*false', "allow_update_branch = false")
 check_pattern(r'delete_branch_on_merge\s*=\s*true', "delete_branch_on_merge = true")
 check_pattern(r'allowed_merge_methods\s*=\s*\[\s*"squash"\s*\]', "allowed_merge_methods = ['squash']")
 check_pattern(r'required_linear_history\s*=\s*true', "required_linear_history = true")
@@ -108,18 +116,51 @@ if self_checks != ["DCO", "Required"]:
     print(f"FAILED: github-terraform required_checks={self_checks}, expected ['DCO', 'Required']")
     sys.exit(1)
 
-if not re.search(r'strict_required_status_checks_policy\s*=\s*optional\(bool,\s*true\)', content):
-    print("FAILED: strict_required_status_checks_policy must default to true for existing repository entries.")
+if not re.search(r'strict_required_status_checks_policy\s*=\s*optional\(bool,\s*false\)', content):
+    print("FAILED: strict_required_status_checks_policy must default to false for managed repository entries.")
     sys.exit(1)
 
 repo_bodies = re.findall(r'"([a-z0-9\-]+)"\s*=\s*\{([^{}]*)\}', content)
-strict_false_repositories = [
+strict_true_repositories = [
     name
     for name, body in repo_bodies
-    if re.search(r'strict_required_status_checks_policy\s*=\s*false', body)
+    if re.search(r'strict_required_status_checks_policy\s*=\s*true', body)
 ]
-if strict_false_repositories != ["github-terraform"]:
-    print(f"FAILED: only github-terraform may disable strict freshness; found {strict_false_repositories}")
+if strict_true_repositories:
+    print(f"FAILED: no managed repository may require strict freshness; found {strict_true_repositories}")
+    sys.exit(1)
+
+expected_checks = {
+    "jambalaya": ["Control / Required"],
+    "pgquill": ["Control / Required"],
+    "tailrocks-code-quality-skills": ["Required"],
+    "tailrocks-gradle-conventions": ["Control / Required"],
+    "tailrocks-macos-skills": ["Required"],
+    "tailrocks-open-source-skills": ["Required"],
+    "tailrocks-pull-request-skills": ["Required"],
+    "tailrocks-roadmap-skills": ["Required"],
+    "tailrocks-rust-skills": ["Required"],
+    "tailrocks-skill-authoring-skills": ["Required"],
+    "tailrocks-typescript-skills": ["Required"],
+    "terminal-components-claude": ["Required"],
+    "velnor-new": ["Required"],
+}
+checks_by_repository = {
+    name: re.findall(r'"([^\"]+)"', checks)
+    for name, _, _, checks in blocks
+}
+for name, want in expected_checks.items():
+    if checks_by_repository.get(name) != want:
+        print(f"FAILED: {name} required_checks={checks_by_repository.get(name)}, expected {want}")
+        sys.exit(1)
+
+no_ci_repositories = {"renovate-rust", "tailrocks-logo", "tailrocks-sqldiff", "vision"}
+empty_check_repositories = {name for name, checks in checks_by_repository.items() if not checks}
+if empty_check_repositories != no_ci_repositories:
+    print(
+        "FAILED: required_checks must be empty only for repositories without an observed CI context; "
+        f"empty={sorted(empty_check_repositories)}, expected={sorted(no_ci_repositories)}"
+    )
     sys.exit(1)
 
 with open("checks.tf") as f:
@@ -130,14 +171,14 @@ if not re.search(
 ):
     print("FAILED: github-terraform required_checks invariant must compare list values with tolist().")
     sys.exit(1)
-if not re.search(
-    r'policy\.strict_required_status_checks_policy\s*==\s*\(name\s*!=\s*"github-terraform"\)',
-    checks,
-):
-    print("FAILED: Terraform must preserve strict freshness for every repository except github-terraform.")
+if not re.search(r'policy\.strict_required_status_checks_policy\s*==\s*false', checks):
+    print("FAILED: Terraform must require current-head checks for every managed repository.")
+    sys.exit(1)
+if not re.search(r'settings\.allow_update_branch\s*==\s*false', checks):
+    print("FAILED: Terraform must disable update-branch suggestions for every managed repository.")
     sys.exit(1)
 
-print("SUCCESS: github-terraform alone uses current-head checks and requires DCO, Required, and resolved threads.")
+print("SUCCESS: all managed repositories use current-head checks and disable update-branch suggestions; observed CI aggregators and resolved-thread gates remain configured.")
 EOF
 
 echo "=== 6. Live GitHub audit (opt-in: LIVE_AUDIT=1) ==="
@@ -159,7 +200,7 @@ repos = {
         "disposition": d,
         "visibility": v,
         "checks": set(re.findall(r'"([^"]+)"', checks)),
-        "strict": name != "github-terraform",
+        "strict": False,
     }
     for name, d, v, checks in blocks
 }

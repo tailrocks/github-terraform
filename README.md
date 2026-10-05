@@ -26,7 +26,7 @@ Matches `jackin-project/jackin-github-terraform`:
 | Merge commits | disabled |
 | Squash merge | enabled (`PR_TITLE` / `PR_BODY`) |
 | Rebase merge | disabled |
-| Allow update branch | enabled |
+| Allow update branch | disabled |
 | Delete branch on merge | enabled |
 | Default branch ruleset `protect-main` | active (all managed repos) |
 | Tag ruleset `protect-tags` | active (all managed repos) |
@@ -41,7 +41,7 @@ All managed repositories are public, so every repo receives the full ruleset pai
 
 ## Managed repositories
 
-See `var.managed_repositories` in `variables.tf` (41 repos today: velnor estate + packaging + java libs + skills/marketplace + policy/iac).
+See `var.managed_repositories` in `variables.tf` (41 repositories today). The requested coverage set contains 34 repositories; seven additional managed repositories remain in the inventory: `graphql-java-datetime`, `jambalaya`, `pgquill`, `renovate-rust`, `tailrocks-gradle-conventions`, `tailrocks-logo`, and `tailrocks-sqldiff`.
 
 ## Prerequisites
 
@@ -88,7 +88,9 @@ Existing repos are imported via `imports.tf` on first apply.
 
 ## Required status checks
 
-Set each repository's `required_checks` in `managed_repositories` in `variables.tf` to the exact GitHub check-run names. For `github-terraform`, those checks are `DCO` and `Required`; resolved review threads are also required. That repository's checks must pass on the pull request head, but the head does not need to include the latest default-branch commit. All other managed repositories retain strict freshness by default.
+Set each repository's `required_checks` in `managed_repositories` in `variables.tf` to the exact GitHub check-run names. Velnor Actions repositories use `Required`; the Control workflow repositories use `Control / Required`; `github-terraform` also requires `DCO`. All configured checks must pass on the pull request head, but the head does not need to include the latest default-branch commit. Resolved review threads, squash-only merging, and the other branch safeguards remain required for all managed repositories. GitHub's update-branch suggestion is disabled across the inventory.
+
+`renovate-rust`, `tailrocks-logo`, `tailrocks-sqldiff`, and `vision` currently have no observed CI workflow check context, so their `required_checks` remain empty until a real CI check is available. The DCO app status on renovate-rust pull requests is not a CI workflow result.
 
 ## Emergency break-glass
 

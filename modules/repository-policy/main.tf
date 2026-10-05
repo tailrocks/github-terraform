@@ -37,7 +37,7 @@ resource "github_repository" "managed_settings" {
   squash_merge_commit_message = "PR_BODY"
 
   # Branch lifecycle management
-  allow_update_branch    = true
+  allow_update_branch    = false
   delete_branch_on_merge = true
 
   lifecycle {

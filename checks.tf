@@ -12,12 +12,10 @@ check "mandatory_target_repositories_present" {
         "tailrocks-typescript-skills", "tailrocks-skill-authoring-skills", "tailrocks-rust-skills",
         "tailrocks-roadmap-skills", "tailrocks-pull-request-skills", "tailrocks-open-source-skills",
         "tailrocks-macos-skills", "tailrocks-code-quality-skills", "tailrocks-skills",
-        "vision", "tui-snap", "terminal-components-claude", "velnor-new",
-        "graphql-java-datetime", "jambalaya", "pgquill", "renovate-rust",
-        "tailrocks-gradle-conventions", "tailrocks-logo", "tailrocks-sqldiff"
+        "vision", "tui-snap", "terminal-components-claude", "velnor-new"
       ] : contains(keys(var.managed_repositories), r)
     ])
-    error_message = "All 41 mandatory target repositories must be managed under TailRocks."
+    error_message = "All 34 requested target repositories must be managed under TailRocks."
   }
 }
 
@@ -39,13 +37,34 @@ check "self_merge_gates_enforced" {
   }
 }
 
-check "strict_freshness_scope_mandate" {
+check "terminal_components_merge_gates_enforced" {
+  assert {
+    condition = (
+      var.managed_repositories["terminal-components-claude"].required_checks == tolist(["Required"]) &&
+      var.managed_repositories["terminal-components-claude"].strict_required_status_checks_policy == false &&
+      module.repository_policy.ruleset_pull_request["terminal-components-claude"].required_review_thread_resolution == true
+    )
+    error_message = "tailrocks/terminal-components-claude must require its green Required check and resolved review threads."
+  }
+}
+
+check "current_head_status_checks_mandate" {
   assert {
     condition = alltrue([
       for name, policy in var.managed_repositories :
-      policy.strict_required_status_checks_policy == (name != "github-terraform")
+      policy.strict_required_status_checks_policy == false
     ])
-    error_message = "Only github-terraform may merge passing required checks without including the latest default-branch commit."
+    error_message = "All managed repositories must allow passing required checks on the pull request head without including the latest default-branch commit."
+  }
+}
+
+check "update_branch_suggestions_disabled" {
+  assert {
+    condition = alltrue([
+      for name, settings in module.repository_policy.repository_settings :
+      settings.allow_update_branch == false
+    ])
+    error_message = "All managed repositories must disable GitHub's update-branch suggestion."
   }
 }
 

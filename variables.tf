@@ -28,7 +28,7 @@ variable "managed_repositories" {
     disposition                          = string
     visibility                           = string
     required_checks                      = list(string)
-    strict_required_status_checks_policy = optional(bool, true)
+    strict_required_status_checks_policy = optional(bool, false)
   }))
   default = {
     "cloudflare-tofu" = {
@@ -37,10 +37,9 @@ variable "managed_repositories" {
       required_checks = ["DCO"]
     }
     "github-terraform" = {
-      disposition                          = "FullRuleset"
-      visibility                           = "public"
-      required_checks                      = ["DCO", "Required"]
-      strict_required_status_checks_policy = false
+      disposition     = "FullRuleset"
+      visibility      = "public"
+      required_checks = ["DCO", "Required"]
     }
     "graphql-java-datetime" = {
       disposition     = "FullRuleset"
@@ -85,7 +84,7 @@ variable "managed_repositories" {
     "jambalaya" = {
       disposition     = "FullRuleset"
       visibility      = "public"
-      required_checks = []
+      required_checks = ["Control / Required"]
     }
     "parallax" = {
       disposition     = "FullRuleset"
@@ -105,7 +104,7 @@ variable "managed_repositories" {
     "pgquill" = {
       disposition     = "FullRuleset"
       visibility      = "public"
-      required_checks = []
+      required_checks = ["Control / Required"]
     }
     "renovate-rust" = {
       disposition     = "FullRuleset"
@@ -130,12 +129,12 @@ variable "managed_repositories" {
     "tailrocks-code-quality-skills" = {
       disposition     = "FullRuleset"
       visibility      = "public"
-      required_checks = []
+      required_checks = ["Required"]
     }
     "tailrocks-gradle-conventions" = {
       disposition     = "FullRuleset"
       visibility      = "public"
-      required_checks = []
+      required_checks = ["Control / Required"]
     }
     "tailrocks-logo" = {
       disposition     = "FullRuleset"
@@ -145,32 +144,32 @@ variable "managed_repositories" {
     "tailrocks-macos-skills" = {
       disposition     = "FullRuleset"
       visibility      = "public"
-      required_checks = []
+      required_checks = ["Required"]
     }
     "tailrocks-open-source-skills" = {
       disposition     = "FullRuleset"
       visibility      = "public"
-      required_checks = []
+      required_checks = ["Required"]
     }
     "tailrocks-pull-request-skills" = {
       disposition     = "FullRuleset"
       visibility      = "public"
-      required_checks = []
+      required_checks = ["Required"]
     }
     "tailrocks-roadmap-skills" = {
       disposition     = "FullRuleset"
       visibility      = "public"
-      required_checks = []
+      required_checks = ["Required"]
     }
     "tailrocks-rust-skills" = {
       disposition     = "FullRuleset"
       visibility      = "public"
-      required_checks = []
+      required_checks = ["Required"]
     }
     "tailrocks-skill-authoring-skills" = {
       disposition     = "FullRuleset"
       visibility      = "public"
-      required_checks = []
+      required_checks = ["Required"]
     }
     "tailrocks-skills" = {
       disposition     = "FullRuleset"
@@ -185,12 +184,12 @@ variable "managed_repositories" {
     "tailrocks-typescript-skills" = {
       disposition     = "FullRuleset"
       visibility      = "public"
-      required_checks = []
+      required_checks = ["Required"]
     }
     "terminal-components-claude" = {
       disposition     = "FullRuleset"
       visibility      = "public"
-      required_checks = []
+      required_checks = ["Required"]
     }
     "termpane" = {
       disposition     = "FullRuleset"

@@ -4,7 +4,7 @@ variable "repository_policies" {
     disposition                          = string # "FullRuleset" | "RepoSettingsOnly"
     visibility                           = string # "public" | "private"
     required_checks                      = list(string)
-    strict_required_status_checks_policy = optional(bool, true)
+    strict_required_status_checks_policy = optional(bool, false)
   }))
 
   validation {
