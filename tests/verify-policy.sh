@@ -179,8 +179,12 @@ if not re.search(r'settings\.allow_update_branch\s*==\s*false', checks):
     sys.exit(1)
 
 with open("tests/verify-policy.sh") as f:
-    verifier = f.read()
-live_audit = verifier.split('echo "=== 6. Live GitHub audit', 1)[1]
+    verifier_lines = f.read().splitlines()
+audit_header = 'echo "=== 6. Live GitHub audit (opt-in: LIVE_AUDIT=1) ==="'
+if audit_header not in verifier_lines:
+    print("FAILED: could not locate the standalone live audit section header.")
+    sys.exit(1)
+live_audit = "\n".join(verifier_lines[verifier_lines.index(audit_header) + 1 :])
 if '"{visibility,allow_update_branch}"' not in live_audit:
     print("FAILED: live audit must query allow_update_branch for each managed repository.")
     sys.exit(1)
