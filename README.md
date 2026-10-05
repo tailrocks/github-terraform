@@ -1,6 +1,6 @@
 # TailRocks GitHub Org OpenTofu (Public)
 
-Manage TailRocks GitHub organization settings with OpenTofu: organization and Actions policy, repository merge policy, branch/tag rulesets, and (optionally) organization Actions secrets via 1Password.
+Manage TailRocks GitHub organization settings with OpenTofu: organization and Actions policy, five retained repository-policy exceptions, and (optionally) organization Actions secrets via 1Password.
 
 ## Scope
 
@@ -17,21 +17,23 @@ visibility changes through the REST API or the Terraform GitHub provider. An
 organization owner must manage those settings in **Organization settings →
 Packages**. Making a package public is irreversible.
 
-### Repository standard (all managed repos)
+### Repository policy ownership
 
-Matches `jackin-project/jackin-github-terraform`:
+Repository merge settings and branch/tag rulesets for the TailRocks fleet are
+being consolidated in the [ChainArgos control-plane root](https://github.com/ChainArgos/github-terraform).
+Do not add other TailRocks repositories to this root. `graphql-java-datetime`,
+`jambalaya`, `renovate-rust`, `tailrocks-logo`, and `tailrocks-sqldiff` are
+excluded from central management and remain under this root with their existing
+settings and rulesets unchanged. `graphql-java-datetime` retains its `Policy`
+check. `jambalaya` has no required-status rule in its live ruleset, so its local
+configuration preserves that state; the other three also remain without
+required CI check contexts.
 
-| Setting | Value |
-|---|---|
-| Merge commits | disabled |
-| Squash merge | enabled (`PR_TITLE` / `PR_BODY`) |
-| Rebase merge | disabled |
-| Allow update branch | disabled |
-| Delete branch on merge | enabled |
-| Default branch ruleset `protect-main` | active (all managed repos) |
-| Tag ruleset `protect-tags` | active (all managed repos) |
-
-All managed repositories are public, so every repo receives the full ruleset pair. (Rulesets and branch protection are unavailable to private repos on the free org plan, which is why no private repo may stay `RepoSettingsOnly` without losing merge gating.)
+This root continues to own TailRocks organization settings, Actions permissions,
+the `velnor-trusted` runner group, and organization Actions secrets. The policy
+handoff uses state-only retirement and resource-address moves; it does not
+delete GitHub repositories, settings, or rulesets. Apply the retirement only
+after the central root has imported and verified the corresponding resources.
 
 ### Organization secrets (optional)
 
@@ -41,7 +43,11 @@ All managed repositories are public, so every repo receives the full ruleset pai
 
 ## Managed repositories
 
-See `var.managed_repositories` in `variables.tf` (41 repositories today). The requested coverage set contains 34 repositories; seven additional managed repositories remain in the inventory: `graphql-java-datetime`, `jambalaya`, `pgquill`, `renovate-rust`, `tailrocks-gradle-conventions`, `tailrocks-logo`, and `tailrocks-sqldiff`.
+`var.managed_repositories` contains only the five retained exceptions listed
+above. The central control-plane root owns the other 36 TailRocks repository
+policies. Existing state is forgotten with `destroy = false` only after the
+central root has imported and verified those resources; this root never deletes
+their GitHub objects.
 
 ## Prerequisites
 
@@ -84,13 +90,17 @@ tofu plan
 tofu apply
 ```
 
-Existing repos are imported via `imports.tf` on first apply.
+Organization resources and the five retained exceptions are imported via `imports.tf` on first apply.
 
 ## Required status checks
 
-Set each repository's `required_checks` in `managed_repositories` in `variables.tf` to its exact GitHub check-run names. Current contexts include `Required`, `Control / Required`, and—where configured—`DCO`, `Policy`, and `ci-required`. `terminal-components-claude` and `velnor-new` require `Required`; `github-terraform` requires `DCO` and `Required`. All configured checks must pass on the pull request head, but the head does not need to include the latest default-branch commit. The shared module fixes status-check freshness to false, and no repository input can turn it back on. Resolved review threads, squash-only merging, and the other branch safeguards remain required for all managed repositories. GitHub's update-branch suggestion is disabled across the inventory.
-
-`renovate-rust`, `tailrocks-logo`, `tailrocks-sqldiff`, and `vision` currently have no observed CI workflow check context, so their `required_checks` remain empty until a real CI check is available. The DCO app status on renovate-rust pull requests is not a CI workflow result.
+Required check contexts and merge safeguards for the 36 centrally managed
+repositories are maintained by the central control-plane root. The five local
+exceptions retain their observed contexts: `Policy` for
+`graphql-java-datetime`, and none for the other four. In particular,
+`jambalaya`'s existing live ruleset has no required-status rule. For
+`renovate-rust`, the DCO app status is not a CI workflow result; this root does
+not invent new required status checks.
 
 ## Emergency break-glass
 
@@ -99,7 +109,7 @@ Rulesets have zero standing bypasses, so when required checks are unhealthy (CI/
 1. In **Settings → Rules → protect-main**, temporarily set enforcement to `disabled` (note the time and reason).
 2. Merge the urgent fix via PR (squash-only merge methods are still enforced by repo settings; linear history and thread resolution are suspended with the ruleset).
 3. Immediately re-enable enforcement to `active`.
-4. Run the live audit (`LIVE_AUDIT=1 bash tests/verify-policy.sh`) to confirm all rulesets are active and match config.
+4. Run the live audit (`LIVE_AUDIT=1 bash tests/verify-policy.sh`) for this root's five exceptions, then run the live audit from the central control-plane root for its 36 repositories.
 5. Open a follow-up PR + postmortem note describing what was bypassed and why.
 
 Never leave a ruleset disabled: the live audit fails loudly until it is restored.
