@@ -14,13 +14,13 @@ output "organization" {
 }
 
 output "managed_repositories" {
-  value       = sort(module.repository_policy.managed_settings_repositories)
-  description = "Repositories under merge-policy management."
+  value       = sort(module.retained_policy_exceptions.managed_settings_repositories)
+  description = "TailRocks repositories retained as local policy exceptions."
 }
 
 output "ruleset_repositories" {
-  value       = sort(module.repository_policy.full_ruleset_repositories)
-  description = "Public repositories that also receive protect-main / protect-tags rulesets."
+  value       = sort(module.retained_policy_exceptions.full_ruleset_repositories)
+  description = "Repositories receiving local protect-main / protect-tags rulesets."
 }
 
 output "velnor_runner_group_repositories" {

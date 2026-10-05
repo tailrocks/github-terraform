@@ -23,214 +23,30 @@ variable "secret_visibility" {
 }
 
 variable "managed_repositories" {
-  description = "Authoritative inventory of managed repositories and their protection dispositions."
+  description = "TailRocks policy exceptions retained locally; the central control plane owns all other TailRocks repositories."
   type = map(object({
     disposition     = string
     visibility      = string
     required_checks = list(string)
   }))
+
+  validation {
+    condition     = toset(keys(var.managed_repositories)) == toset(["renovate-rust", "tailrocks-logo", "tailrocks-sqldiff"])
+    error_message = "Only renovate-rust, tailrocks-logo, and tailrocks-sqldiff remain in the TailRocks policy root; all other repository policies are owned by the central control plane."
+  }
+
   default = {
-    "cloudflare-tofu" = {
-      disposition     = "FullRuleset"
-      visibility      = "public"
-      required_checks = ["DCO"]
-    }
-    "github-terraform" = {
-      disposition     = "FullRuleset"
-      visibility      = "public"
-      required_checks = ["DCO", "Required"]
-    }
-    "graphql-java-datetime" = {
-      disposition     = "FullRuleset"
-      visibility      = "public"
-      required_checks = ["Policy"]
-    }
-    "holla" = {
-      disposition     = "FullRuleset"
-      visibility      = "public"
-      required_checks = ["DCO", "Policy", "ci-required"]
-    }
-    "holla-apt" = {
-      disposition     = "FullRuleset"
-      visibility      = "public"
-      required_checks = ["DCO", "Policy", "ci-required"]
-    }
-    "homebrew-holla" = {
-      disposition     = "FullRuleset"
-      visibility      = "public"
-      required_checks = ["DCO", "Policy", "ci-required"]
-    }
-    "homebrew-parallax" = {
-      disposition     = "FullRuleset"
-      visibility      = "public"
-      required_checks = ["DCO", "Policy", "ci-required"]
-    }
-    "homebrew-ruxel" = {
-      disposition     = "FullRuleset"
-      visibility      = "public"
-      required_checks = ["DCO", "Policy", "ci-required"]
-    }
-    "homebrew-tablerock" = {
-      disposition     = "FullRuleset"
-      visibility      = "public"
-      required_checks = ["DCO", "Policy", "ci-required"]
-    }
-    "homebrew-velnor" = {
-      disposition     = "FullRuleset"
-      visibility      = "public"
-      required_checks = ["DCO", "Policy", "ci-required"]
-    }
-    "jambalaya" = {
-      disposition     = "FullRuleset"
-      visibility      = "public"
-      required_checks = ["Control / Required"]
-    }
-    "parallax" = {
-      disposition     = "FullRuleset"
-      visibility      = "public"
-      required_checks = ["DCO", "Policy", "ci-required"]
-    }
-    "parallax-telemetry-playground" = {
-      disposition     = "FullRuleset"
-      visibility      = "public"
-      required_checks = ["DCO", "Policy", "ci-required"]
-    }
-    "pg-bigdecimal" = {
-      disposition     = "FullRuleset"
-      visibility      = "public"
-      required_checks = ["DCO", "Policy", "ci-required"]
-    }
-    "pgquill" = {
-      disposition     = "FullRuleset"
-      visibility      = "public"
-      required_checks = ["Control / Required"]
-    }
     "renovate-rust" = {
       disposition     = "FullRuleset"
       visibility      = "public"
       required_checks = []
-    }
-    "ruxel" = {
-      disposition     = "FullRuleset"
-      visibility      = "public"
-      required_checks = ["DCO", "Policy", "ci-required"]
-    }
-    "schemalane" = {
-      disposition     = "FullRuleset"
-      visibility      = "public"
-      required_checks = ["DCO", "Policy", "ci-required"]
-    }
-    "tablerock" = {
-      disposition     = "FullRuleset"
-      visibility      = "public"
-      required_checks = ["DCO", "Policy", "ci-required"]
-    }
-    "tailrocks-code-quality-skills" = {
-      disposition     = "FullRuleset"
-      visibility      = "public"
-      required_checks = ["Required"]
-    }
-    "tailrocks-gradle-conventions" = {
-      disposition     = "FullRuleset"
-      visibility      = "public"
-      required_checks = ["Control / Required"]
     }
     "tailrocks-logo" = {
       disposition     = "FullRuleset"
       visibility      = "public"
       required_checks = []
     }
-    "tailrocks-macos-skills" = {
-      disposition     = "FullRuleset"
-      visibility      = "public"
-      required_checks = ["Required"]
-    }
-    "tailrocks-open-source-skills" = {
-      disposition     = "FullRuleset"
-      visibility      = "public"
-      required_checks = ["Required"]
-    }
-    "tailrocks-pull-request-skills" = {
-      disposition     = "FullRuleset"
-      visibility      = "public"
-      required_checks = ["Required"]
-    }
-    "tailrocks-roadmap-skills" = {
-      disposition     = "FullRuleset"
-      visibility      = "public"
-      required_checks = ["Required"]
-    }
-    "tailrocks-rust-skills" = {
-      disposition     = "FullRuleset"
-      visibility      = "public"
-      required_checks = ["Required"]
-    }
-    "tailrocks-skill-authoring-skills" = {
-      disposition     = "FullRuleset"
-      visibility      = "public"
-      required_checks = ["Required"]
-    }
-    "tailrocks-skills" = {
-      disposition     = "FullRuleset"
-      visibility      = "public"
-      required_checks = ["DCO"]
-    }
     "tailrocks-sqldiff" = {
-      disposition     = "FullRuleset"
-      visibility      = "public"
-      required_checks = []
-    }
-    "tailrocks-typescript-skills" = {
-      disposition     = "FullRuleset"
-      visibility      = "public"
-      required_checks = ["Required"]
-    }
-    "terminal-components-claude" = {
-      disposition     = "FullRuleset"
-      visibility      = "public"
-      required_checks = ["Required"]
-    }
-    "termpane" = {
-      disposition     = "FullRuleset"
-      visibility      = "public"
-      required_checks = ["DCO", "Required"]
-    }
-    "termrock" = {
-      disposition     = "FullRuleset"
-      visibility      = "public"
-      required_checks = ["DCO", "Policy", "ci-required"]
-    }
-    "tracing-request-level" = {
-      disposition     = "FullRuleset"
-      visibility      = "public"
-      required_checks = ["DCO", "Policy", "ci-required"]
-    }
-    "tui-snap" = {
-      disposition     = "FullRuleset"
-      visibility      = "public"
-      required_checks = ["DCO", "Required"]
-    }
-    "velnor" = {
-      disposition     = "FullRuleset"
-      visibility      = "public"
-      required_checks = ["DCO", "Policy", "ci-required"]
-    }
-    "velnor-actions-fixture" = {
-      disposition     = "FullRuleset"
-      visibility      = "public"
-      required_checks = ["DCO", "Policy", "ci-required"]
-    }
-    "velnor-apt" = {
-      disposition     = "FullRuleset"
-      visibility      = "public"
-      required_checks = ["DCO", "Policy", "ci-required"]
-    }
-    "velnor-new" = {
-      disposition     = "FullRuleset"
-      visibility      = "public"
-      required_checks = ["Required"]
-    }
-    "vision" = {
       disposition     = "FullRuleset"
       visibility      = "public"
       required_checks = []
@@ -257,8 +73,5 @@ variable "velnor_runner_group_repositories" {
     "velnor-apt",
   ]
 
-  validation {
-    condition     = length(setsubtract(var.velnor_runner_group_repositories, keys(var.managed_repositories))) == 0
-    error_message = "velnor_runner_group_repositories must be a subset of managed_repositories."
-  }
+
 }

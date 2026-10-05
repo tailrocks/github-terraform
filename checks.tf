@@ -1,101 +1,80 @@
-# Deterministic invariant assertions for TailRocks GitHub policy management
+# TailRocks retains repository policy only for three documented exclusions.
+# The central control-plane root owns settings and rulesets for all others.
 
-check "mandatory_target_repositories_present" {
+check "legacy_policy_scope_is_exactly_the_documented_exceptions" {
+  assert {
+    condition = (
+      toset(keys(var.managed_repositories)) == toset(["renovate-rust", "tailrocks-logo", "tailrocks-sqldiff"]) &&
+      toset(module.retained_policy_exceptions.managed_settings_repositories) == toset(["renovate-rust", "tailrocks-logo", "tailrocks-sqldiff"]) &&
+      toset(module.retained_policy_exceptions.full_ruleset_repositories) == toset(["renovate-rust", "tailrocks-logo", "tailrocks-sqldiff"])
+    )
+    error_message = "Only renovate-rust, tailrocks-logo, and tailrocks-sqldiff may remain managed by the TailRocks repository-policy root."
+  }
+}
+
+check "retained_policy_exceptions_are_preserved" {
   assert {
     condition = alltrue([
-      for r in [
-        "velnor", "holla-apt", "homebrew-holla", "homebrew-tablerock", "homebrew-ruxel",
-        "tablerock", "parallax", "schemalane", "ruxel", "pg-bigdecimal",
-        "velnor-actions-fixture", "github-terraform", "tracing-request-level", "velnor-apt",
-        "cloudflare-tofu", "homebrew-velnor", "termpane", "termrock",
-        "parallax-telemetry-playground", "homebrew-parallax", "holla",
-        "tailrocks-typescript-skills", "tailrocks-skill-authoring-skills", "tailrocks-rust-skills",
-        "tailrocks-roadmap-skills", "tailrocks-pull-request-skills", "tailrocks-open-source-skills",
-        "tailrocks-macos-skills", "tailrocks-code-quality-skills", "tailrocks-skills",
-        "vision", "tui-snap", "terminal-components-claude", "velnor-new"
-      ] : contains(keys(var.managed_repositories), r)
+      for name in ["renovate-rust", "tailrocks-logo", "tailrocks-sqldiff"] :
+      var.managed_repositories[name].disposition == "FullRuleset" &&
+      var.managed_repositories[name].visibility == "public" &&
+      length(var.managed_repositories[name].required_checks) == 0 &&
+      module.retained_policy_exceptions.ruleset_pull_request[name].required_review_thread_resolution == true
     ])
-    error_message = "All 34 requested target repositories must be managed under TailRocks."
-  }
-}
-
-check "self_protection_enforced" {
-  assert {
-    condition     = contains(keys(var.managed_repositories), "github-terraform")
-    error_message = "tailrocks/github-terraform must be self-protected by this configuration."
-  }
-}
-
-check "self_merge_gates_enforced" {
-  assert {
-    condition = (
-      var.managed_repositories["github-terraform"].required_checks == tolist(["DCO", "Required"]) &&
-      module.repository_policy.ruleset_pull_request["github-terraform"].required_review_thread_resolution == true
-    )
-    error_message = "tailrocks/github-terraform must require the observed DCO and Required checks and resolved review threads."
-  }
-}
-
-check "terminal_components_merge_gates_enforced" {
-  assert {
-    condition = (
-      var.managed_repositories["terminal-components-claude"].required_checks == tolist(["Required"]) &&
-      module.repository_policy.ruleset_pull_request["terminal-components-claude"].required_review_thread_resolution == true
-    )
-    error_message = "tailrocks/terminal-components-claude must require its green Required check and resolved review threads."
+    error_message = "The three excluded repositories must retain their current public/full-ruleset policy without invented status checks."
   }
 }
 
 check "update_branch_suggestions_disabled" {
   assert {
     condition = alltrue([
-      for name, settings in module.repository_policy.repository_settings :
+      for settings in module.retained_policy_exceptions.repository_settings :
       settings.allow_update_branch == false
     ])
-    error_message = "All managed repositories must disable GitHub's update-branch suggestion."
+    error_message = "The retained exception policies must keep update-branch suggestions disabled."
   }
 }
 
 check "delete_branch_on_merge_mandate" {
   assert {
     condition = alltrue([
-      for k, v in module.repository_policy.repository_settings : v.delete_branch_on_merge == true
+      for settings in module.retained_policy_exceptions.repository_settings :
+      settings.delete_branch_on_merge == true
     ])
-    error_message = "All managed repositories must enforce delete_branch_on_merge = true."
+    error_message = "The retained exception policies must keep delete_branch_on_merge enabled."
   }
 }
 
 check "ruleset_enforcement_mandate" {
   assert {
     condition = alltrue([
-      for k, v in module.repository_policy.ruleset_pull_request : (
-        v.enforcement == "active" && v.tags_enforcement == "active"
-      )
+      for rules in module.retained_policy_exceptions.ruleset_pull_request :
+      rules.enforcement == "active" && rules.tags_enforcement == "active"
     ])
-    error_message = "All protect-main and protect-tags rulesets must have enforcement = active."
+    error_message = "The retained exception rulesets must remain active."
   }
 }
 
 check "conversation_resolution_mandate" {
   assert {
     condition = alltrue([
-      for k, v in module.repository_policy.ruleset_pull_request : v.required_review_thread_resolution == true
+      for rules in module.retained_policy_exceptions.ruleset_pull_request :
+      rules.required_review_thread_resolution == true
     ])
-    error_message = "All protect-main rulesets must require conversation resolution before merging."
+    error_message = "The retained exception main rulesets must continue requiring resolved review threads."
   }
 }
 
 check "squash_only_merge_mandate" {
   assert {
     condition = alltrue([
-      for k, v in module.repository_policy.repository_settings : (
-        v.allow_squash_merge == true &&
-        v.allow_merge_commit == false &&
-        v.allow_rebase_merge == false &&
-        v.squash_merge_commit_title == "PR_TITLE" &&
-        v.squash_merge_commit_message == "PR_BODY"
-      )
+      for settings in module.retained_policy_exceptions.repository_settings :
+      settings.allow_squash_merge == true &&
+      settings.allow_merge_commit == false &&
+      settings.allow_rebase_merge == false &&
+      settings.squash_merge_commit_title == "PR_TITLE" &&
+      settings.squash_merge_commit_message == "PR_BODY"
     ])
-    error_message = "All managed repositories must enforce canonical squash-only merge policy."
+    error_message = "The retained exception policies must remain squash-only."
   }
 }
