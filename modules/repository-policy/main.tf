@@ -97,7 +97,8 @@ resource "github_repository_ruleset" "protect_main" {
     dynamic "required_status_checks" {
       for_each = length(var.repository_policies[each.value].required_checks) > 0 ? [1] : []
       content {
-        strict_required_status_checks_policy = var.repository_policies[each.value].strict_required_status_checks_policy
+        # Green checks on the pull-request head must not require a main-branch update.
+        strict_required_status_checks_policy = false
         do_not_enforce_on_create             = false
 
         dynamic "required_check" {

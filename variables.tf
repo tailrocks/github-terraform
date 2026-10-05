@@ -25,10 +25,9 @@ variable "secret_visibility" {
 variable "managed_repositories" {
   description = "Authoritative inventory of managed repositories and their protection dispositions."
   type = map(object({
-    disposition                          = string
-    visibility                           = string
-    required_checks                      = list(string)
-    strict_required_status_checks_policy = optional(bool, false)
+    disposition     = string
+    visibility      = string
+    required_checks = list(string)
   }))
   default = {
     "cloudflare-tofu" = {

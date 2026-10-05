@@ -30,7 +30,6 @@ check "self_merge_gates_enforced" {
   assert {
     condition = (
       var.managed_repositories["github-terraform"].required_checks == tolist(["DCO", "Required"]) &&
-      var.managed_repositories["github-terraform"].strict_required_status_checks_policy == false &&
       module.repository_policy.ruleset_pull_request["github-terraform"].required_review_thread_resolution == true
     )
     error_message = "tailrocks/github-terraform must require the observed DCO and Required checks and resolved review threads."
@@ -41,20 +40,9 @@ check "terminal_components_merge_gates_enforced" {
   assert {
     condition = (
       var.managed_repositories["terminal-components-claude"].required_checks == tolist(["Required"]) &&
-      var.managed_repositories["terminal-components-claude"].strict_required_status_checks_policy == false &&
       module.repository_policy.ruleset_pull_request["terminal-components-claude"].required_review_thread_resolution == true
     )
     error_message = "tailrocks/terminal-components-claude must require its green Required check and resolved review threads."
-  }
-}
-
-check "current_head_status_checks_mandate" {
-  assert {
-    condition = alltrue([
-      for name, policy in var.managed_repositories :
-      policy.strict_required_status_checks_policy == false
-    ])
-    error_message = "All managed repositories must allow passing required checks on the pull request head without including the latest default-branch commit."
   }
 }
 
