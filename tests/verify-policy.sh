@@ -178,6 +178,16 @@ if not re.search(r'settings\.allow_update_branch\s*==\s*false', checks):
     print("FAILED: Terraform must disable update-branch suggestions for every managed repository.")
     sys.exit(1)
 
+with open("tests/verify-policy.sh") as f:
+    verifier = f.read()
+live_audit = verifier.split('echo "=== 6. Live GitHub audit', 1)[1]
+if '"{visibility,allow_update_branch}"' not in live_audit:
+    print("FAILED: live audit must query allow_update_branch for each managed repository.")
+    sys.exit(1)
+if 'repo["allow_update_branch"] is not False' not in live_audit:
+    print("FAILED: live audit must require allow_update_branch=false for each managed repository.")
+    sys.exit(1)
+
 print("SUCCESS: all managed repositories use current-head checks and disable update-branch suggestions; observed CI aggregators and resolved-thread gates remain configured.")
 EOF
 
@@ -216,9 +226,11 @@ failures = []
 for name, want in sorted(repos.items()):
     if want["disposition"] != "FullRuleset":
         continue
-    repo = gh(f"repos/tailrocks/{name}", "--jq", "{visibility}")
+    repo = gh(f"repos/tailrocks/{name}", "--jq", "{visibility,allow_update_branch}")
     if repo["visibility"] != want["visibility"]:
         failures.append(f"{name}: visibility live={repo['visibility']} want={want['visibility']}")
+    if repo["allow_update_branch"] is not False:
+        failures.append(f"{name}: allow_update_branch live={repo['allow_update_branch']} want=false")
     rulesets = gh(f"repos/tailrocks/{name}/rulesets")
     main = next((r for r in rulesets if r["name"] == "protect-main"), None)
     tags = next((r for r in rulesets if r["name"] == "protect-tags"), None)
