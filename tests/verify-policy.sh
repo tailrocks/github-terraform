@@ -105,6 +105,15 @@ if self_checks != ["DCO", "Required"]:
     print(f"FAILED: github-terraform required_checks={self_checks}, expected ['DCO', 'Required']")
     sys.exit(1)
 
+with open("checks.tf") as f:
+    checks = f.read()
+if not re.search(
+    r'var\.managed_repositories\["github-terraform"\]\.required_checks\s*==\s*tolist\(\s*\["DCO"\s*,\s*"Required"\]\s*\)',
+    checks,
+):
+    print("FAILED: github-terraform required_checks invariant must compare list values with tolist().")
+    sys.exit(1)
+
 print("SUCCESS: github-terraform requires the observed DCO and Required checks.")
 EOF
 

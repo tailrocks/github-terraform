@@ -31,7 +31,7 @@ check "self_protection_enforced" {
 check "self_merge_gates_enforced" {
   assert {
     condition = (
-      var.managed_repositories["github-terraform"].required_checks == ["DCO", "Required"] &&
+      var.managed_repositories["github-terraform"].required_checks == tolist(["DCO", "Required"]) &&
       module.repository_policy.ruleset_pull_request["github-terraform"].required_review_thread_resolution == true
     )
     error_message = "tailrocks/github-terraform must require the observed DCO and Required checks and resolved review threads."
