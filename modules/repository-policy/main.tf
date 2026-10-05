@@ -10,15 +10,8 @@ terraform {
 }
 
 locals {
-  managed_settings_repositories = toset([
-    for repo, policy in var.repository_policies : repo
-    if contains(["FullRuleset", "RepoSettingsOnly"], policy.disposition)
-  ])
-
-  full_ruleset_repositories = toset([
-    for repo, policy in var.repository_policies : repo
-    if policy.disposition == "FullRuleset"
-  ])
+  managed_settings_repositories = toset(keys(var.repository_policies))
+  full_ruleset_repositories     = toset(keys(var.repository_policies))
 }
 
 # Repository-level merge settings (Tier 1 enforcement across all repos)
@@ -26,6 +19,9 @@ resource "github_repository" "managed_settings" {
   for_each = local.managed_settings_repositories
 
   name = each.value
+
+  # Preserve and manage the repository's declared visibility explicitly.
+  visibility = var.repository_policies[each.value].visibility
 
   # Strict squash-only merge policy
   allow_squash_merge = true
@@ -49,7 +45,6 @@ resource "github_repository" "managed_settings" {
       has_projects,
       has_wiki,
       has_discussions,
-      visibility,
       archived,
       topics,
       vulnerability_alerts,
@@ -68,7 +63,7 @@ resource "github_repository_ruleset" "protect_main" {
   name        = "protect-main"
   target      = "branch"
   enforcement = "active"
-  repository  = each.value
+  repository  = github_repository.managed_settings[each.value].name
 
   conditions {
     ref_name {
@@ -119,7 +114,7 @@ resource "github_repository_ruleset" "protect_tags" {
   name        = "protect-tags"
   target      = "tag"
   enforcement = "active"
-  repository  = each.value
+  repository  = github_repository.managed_settings[each.value].name
 
   conditions {
     ref_name {

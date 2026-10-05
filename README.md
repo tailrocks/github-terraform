@@ -31,7 +31,7 @@ Matches `jackin-project/jackin-github-terraform`:
 | Default branch ruleset `protect-main` | active (all managed repos) |
 | Tag ruleset `protect-tags` | active (all managed repos) |
 
-All managed repositories are public, so every repo receives the full ruleset pair. (Rulesets and branch protection are unavailable to private repos on the free org plan, which is why no private repo may stay `RepoSettingsOnly` without losing merge gating.)
+Every inventory entry receives the full ruleset pair, regardless of visibility. Visibility is declared and managed explicitly; all 41 repositories in the current inventory are public. A visibility change does not remove either ruleset or weaken its merge gates.
 
 ### Organization secrets (optional)
 
@@ -85,6 +85,17 @@ tofu apply
 ```
 
 Existing repos are imported via `imports.tf` on first apply.
+
+## Adding repositories
+
+Add each repository to `managed_repositories` in `variables.tf` with its exact
+visibility and required check contexts. New repositories are created with the
+declared repository settings, then receive `protect-main` and `protect-tags`
+through explicit resource dependencies. If the repository already exists on
+GitHub, add import blocks for its settings resource and any existing rulesets
+to `imports.tf` before planning. Keep the import blocks after adoption; Tofu
+no-ops imports for resources already present in state. The shared module applies
+the same merge protections independently of repository visibility.
 
 ## Required status checks
 

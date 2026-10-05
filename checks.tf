@@ -19,6 +19,18 @@ check "mandatory_target_repositories_present" {
   }
 }
 
+check "no_ci_exception_allowlist_is_explicit" {
+  assert {
+    condition = toset([
+      for name, policy in var.managed_repositories : name
+      if length(policy.required_checks) == 0
+      ]) == toset([
+      "renovate-rust", "tailrocks-logo", "tailrocks-sqldiff", "vision"
+    ])
+    error_message = "Only the four audited repositories without CI contexts may have empty required_checks."
+  }
+}
+
 check "self_protection_enforced" {
   assert {
     condition     = contains(keys(var.managed_repositories), "github-terraform")

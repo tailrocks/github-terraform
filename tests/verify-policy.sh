@@ -79,6 +79,27 @@ check_pattern(r'deletion\s*=\s*true', "deletion = true")
 check_pattern(r'non_fast_forward\s*=\s*true', "non_fast_forward = true")
 check_pattern(r'required_review_thread_resolution\s*=\s*true', "required_review_thread_resolution = true")
 check_pattern(r'strict_required_status_checks_policy\s*=\s*false', "strict_required_status_checks_policy = false")
+check_pattern(
+    r'visibility\s*=\s*var\.repository_policies\[each\.value\]\.visibility',
+    "repository visibility is managed from the inventory",
+)
+
+if "RepoSettingsOnly" in mod or "disposition" in mod:
+    print("FAILED: every repository must receive the full policy; no settings-only bypass is allowed.")
+    sys.exit(1)
+
+if mod.count("repository  = github_repository.managed_settings[each.value].name") != 2:
+    print("FAILED: both main and tag rulesets must depend on the managed repository resource.")
+    sys.exit(1)
+
+locals_block = re.search(r"locals\s*\{(.*?)\n\}", mod, re.DOTALL)
+if not locals_block or "visibility" in locals_block.group(1):
+    print("FAILED: ruleset coverage must be independent of repository visibility.")
+    sys.exit(1)
+
+if re.search(r"ignore_changes\s*=\s*\[[^\]]*\bvisibility\b", mod, re.DOTALL):
+    print("FAILED: repository visibility must be authoritative, not ignored.")
+    sys.exit(1)
 
 assert 'bypass_actors' not in mod, "No bypass_actors allowed on core protection"
 
@@ -92,8 +113,11 @@ import re, sys
 with open("variables.tf") as f:
     content = f.read()
 
-# Every FullRuleset entry must declare required_checks explicitly (possibly empty).
-blocks = re.findall(r'"([a-z0-9\-]+)"\s*=\s*\{\s*disposition\s*=\s*"([^"]+)"\s*visibility\s*=\s*"([^"]+)"\s*required_checks\s*=\s*(\[[^\]]*\])', content)
+# Every managed repository must declare visibility and required_checks explicitly.
+blocks = re.findall(
+    r'"([a-z0-9\-]+)"\s*=\s*\{\s*visibility\s*=\s*"([^"]+)"\s*required_checks\s*=\s*(\[[^\]]*\])(?:\s*no_ci_reason\s*=\s*"([^"]*)")?',
+    content,
+)
 if not blocks:
     print("FAILED: could not parse managed_repositories from variables.tf")
     sys.exit(1)
@@ -101,14 +125,16 @@ if len(blocks) != 41:
     print(f"FAILED: parsed {len(blocks)} repositories, expected 41 (field order changed or entries added/removed?)")
     sys.exit(1)
 
-full = [b for b in blocks if b[1] == "FullRuleset"]
-print(f"SUCCESS: {len(full)}/{len(blocks)} managed repositories are FullRuleset with explicit required_checks.")
+if "disposition" in content or "RepoSettingsOnly" in content:
+    print("FAILED: managed repository inventory must not expose a settings-only disposition.")
+    sys.exit(1)
+print(f"SUCCESS: {len(blocks)}/{len(blocks)} managed repositories receive full policy with explicit visibility and required_checks.")
 
 self_repo = next((b for b in blocks if b[0] == "github-terraform"), None)
 if self_repo is None:
     print("FAILED: github-terraform is missing from managed_repositories")
     sys.exit(1)
-self_checks = re.findall(r'"([^"]+)"', self_repo[3])
+self_checks = re.findall(r'"([^"]+)"', self_repo[2])
 if self_checks != ["DCO", "Required"]:
     print(f"FAILED: github-terraform required_checks={self_checks}, expected ['DCO', 'Required']")
     sys.exit(1)
@@ -134,7 +160,7 @@ expected_checks = {
 }
 checks_by_repository = {
     name: re.findall(r'"([^\"]+)"', checks)
-    for name, _, _, checks in blocks
+    for name, _, checks, _ in blocks
 }
 for name, want in expected_checks.items():
     if checks_by_repository.get(name) != want:
@@ -148,6 +174,16 @@ if empty_check_repositories != no_ci_repositories:
         "FAILED: required_checks must be empty only for repositories without an observed CI context; "
         f"empty={sorted(empty_check_repositories)}, expected={sorted(no_ci_repositories)}"
     )
+    sys.exit(1)
+
+no_ci_reasons = {name: reason for name, _, _, reason in blocks if name in empty_check_repositories}
+if set(no_ci_reasons) != no_ci_repositories or any(not reason or not reason.strip() for reason in no_ci_reasons.values()):
+    print(f"FAILED: every explicit no-CI exception needs a reason; reasons={no_ci_reasons}")
+    sys.exit(1)
+
+unexpected_no_ci_reasons = [name for name, _, checks, reason in blocks if checks != "[]" and reason and reason.strip()]
+if unexpected_no_ci_reasons:
+    print(f"FAILED: repositories with required checks must not carry no-CI reasons: {unexpected_no_ci_reasons}")
     sys.exit(1)
 
 with open("checks.tf") as f:
@@ -166,6 +202,9 @@ if "strict_required_status_checks_policy" in module_variables:
 if "strict_required_status_checks_policy" in checks:
     print("FAILED: Terraform invariants must not rely on a user-settable strict freshness field.")
     sys.exit(1)
+if "RepoSettingsOnly" in module_variables or "disposition" in module_variables:
+    print("FAILED: reusable module must not expose a settings-only bypass.")
+    sys.exit(1)
 if not re.search(r'settings\.allow_update_branch\s*==\s*false', checks):
     print("FAILED: Terraform must disable update-branch suggestions for every managed repository.")
     sys.exit(1)
@@ -183,6 +222,9 @@ if '"{visibility,allow_update_branch}"' not in live_audit:
 if 'repo["allow_update_branch"] is not False' not in live_audit:
     print("FAILED: live audit must require allow_update_branch=false for each managed repository.")
     sys.exit(1)
+if 'any(rule["parameters"].get("strict_required_status_checks_policy") is not False for rule in status_rules)' not in live_audit:
+    print("FAILED: live audit must require strict freshness=false for every status-check rule, including optional no-CI cases.")
+    sys.exit(1)
 
 print("SUCCESS: all managed repositories use current-head checks and disable update-branch suggestions; observed CI aggregators and resolved-thread gates remain configured.")
 EOF
@@ -197,18 +239,20 @@ import json, re, subprocess, sys
 with open("variables.tf") as f:
     content = f.read()
 
-blocks = re.findall(r'"([a-z0-9\-]+)"\s*=\s*\{\s*disposition\s*=\s*"([^"]+)"\s*visibility\s*=\s*"([^"]+)"\s*required_checks\s*=\s*(\[[^\]]*\])', content)
+blocks = re.findall(
+    r'"([a-z0-9\-]+)"\s*=\s*\{\s*visibility\s*=\s*"([^"]+)"\s*required_checks\s*=\s*(\[[^\]]*\])(?:\s*no_ci_reason\s*=\s*"([^"]*)")?',
+    content,
+)
 if len(blocks) != 41:
     print(f"FAILED: parsed {len(blocks)} repositories, expected 41 (field order changed or entries added/removed?)")
     sys.exit(1)
 repos = {
     name: {
-        "disposition": d,
         "visibility": v,
         "checks": set(re.findall(r'"([^"]+)"', checks)),
         "strict": False,
     }
-    for name, d, v, checks in blocks
+    for name, v, checks, _ in blocks
 }
 
 def gh(*args):
@@ -220,8 +264,6 @@ def gh(*args):
 
 failures = []
 for name, want in sorted(repos.items()):
-    if want["disposition"] != "FullRuleset":
-        continue
     repo = gh(f"repos/tailrocks/{name}", "--jq", "{visibility,allow_update_branch}")
     if repo["visibility"] != want["visibility"]:
         failures.append(f"{name}: visibility live={repo['visibility']} want={want['visibility']}")
@@ -251,21 +293,18 @@ for name, want in sorted(repos.items()):
         failures.append(f"{name}: checks live={sorted(live_checks)} want={sorted(want['checks'])}")
     if name == "github-terraform" and live_checks != {"DCO", "Required"}:
         failures.append(f"github-terraform: live required checks={sorted(live_checks)} want=['DCO', 'Required']")
-    if want["checks"] and any(
-        rule["parameters"].get("strict_required_status_checks_policy") is not want["strict"]
-        for rule in status_rules
-    ):
+    if any(rule["parameters"].get("strict_required_status_checks_policy") is not False for rule in status_rules):
         live_strict = [rule["parameters"].get("strict_required_status_checks_policy") for rule in status_rules]
-        failures.append(f"{name}: strict_required_status_checks_policy live={live_strict} want={want['strict']}")
+        failures.append(f"{name}: strict_required_status_checks_policy live={live_strict} want=false")
 
 if failures:
     print("FAILED live audit:")
     for f in failures:
         print(f"  - {f}")
     sys.exit(1)
-empty = sum(1 for r in repos.values() if r["disposition"] == "FullRuleset" and not r["checks"])
-print(f"INFO: {empty} FullRuleset repositories have empty required_checks (drift guard only, not a posture audit).")
-print(f"SUCCESS: live audit passed for {sum(1 for r in repos.values() if r['disposition']=='FullRuleset')} FullRuleset repositories.")
+empty = sum(1 for r in repos.values() if not r["checks"])
+print(f"INFO: {empty} repositories have explicit no-CI exceptions with non-empty rationale.")
+print(f"SUCCESS: live audit passed for all {len(repos)} managed repositories.")
 EOF
 fi
 

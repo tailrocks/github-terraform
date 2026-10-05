@@ -23,217 +23,202 @@ variable "secret_visibility" {
 }
 
 variable "managed_repositories" {
-  description = "Authoritative inventory of managed repositories and their protection dispositions."
+  description = "Authoritative inventory of managed repositories and their visibility and check policy."
   type = map(object({
-    disposition     = string
     visibility      = string
     required_checks = list(string)
+    no_ci_reason    = optional(string)
   }))
+
+  validation {
+    condition = alltrue([
+      for repo in values(var.managed_repositories) :
+      contains(["public", "private"], repo.visibility)
+    ])
+    error_message = "Each managed repository visibility must be either public or private."
+  }
+
+  validation {
+    condition = alltrue([
+      for repo in values(var.managed_repositories) :
+      length(repo.required_checks) > 0
+      ? (
+        alltrue([for context in repo.required_checks : trimspace(context) != ""]) &&
+        repo.no_ci_reason == null
+      )
+      : try(length(trimspace(repo.no_ci_reason)) > 0, false)
+    ])
+    error_message = "Each repository must declare non-empty required checks or a non-empty no_ci_reason for an explicit no-CI exception."
+  }
+
   default = {
     "cloudflare-tofu" = {
-      disposition     = "FullRuleset"
       visibility      = "public"
       required_checks = ["DCO"]
     }
     "github-terraform" = {
-      disposition     = "FullRuleset"
       visibility      = "public"
       required_checks = ["DCO", "Required"]
     }
     "graphql-java-datetime" = {
-      disposition     = "FullRuleset"
       visibility      = "public"
       required_checks = ["Policy"]
     }
     "holla" = {
-      disposition     = "FullRuleset"
       visibility      = "public"
       required_checks = ["DCO", "Policy", "ci-required"]
     }
     "holla-apt" = {
-      disposition     = "FullRuleset"
       visibility      = "public"
       required_checks = ["DCO", "Policy", "ci-required"]
     }
     "homebrew-holla" = {
-      disposition     = "FullRuleset"
       visibility      = "public"
       required_checks = ["DCO", "Policy", "ci-required"]
     }
     "homebrew-parallax" = {
-      disposition     = "FullRuleset"
       visibility      = "public"
       required_checks = ["DCO", "Policy", "ci-required"]
     }
     "homebrew-ruxel" = {
-      disposition     = "FullRuleset"
       visibility      = "public"
       required_checks = ["DCO", "Policy", "ci-required"]
     }
     "homebrew-tablerock" = {
-      disposition     = "FullRuleset"
       visibility      = "public"
       required_checks = ["DCO", "Policy", "ci-required"]
     }
     "homebrew-velnor" = {
-      disposition     = "FullRuleset"
       visibility      = "public"
       required_checks = ["DCO", "Policy", "ci-required"]
     }
     "jambalaya" = {
-      disposition     = "FullRuleset"
       visibility      = "public"
       required_checks = ["Control / Required"]
     }
     "parallax" = {
-      disposition     = "FullRuleset"
       visibility      = "public"
       required_checks = ["DCO", "Policy", "ci-required"]
     }
     "parallax-telemetry-playground" = {
-      disposition     = "FullRuleset"
       visibility      = "public"
       required_checks = ["DCO", "Policy", "ci-required"]
     }
     "pg-bigdecimal" = {
-      disposition     = "FullRuleset"
       visibility      = "public"
       required_checks = ["DCO", "Policy", "ci-required"]
     }
     "pgquill" = {
-      disposition     = "FullRuleset"
       visibility      = "public"
       required_checks = ["Control / Required"]
     }
     "renovate-rust" = {
-      disposition     = "FullRuleset"
       visibility      = "public"
       required_checks = []
+      no_ci_reason    = "No CI workflow emits a status context; DCO app results are not a CI check."
     }
     "ruxel" = {
-      disposition     = "FullRuleset"
       visibility      = "public"
       required_checks = ["DCO", "Policy", "ci-required"]
     }
     "schemalane" = {
-      disposition     = "FullRuleset"
       visibility      = "public"
       required_checks = ["DCO", "Policy", "ci-required"]
     }
     "tablerock" = {
-      disposition     = "FullRuleset"
       visibility      = "public"
       required_checks = ["DCO", "Policy", "ci-required"]
     }
     "tailrocks-code-quality-skills" = {
-      disposition     = "FullRuleset"
       visibility      = "public"
       required_checks = ["Required"]
     }
     "tailrocks-gradle-conventions" = {
-      disposition     = "FullRuleset"
       visibility      = "public"
       required_checks = ["Control / Required"]
     }
     "tailrocks-logo" = {
-      disposition     = "FullRuleset"
       visibility      = "public"
       required_checks = []
+      no_ci_reason    = "No CI workflow currently emits a status context."
     }
     "tailrocks-macos-skills" = {
-      disposition     = "FullRuleset"
       visibility      = "public"
       required_checks = ["Required"]
     }
     "tailrocks-open-source-skills" = {
-      disposition     = "FullRuleset"
       visibility      = "public"
       required_checks = ["Required"]
     }
     "tailrocks-pull-request-skills" = {
-      disposition     = "FullRuleset"
       visibility      = "public"
       required_checks = ["Required"]
     }
     "tailrocks-roadmap-skills" = {
-      disposition     = "FullRuleset"
       visibility      = "public"
       required_checks = ["Required"]
     }
     "tailrocks-rust-skills" = {
-      disposition     = "FullRuleset"
       visibility      = "public"
       required_checks = ["Required"]
     }
     "tailrocks-skill-authoring-skills" = {
-      disposition     = "FullRuleset"
       visibility      = "public"
       required_checks = ["Required"]
     }
     "tailrocks-skills" = {
-      disposition     = "FullRuleset"
       visibility      = "public"
       required_checks = ["DCO"]
     }
     "tailrocks-sqldiff" = {
-      disposition     = "FullRuleset"
       visibility      = "public"
       required_checks = []
+      no_ci_reason    = "No CI workflow currently emits a status context."
     }
     "tailrocks-typescript-skills" = {
-      disposition     = "FullRuleset"
       visibility      = "public"
       required_checks = ["Required"]
     }
     "terminal-components-claude" = {
-      disposition     = "FullRuleset"
       visibility      = "public"
       required_checks = ["Required"]
     }
     "termpane" = {
-      disposition     = "FullRuleset"
       visibility      = "public"
       required_checks = ["DCO", "Required"]
     }
     "termrock" = {
-      disposition     = "FullRuleset"
       visibility      = "public"
       required_checks = ["DCO", "Policy", "ci-required"]
     }
     "tracing-request-level" = {
-      disposition     = "FullRuleset"
       visibility      = "public"
       required_checks = ["DCO", "Policy", "ci-required"]
     }
     "tui-snap" = {
-      disposition     = "FullRuleset"
       visibility      = "public"
       required_checks = ["DCO", "Required"]
     }
     "velnor" = {
-      disposition     = "FullRuleset"
       visibility      = "public"
       required_checks = ["DCO", "Policy", "ci-required"]
     }
     "velnor-actions-fixture" = {
-      disposition     = "FullRuleset"
       visibility      = "public"
       required_checks = ["DCO", "Policy", "ci-required"]
     }
     "velnor-apt" = {
-      disposition     = "FullRuleset"
       visibility      = "public"
       required_checks = ["DCO", "Policy", "ci-required"]
     }
     "velnor-new" = {
-      disposition     = "FullRuleset"
       visibility      = "public"
       required_checks = ["Required"]
     }
     "vision" = {
-      disposition     = "FullRuleset"
       visibility      = "public"
       required_checks = []
+      no_ci_reason    = "No CI workflow currently emits a status context."
     }
   }
 }
