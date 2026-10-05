@@ -1,10 +1,9 @@
 variable "repository_policies" {
   description = "Map of repository names to their protection policy configurations"
   type = map(object({
-    disposition                          = string # "FullRuleset" | "RepoSettingsOnly"
-    visibility                           = string # "public" | "private"
-    required_checks                      = list(string)
-    strict_required_status_checks_policy = optional(bool, true)
+    disposition     = string # "FullRuleset" | "RepoSettingsOnly"
+    visibility      = string # "public" | "private"
+    required_checks = list(string)
   }))
 
   validation {
