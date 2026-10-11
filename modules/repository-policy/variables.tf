@@ -1,3 +1,6 @@
+# SPDX-FileCopyrightText: 2026 Alexey Zhokhov
+# SPDX-License-Identifier: Apache-2.0
+
 variable "repository_policies" {
   description = "Map of repository names to their protection policy configurations"
   type = map(object({
