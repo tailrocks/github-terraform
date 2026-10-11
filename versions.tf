@@ -9,10 +9,5 @@ terraform {
       source  = "integrations/github"
       version = "~> 6.13"
     }
-
-    onepassword = {
-      source  = "1password/onepassword"
-      version = "~> 3.3"
-    }
   }
 }

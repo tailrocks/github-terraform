@@ -14,17 +14,6 @@ variable "github_token" {
   default     = null
 }
 
-variable "secret_visibility" {
-  type        = string
-  description = "Fallback org secret visibility when an entry omits it: all, private, or selected. All managed repos are public, so private hides a secret from everywhere; prefer explicit per-entry visibility."
-  default     = "selected"
-
-  validation {
-    condition     = contains(["all", "private", "selected"], var.secret_visibility)
-    error_message = "secret_visibility must be one of: all, private, selected."
-  }
-}
-
 variable "repository_policies" {
   description = "Authoritative inventory of managed repositories and their visibility and check policy."
   type = map(object({
