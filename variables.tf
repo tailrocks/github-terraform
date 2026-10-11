@@ -123,6 +123,16 @@ variable "repository_policies" {
       required_checks = []
       no_ci_reason    = "No CI workflow emits a status context; DCO app results are not a CI check."
     }
+    "repo-scan" = {
+      # local.check_templates.required_only
+      visibility      = "public"
+      required_checks = ["Required"]
+    }
+    "rust-repository-policy" = {
+      visibility      = "public"
+      required_checks = []
+      no_ci_reason    = "No CI workflow emits a status context on the default branch; only tag-push release checks exist."
+    }
     "ruxel" = {
       visibility      = "public"
       required_checks = ["DCO", "Policy", "ci-required"]
@@ -135,7 +145,17 @@ variable "repository_policies" {
       visibility      = "public"
       required_checks = ["DCO", "Policy", "ci-required"]
     }
+    "tailrocks-asd-ste100-skills" = {
+      # local.check_templates.required_only
+      visibility      = "private"
+      required_checks = ["Required"]
+    }
     "tailrocks-code-quality-skills" = {
+      visibility      = "public"
+      required_checks = ["Required"]
+    }
+    "tailrocks-contribution-skills" = {
+      # local.check_templates.required_only
       visibility      = "public"
       required_checks = ["Required"]
     }
@@ -157,6 +177,11 @@ variable "repository_policies" {
       required_checks = ["Required"]
     }
     "tailrocks-pull-request-skills" = {
+      visibility      = "public"
+      required_checks = ["Required"]
+    }
+    "tailrocks-repository-skills" = {
+      # local.check_templates.required_only
       visibility      = "public"
       required_checks = ["Required"]
     }
@@ -202,6 +227,11 @@ variable "repository_policies" {
       required_checks = ["DCO", "Policy", "ci-required"]
     }
     "tui-snap" = {
+      visibility      = "public"
+      required_checks = ["DCO", "Required"]
+    }
+    "tuiscotti" = {
+      # Bespoke: matches live protect-main ruleset 23746094 required contexts (DCO + Required).
       visibility      = "public"
       required_checks = ["DCO", "Required"]
     }
