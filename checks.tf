@@ -14,16 +14,16 @@ check "mandatory_target_repositories_present" {
       "schemalane", "tablerock", "tailrocks-asd-ste100-skills",
       "tailrocks-code-quality-skills", "tailrocks-contribution-skills",
       "tailrocks-gradle-conventions", "tailrocks-logo",
-      "tailrocks-macos-skills", "tailrocks-open-source-skills",
+      "tailrocks-macos-skills",
       "tailrocks-pull-request-skills", "tailrocks-repository-skills",
       "tailrocks-roadmap-skills", "tailrocks-rust-skills",
       "tailrocks-skill-authoring-skills", "tailrocks-skills",
       "tailrocks-sqldiff", "tailrocks-typescript-skills",
       "terminal-components-claude", "termpane", "termrock",
-      "tracing-request-level", "tui-snap", "tuiscotti", "velnor",
+      "tracing-request-level", "tuiscotti", "velnor",
       "velnor-actions-fixture", "velnor-apt", "velnor-new", "vision",
     ])
-    error_message = "repository_policies must contain exactly the 47 managed tailrocks repositories."
+    error_message = "repository_policies must contain exactly the 45 managed tailrocks repositories."
   }
 }
 

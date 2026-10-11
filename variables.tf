@@ -161,10 +161,6 @@ variable "repository_policies" {
       visibility      = "public"
       required_checks = ["Required"]
     }
-    "tailrocks-open-source-skills" = {
-      visibility      = "public"
-      required_checks = ["Required"]
-    }
     "tailrocks-pull-request-skills" = {
       visibility      = "public"
       required_checks = ["Required"]
@@ -214,10 +210,6 @@ variable "repository_policies" {
     "tracing-request-level" = {
       visibility      = "public"
       required_checks = ["DCO", "Policy", "ci-required"]
-    }
-    "tui-snap" = {
-      visibility      = "public"
-      required_checks = ["DCO", "Required"]
     }
     "tuiscotti" = {
       # Bespoke: matches live protect-main ruleset 23746094 required contexts (DCO + Required).

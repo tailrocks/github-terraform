@@ -159,11 +159,6 @@ import {
 }
 
 import {
-  to = module.repository_policy.github_repository.managed_settings["tailrocks-open-source-skills"]
-  id = "tailrocks-open-source-skills"
-}
-
-import {
   to = module.repository_policy.github_repository.managed_settings["tailrocks-pull-request-skills"]
   id = "tailrocks-pull-request-skills"
 }
@@ -220,11 +215,6 @@ import {
 import {
   to = module.repository_policy.github_repository.managed_settings["tracing-request-level"]
   id = "tracing-request-level"
-}
-
-import {
-  to = module.repository_policy.github_repository.managed_settings["tui-snap"]
-  id = "tui-snap"
 }
 
 import {
@@ -338,6 +328,16 @@ import {
 }
 
 import {
+  to = module.repository_policy.github_repository_ruleset.protect_main["repo-scan"]
+  id = "repo-scan:24877074"
+}
+
+import {
+  to = module.repository_policy.github_repository_ruleset.protect_main["rust-repository-policy"]
+  id = "rust-repository-policy:24877097"
+}
+
+import {
   to = module.repository_policy.github_repository_ruleset.protect_main["ruxel"]
   id = "ruxel:19573057"
 }
@@ -374,6 +374,11 @@ import {
 import {
   to = module.repository_policy.github_repository_ruleset.protect_main["tailrocks-pull-request-skills"]
   id = "tailrocks-pull-request-skills:23746082"
+}
+
+import {
+  to = module.repository_policy.github_repository_ruleset.protect_main["tailrocks-repository-skills"]
+  id = "tailrocks-repository-skills:24877099"
 }
 
 import {
@@ -533,6 +538,16 @@ import {
 }
 
 import {
+  to = module.repository_policy.github_repository_ruleset.protect_tags["repo-scan"]
+  id = "repo-scan:24877093"
+}
+
+import {
+  to = module.repository_policy.github_repository_ruleset.protect_tags["rust-repository-policy"]
+  id = "rust-repository-policy:24877092"
+}
+
+import {
   to = module.repository_policy.github_repository_ruleset.protect_tags["ruxel"]
   id = "ruxel:19572976"
 }
@@ -569,6 +584,11 @@ import {
 import {
   to = module.repository_policy.github_repository_ruleset.protect_tags["tailrocks-pull-request-skills"]
   id = "tailrocks-pull-request-skills:23746069"
+}
+
+import {
+  to = module.repository_policy.github_repository_ruleset.protect_tags["tailrocks-repository-skills"]
+  id = "tailrocks-repository-skills:24877095"
 }
 
 import {

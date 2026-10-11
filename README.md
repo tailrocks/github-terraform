@@ -1,7 +1,7 @@
 # github-terraform
 
 Manages GitHub repository settings and branch/tag protection for the
-`tailrocks` organization: 47 repositories, each with repository merge
+`tailrocks` organization: 45 repositories, each with repository merge
 settings plus `protect-main` and `protect-tags` rulesets.
 
 ## Layout
@@ -18,11 +18,11 @@ settings plus `protect-main` and `protect-tags` rulesets.
 
 ## Authentication
 
-Run tofu with `GITHUB_TOKEN` exported in the shell; the GitHub provider
-reads it from the environment. The token needs Administration: write on
-every managed repository. It also needs org admin on `tailrocks` for the
-organization settings, Actions policies, and runner group in
-`organization.tf`.
+Run tofu with `GITHUB_TOKEN` exported in the shell, or via the mise tasks
+`mise run tofu:plan` / `mise run tofu:apply`, which inject the organization
+token from 1Password. The token needs Administration: write on every managed
+repository. It also needs org admin on `tailrocks` for the organization
+settings, Actions policies, and runner group in `organization.tf`.
 
 ## Adding a repository
 
