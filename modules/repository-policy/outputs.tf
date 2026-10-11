@@ -1,3 +1,6 @@
+# SPDX-FileCopyrightText: 2026 Alexey Zhokhov
+# SPDX-License-Identifier: Apache-2.0
+
 output "managed_repositories" {
   description = "Set of managed repository names (inventory keys)"
   value       = local.managed_repositories
@@ -27,7 +30,7 @@ output "required_check_contexts" {
 }
 
 output "repository_ids" {
-  description = "Map of repository name to numeric repository ID (consumed by the velnor-trusted runner group)"
+  description = "Map of repository name to repository ID"
   value = {
     for k, v in github_repository.managed_settings : k => v.repo_id
   }
