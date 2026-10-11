@@ -5,24 +5,28 @@
 crash.log
 crash.*.log
 
-# OpenTofu working directory (lock file IS committed)
+# OpenTofu working directory and provider cache
 .terraform/
 .terraform.tfstate.lock.info
 
-# Variable files — may contain secrets or internal structure
+# OpenTofu variable files — often contain secrets
 *.tfvars
 *.tfvars.json
 *.auto.tfvars
 *.auto.tfvars.json
 !terraform.tfvars.example
 
-# Override files — local-only config
+# OpenTofu override files — often used for local-only config
 override.tf
 override.tf.json
 *_override.tf
 *_override.tf.json
+override.tofu
+override.tofu.json
+*_override.tofu
+*_override.tofu.json
 
-# Credentials and environment
+# Credentials and environment files
 .env
 .env.*
 .envrc
@@ -30,8 +34,11 @@ override.tf.json
 *.key
 *.p12
 *.pfx
+id_rsa*
+id_ed25519*
 
 # Editor/tool local state
+.worktrees/
 .idea/
 .vscode/
 *.swp

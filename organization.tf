@@ -1,3 +1,6 @@
+# SPDX-FileCopyrightText: 2026 Alexey Zhokhov
+# SPDX-License-Identifier: Apache-2.0
+
 # Organization-wide policy. Actions permissions and workflow defaults match the
 # live baseline (tightening waits for per-repo workflow audits). New-repository
 # security defaults are intentionally hardened (detection-only, future repos).

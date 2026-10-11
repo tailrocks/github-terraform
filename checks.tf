@@ -1,4 +1,7 @@
-# Deterministic invariant assertions for TailRocks GitHub policy management
+# SPDX-FileCopyrightText: 2026 Alexey Zhokhov
+# SPDX-License-Identifier: Apache-2.0
+
+# Deterministic invariant assertions to prevent policy weakening and inventory omissions
 
 check "mandatory_target_repositories_present" {
   assert {
