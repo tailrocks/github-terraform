@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 [tools]
-opentofu = "1.12.5"
+opentofu = "1.13.1"
 
 [settings]
 lockfile = true
