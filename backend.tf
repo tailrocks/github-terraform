@@ -1,9 +1,8 @@
-terraform {
-  required_version = ">= 1.7.0"
-}
+# Local state backend. No remote backend is configured; remote-state
+# migration stays out of scope for the policy unification.
 
 # TODO: initialize once you are ready for remote state.
-# Example with an existing bucket/back-end:
+# Example with an existing bucket back-end:
 # terraform {
 #   backend "s3" {
 #     bucket  = "tailrocks-terraform-state"

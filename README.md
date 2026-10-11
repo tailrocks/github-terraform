@@ -31,7 +31,7 @@ Matches `jackin-project/jackin-github-terraform`:
 | Default branch ruleset `protect-main` | active (all managed repos) |
 | Tag ruleset `protect-tags` | active (all managed repos) |
 
-All managed repositories are public, so every repo receives the full ruleset pair. (Rulesets and branch protection are unavailable to private repos on the free org plan, which is why no private repo may stay `RepoSettingsOnly` without losing merge gating.)
+All managed repositories are public, so every repo receives the full ruleset pair (settings plus protect-main and protect-tags).
 
 ### Organization secrets (optional)
 
@@ -41,7 +41,7 @@ All managed repositories are public, so every repo receives the full ruleset pai
 
 ## Managed repositories
 
-See `var.managed_repositories` in `variables.tf` (41 repositories today). The requested coverage set contains 34 repositories; seven additional managed repositories remain in the inventory: `graphql-java-datetime`, `jambalaya`, `pgquill`, `renovate-rust`, `tailrocks-gradle-conventions`, `tailrocks-logo`, and `tailrocks-sqldiff`.
+See `var.repository_policies` in `variables.tf` (41 repositories today).
 
 ## Prerequisites
 
@@ -88,9 +88,9 @@ Existing repos are imported via `imports.tf` on first apply.
 
 ## Required status checks
 
-Set each repository's `required_checks` in `managed_repositories` in `variables.tf` to its exact GitHub check-run names. Current contexts include `Required`, `Control / Required`, and—where configured—`DCO`, `Policy`, and `ci-required`. `terminal-components-claude` and `velnor-new` require `Required`; `github-terraform` requires `DCO` and `Required`. All configured checks must pass on the pull request head, but the head does not need to include the latest default-branch commit. The shared module fixes status-check freshness to false, and no repository input can turn it back on. Resolved review threads, squash-only merging, and the other branch safeguards remain required for all managed repositories. GitHub's update-branch suggestion is disabled across the inventory.
+Set each repository's `required_checks` in `repository_policies` in `variables.tf` to its exact GitHub check-run names. Current contexts include `Required`, `Control / Required`, and—where configured—`DCO`, `Policy`, and `ci-required`. `terminal-components-claude` and `velnor-new` require `Required`; `github-terraform` requires `DCO` and `Required`. All configured checks must pass on the pull request head, but the head does not need to include the latest default-branch commit. The shared module fixes status-check freshness to false, and no repository input can turn it back on. Resolved review threads, squash-only merging, and the other branch safeguards remain required for all managed repositories. GitHub's update-branch suggestion is disabled across the in…
 
-`renovate-rust`, `tailrocks-logo`, `tailrocks-sqldiff`, and `vision` currently have no observed CI workflow check context, so their `required_checks` remain empty until a real CI check is available. The DCO app status on renovate-rust pull requests is not a CI workflow result.
+`jambalaya`, `renovate-rust`, `tailrocks-logo`, `tailrocks-sqldiff`, and `vision` currently have no observed CI workflow check context, so their `required_checks` remain empty with an explicit `no_ci_reason` until a real CI check is available. The DCO app status on renovate-rust pull requests is not a CI workflow result. See `locals.check_templates` in `locals.tf` for the check templates to use when adding a repo.
 
 ## Emergency break-glass
 
@@ -99,7 +99,7 @@ Rulesets have zero standing bypasses, so when required checks are unhealthy (CI/
 1. In **Settings → Rules → protect-main**, temporarily set enforcement to `disabled` (note the time and reason).
 2. Merge the urgent fix via PR (squash-only merge methods are still enforced by repo settings; linear history and thread resolution are suspended with the ruleset).
 3. Immediately re-enable enforcement to `active`.
-4. Run the live audit (`LIVE_AUDIT=1 bash tests/verify-policy.sh`) to confirm all rulesets are active and match config.
+4. Re-run `tofu plan` to confirm all rulesets are active and match config.
 5. Open a follow-up PR + postmortem note describing what was bypassed and why.
 
 Never leave a ruleset disabled: the live audit fails loudly until it is restored.

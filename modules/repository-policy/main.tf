@@ -4,28 +4,21 @@ terraform {
   required_providers {
     github = {
       source  = "integrations/github"
-      version = "~> 6.0"
+      version = "~> 6.13"
     }
   }
 }
 
 locals {
-  managed_settings_repositories = toset([
-    for repo, policy in var.repository_policies : repo
-    if contains(["FullRuleset", "RepoSettingsOnly"], policy.disposition)
-  ])
-
-  full_ruleset_repositories = toset([
-    for repo, policy in var.repository_policies : repo
-    if policy.disposition == "FullRuleset"
-  ])
+  managed_repositories = toset(keys(var.repository_policies))
 }
 
 # Repository-level merge settings (Tier 1 enforcement across all repos)
 resource "github_repository" "managed_settings" {
-  for_each = local.managed_settings_repositories
+  for_each = local.managed_repositories
 
-  name = each.value
+  name       = each.value
+  visibility = var.repository_policies[each.value].visibility
 
   # Strict squash-only merge policy
   allow_squash_merge = true
@@ -36,7 +29,7 @@ resource "github_repository" "managed_settings" {
   squash_merge_commit_title   = "PR_TITLE"
   squash_merge_commit_message = "PR_BODY"
 
-  # Branch lifecycle management
+  # Keep GitHub from offering the pull-request branch-update action.
   allow_update_branch    = false
   delete_branch_on_merge = true
 
@@ -49,7 +42,6 @@ resource "github_repository" "managed_settings" {
       has_projects,
       has_wiki,
       has_discussions,
-      visibility,
       archived,
       topics,
       vulnerability_alerts,
@@ -63,12 +55,12 @@ resource "github_repository" "managed_settings" {
 
 # Branch ruleset on main / default branch (Tier 2 ref protection)
 resource "github_repository_ruleset" "protect_main" {
-  for_each = local.full_ruleset_repositories
+  for_each = local.managed_repositories
 
   name        = "protect-main"
   target      = "branch"
   enforcement = "active"
-  repository  = each.value
+  repository  = github_repository.managed_settings[each.value].name
 
   conditions {
     ref_name {
@@ -97,7 +89,6 @@ resource "github_repository_ruleset" "protect_main" {
     dynamic "required_status_checks" {
       for_each = length(var.repository_policies[each.value].required_checks) > 0 ? [1] : []
       content {
-        # Green checks on the pull-request head must not require a main-branch update.
         strict_required_status_checks_policy = false
         do_not_enforce_on_create             = false
 
@@ -114,12 +105,12 @@ resource "github_repository_ruleset" "protect_main" {
 
 # Tag ruleset protecting all tags
 resource "github_repository_ruleset" "protect_tags" {
-  for_each = local.full_ruleset_repositories
+  for_each = local.managed_repositories
 
   name        = "protect-tags"
   target      = "tag"
   enforcement = "active"
-  repository  = each.value
+  repository  = github_repository.managed_settings[each.value].name
 
   conditions {
     ref_name {

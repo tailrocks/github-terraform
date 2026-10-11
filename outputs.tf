@@ -14,13 +14,13 @@ output "organization" {
 }
 
 output "managed_repositories" {
-  value       = sort(module.repository_policy.managed_settings_repositories)
+  value       = sort(tolist(module.repository_policy.managed_repositories))
   description = "Repositories under merge-policy management."
 }
 
 output "ruleset_repositories" {
-  value       = sort(module.repository_policy.full_ruleset_repositories)
-  description = "Public repositories that also receive protect-main / protect-tags rulesets."
+  value       = sort(tolist(module.repository_policy.managed_repositories))
+  description = "Repositories that receive protect-main / protect-tags rulesets (identical to managed set: every inventory entry receives both rulesets)."
 }
 
 output "velnor_runner_group_repositories" {

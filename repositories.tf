@@ -6,7 +6,7 @@
 module "repository_policy" {
   source = "./modules/repository-policy"
 
-  repository_policies = var.managed_repositories
+  repository_policies = var.repository_policies
 }
 
 moved {
