@@ -372,11 +372,6 @@ import {
 }
 
 import {
-  to = module.repository_policy.github_repository_ruleset.protect_main["tailrocks-open-source-skills"]
-  id = "tailrocks-open-source-skills:23746090"
-}
-
-import {
   to = module.repository_policy.github_repository_ruleset.protect_main["tailrocks-pull-request-skills"]
   id = "tailrocks-pull-request-skills:23746082"
 }
@@ -419,11 +414,6 @@ import {
 import {
   to = module.repository_policy.github_repository_ruleset.protect_main["termpane"]
   id = "termpane:23746101"
-}
-
-import {
-  to = module.repository_policy.github_repository_ruleset.protect_main["tui-snap"]
-  id = "tui-snap:23746094"
 }
 
 import {
@@ -577,11 +567,6 @@ import {
 }
 
 import {
-  to = module.repository_policy.github_repository_ruleset.protect_tags["tailrocks-open-source-skills"]
-  id = "tailrocks-open-source-skills:23746068"
-}
-
-import {
   to = module.repository_policy.github_repository_ruleset.protect_tags["tailrocks-pull-request-skills"]
   id = "tailrocks-pull-request-skills:23746069"
 }
@@ -624,11 +609,6 @@ import {
 import {
   to = module.repository_policy.github_repository_ruleset.protect_tags["termpane"]
   id = "termpane:23746073"
-}
-
-import {
-  to = module.repository_policy.github_repository_ruleset.protect_tags["tui-snap"]
-  id = "tui-snap:23746052"
 }
 
 import {
