@@ -106,6 +106,15 @@ import {
 }
 
 import {
+  to = module.repository_policy.github_repository.managed_settings["repo-scan"]
+  id = "repo-scan"
+}
+
+import {
+  to = module.repository_policy.github_repository.managed_settings["rust-repository-policy"]
+  id = "rust-repository-policy"
+}
+import {
   to = module.repository_policy.github_repository.managed_settings["ruxel"]
   id = "ruxel"
 }
@@ -121,10 +130,19 @@ import {
 }
 
 import {
+  to = module.repository_policy.github_repository.managed_settings["tailrocks-asd-ste100-skills"]
+  id = "tailrocks-asd-ste100-skills"
+}
+
+import {
   to = module.repository_policy.github_repository.managed_settings["tailrocks-code-quality-skills"]
   id = "tailrocks-code-quality-skills"
 }
 
+import {
+  to = module.repository_policy.github_repository.managed_settings["tailrocks-contribution-skills"]
+  id = "tailrocks-contribution-skills"
+}
 import {
   to = module.repository_policy.github_repository.managed_settings["tailrocks-gradle-conventions"]
   id = "tailrocks-gradle-conventions"
@@ -150,6 +168,10 @@ import {
   id = "tailrocks-pull-request-skills"
 }
 
+import {
+  to = module.repository_policy.github_repository.managed_settings["tailrocks-repository-skills"]
+  id = "tailrocks-repository-skills"
+}
 import {
   to = module.repository_policy.github_repository.managed_settings["tailrocks-roadmap-skills"]
   id = "tailrocks-roadmap-skills"
@@ -205,6 +227,10 @@ import {
   id = "tui-snap"
 }
 
+import {
+  to = module.repository_policy.github_repository.managed_settings["tuiscotti"]
+  id = "tuiscotti"
+}
 import {
   to = module.repository_policy.github_repository.managed_settings["velnor"]
   id = "velnor"
@@ -332,6 +358,10 @@ import {
 }
 
 import {
+  to = module.repository_policy.github_repository_ruleset.protect_main["tailrocks-contribution-skills"]
+  id = "tailrocks-contribution-skills:23746090"
+}
+import {
   to = module.repository_policy.github_repository_ruleset.protect_main["tailrocks-gradle-conventions"]
   id = "tailrocks-gradle-conventions:19573041"
 }
@@ -394,6 +424,11 @@ import {
 import {
   to = module.repository_policy.github_repository_ruleset.protect_main["tui-snap"]
   id = "tui-snap:23746094"
+}
+
+import {
+  to = module.repository_policy.github_repository_ruleset.protect_main["tuiscotti"]
+  id = "tuiscotti:23746094"
 }
 
 import {
@@ -528,6 +563,10 @@ import {
 }
 
 import {
+  to = module.repository_policy.github_repository_ruleset.protect_tags["tailrocks-contribution-skills"]
+  id = "tailrocks-contribution-skills:23746068"
+}
+import {
   to = module.repository_policy.github_repository_ruleset.protect_tags["tailrocks-gradle-conventions"]
   id = "tailrocks-gradle-conventions:19573027"
 }
@@ -592,6 +631,10 @@ import {
   id = "tui-snap:23746052"
 }
 
+import {
+  to = module.repository_policy.github_repository_ruleset.protect_tags["tuiscotti"]
+  id = "tuiscotti:23746052"
+}
 import {
   to = module.repository_policy.github_repository_ruleset.protect_tags["termrock"]
   id = "termrock:19573026"

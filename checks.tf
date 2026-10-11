@@ -10,18 +10,20 @@ check "mandatory_target_repositories_present" {
       "holla-apt", "homebrew-holla", "homebrew-parallax", "homebrew-ruxel",
       "homebrew-tablerock", "homebrew-velnor", "jambalaya", "parallax",
       "parallax-telemetry-playground", "pg-bigdecimal", "pgquill",
-      "renovate-rust", "ruxel", "schemalane", "tablerock",
-      "tailrocks-code-quality-skills", "tailrocks-gradle-conventions",
-      "tailrocks-logo", "tailrocks-macos-skills",
-      "tailrocks-open-source-skills", "tailrocks-pull-request-skills",
+      "renovate-rust", "repo-scan", "rust-repository-policy", "ruxel",
+      "schemalane", "tablerock", "tailrocks-asd-ste100-skills",
+      "tailrocks-code-quality-skills", "tailrocks-contribution-skills",
+      "tailrocks-gradle-conventions", "tailrocks-logo",
+      "tailrocks-macos-skills", "tailrocks-open-source-skills",
+      "tailrocks-pull-request-skills", "tailrocks-repository-skills",
       "tailrocks-roadmap-skills", "tailrocks-rust-skills",
       "tailrocks-skill-authoring-skills", "tailrocks-skills",
       "tailrocks-sqldiff", "tailrocks-typescript-skills",
       "terminal-components-claude", "termpane", "termrock",
-      "tracing-request-level", "tui-snap", "velnor",
+      "tracing-request-level", "tui-snap", "tuiscotti", "velnor",
       "velnor-actions-fixture", "velnor-apt", "velnor-new", "vision",
     ])
-    error_message = "repository_policies must contain exactly the 41 managed tailrocks repositories."
+    error_message = "repository_policies must contain exactly the 47 managed tailrocks repositories."
   }
 }
 
@@ -48,8 +50,8 @@ check "no_ci_exception_allowlist_is_explicit" {
     condition = toset([
       for name, policy in var.repository_policies : name
       if policy.no_ci_reason != null
-    ]) == toset(["jambalaya", "renovate-rust", "tailrocks-logo", "tailrocks-sqldiff", "vision"])
-    error_message = "Only jambalaya, renovate-rust, tailrocks-logo, tailrocks-sqldiff, and vision may carry a no_ci_reason exception."
+    ]) == toset(["jambalaya", "renovate-rust", "rust-repository-policy", "tailrocks-logo", "tailrocks-sqldiff", "vision"])
+    error_message = "Only jambalaya, renovate-rust, rust-repository-policy, tailrocks-logo, tailrocks-sqldiff, and vision may carry a no_ci_reason exception."
   }
 }
 
