@@ -1,3 +1,6 @@
+# SPDX-FileCopyrightText: 2026 Alexey Zhokhov
+# SPDX-License-Identifier: Apache-2.0
+
 resource "github_actions_organization_secret" "org_secret" {
   for_each = local.org_secrets
 

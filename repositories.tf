@@ -1,3 +1,6 @@
+# SPDX-FileCopyrightText: 2026 Alexey Zhokhov
+# SPDX-License-Identifier: Apache-2.0
+
 # Managed repository settings + rulesets.
 # Authoritative canonical module: modules/repository-policy
 # Enforces squash-only merges, delete head branch, allow update branch,
@@ -9,17 +12,3 @@ module "repository_policy" {
   repository_policies = var.repository_policies
 }
 
-moved {
-  from = github_repository.managed_settings
-  to   = module.repository_policy.github_repository.managed_settings
-}
-
-moved {
-  from = github_repository_ruleset.protect_main
-  to   = module.repository_policy.github_repository_ruleset.protect_main
-}
-
-moved {
-  from = github_repository_ruleset.protect_tags
-  to   = module.repository_policy.github_repository_ruleset.protect_tags
-}

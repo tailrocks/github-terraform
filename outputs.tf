@@ -1,3 +1,6 @@
+# SPDX-FileCopyrightText: 2026 Alexey Zhokhov
+# SPDX-License-Identifier: Apache-2.0
+
 output "managed_secrets" {
   value = {
     for name, secret in github_actions_organization_secret.org_secret :
@@ -18,9 +21,19 @@ output "managed_repositories" {
   description = "Repositories under merge-policy management."
 }
 
-output "ruleset_repositories" {
-  value       = sort(tolist(module.repository_policy.managed_repositories))
-  description = "Repositories that receive protect-main / protect-tags rulesets (identical to managed set: every inventory entry receives both rulesets)."
+output "repository_settings" {
+  description = "Map of repository merge and lifecycle settings"
+  value       = module.repository_policy.repository_settings
+}
+
+output "required_check_contexts" {
+  description = "Map of repository name to its required status-check contexts"
+  value       = module.repository_policy.required_check_contexts
+}
+
+output "repository_ids" {
+  description = "Map of repository name to repository ID"
+  value       = module.repository_policy.repository_ids
 }
 
 output "velnor_runner_group_repositories" {

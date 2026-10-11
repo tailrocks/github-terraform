@@ -1,3 +1,6 @@
+# SPDX-FileCopyrightText: 2026 Alexey Zhokhov
+# SPDX-License-Identifier: Apache-2.0
+
 variable "github_organization" {
   type        = string
   description = "GitHub organization name for TailRocks"

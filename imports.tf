@@ -1,3 +1,6 @@
+# SPDX-FileCopyrightText: 2026 Alexey Zhokhov
+# SPDX-License-Identifier: Apache-2.0
+
 # Import existing GitHub repositories and rulesets into module.repository_policy.
 # Safe to keep: OpenTofu no-ops imports already present in state.
 
