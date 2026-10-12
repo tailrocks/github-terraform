@@ -14,17 +14,6 @@ variable "github_token" {
   default     = null
 }
 
-variable "secret_visibility" {
-  type        = string
-  description = "Fallback org secret visibility when an entry omits it: all, private, or selected. All managed repos are public, so private hides a secret from everywhere; prefer explicit per-entry visibility."
-  default     = "selected"
-
-  validation {
-    condition     = contains(["all", "private", "selected"], var.secret_visibility)
-    error_message = "secret_visibility must be one of: all, private, selected."
-  }
-}
-
 variable "repository_policies" {
   description = "Authoritative inventory of managed repositories and their visibility and check policy."
   type = map(object({
@@ -172,10 +161,6 @@ variable "repository_policies" {
       visibility      = "public"
       required_checks = ["Required"]
     }
-    "tailrocks-open-source-skills" = {
-      visibility      = "public"
-      required_checks = ["Required"]
-    }
     "tailrocks-pull-request-skills" = {
       visibility      = "public"
       required_checks = ["Required"]
@@ -225,10 +210,6 @@ variable "repository_policies" {
     "tracing-request-level" = {
       visibility      = "public"
       required_checks = ["DCO", "Policy", "ci-required"]
-    }
-    "tui-snap" = {
-      visibility      = "public"
-      required_checks = ["DCO", "Required"]
     }
     "tuiscotti" = {
       # Bespoke: matches live protect-main ruleset 23746094 required contexts (DCO + Required).

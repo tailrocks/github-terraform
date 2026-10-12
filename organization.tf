@@ -27,7 +27,8 @@ resource "github_organization_settings" "tailrocks" {
   members_can_fork_private_repositories = false
   web_commit_signoff_required           = false
 
-  advanced_security_enabled_for_new_repositories               = true
+  # advanced_security_enabled_for_new_repositories omitted: the org is on the
+  # free plan and the API silently ignores it (perpetual diff otherwise).
   dependabot_alerts_enabled_for_new_repositories               = true
   dependabot_security_updates_enabled_for_new_repositories     = true
   dependency_graph_enabled_for_new_repositories                = true
