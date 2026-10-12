@@ -31,10 +31,10 @@ settings, Actions policies, and runner group in `organization.tf`.
    `control` = `["Control / Required"]`, `required_only` = `["Required"]`,
    `dco_only` = `["DCO"]`, `policy` = `["Policy"]`); bespoke checks inline
    with a comment citing the producing workflow. Repos with no CI use
-   `required_checks = []` plus a non-empty `no_ci_reason`, extend the
-   allowlist check in `checks.tf`, and always add the name to the mandatory
-   list in `mandatory_target_repositories_present` in `checks.tf` (updating
-   its count and message).
+   `required_checks = []` plus a non-empty `no_ci_reason` and extend the
+   allowlist check in `checks.tf`. Always add the name to the mandatory list
+   in `mandatory_target_repositories_present` in `checks.tf` (updating its
+   count and message).
 2. Add one import triple (settings + `protect_main` + `protect_tags`) to
    `imports.tf` using the live numeric ruleset IDs.
 
