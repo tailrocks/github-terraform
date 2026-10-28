@@ -46,7 +46,7 @@ resource "github_actions_organization_workflow_permissions" "tailrocks" {
   organization_slug = var.github_organization
 
   default_workflow_permissions     = "write"
-  can_approve_pull_request_reviews = false
+  can_approve_pull_request_reviews = true
 }
 
 resource "github_actions_runner_group" "velnor_trusted" {
