@@ -8,7 +8,7 @@ check "mandatory_target_repositories_present" {
     condition = toset(keys(var.repository_policies)) == toset([
       "cloudflare-tofu", "github-terraform", "graphql-java-datetime", "holla",
       "holla-apt", "homebrew-holla", "homebrew-parallax", "homebrew-ruxel",
-      "homebrew-tablerock", "homebrew-velnor", "jambalaya", "parallax",
+      "homebrew-tablerock", "homebrew-velnor-legacy", "jambalaya", "parallax",
       "parallax-telemetry-playground", "pg-bigdecimal", "pgquill",
       "renovate-rust", "repo-scan", "rust-repository-policy", "ruxel",
       "schemalane", "tablerock", "tailrocks-asd-ste100-skills",
@@ -20,10 +20,10 @@ check "mandatory_target_repositories_present" {
       "tailrocks-skill-authoring-skills", "tailrocks-skills",
       "tailrocks-sqldiff", "tailrocks-typescript-skills",
       "terminal-components-claude", "termpane", "termrock",
-      "tracing-request-level", "tuiscotti", "velnor",
-      "velnor-actions-fixture", "velnor-apt", "velnor-new", "vision",
+      "tracing-request-level", "tuiscotti", "velnor-actions-fixture-legacy",
+      "velnor-apt-legacy", "velnor-lab", "velnor-legacy", "velnor-new", "vision",
     ])
-    error_message = "repository_policies must contain exactly the 45 managed tailrocks repositories."
+    error_message = "repository_policies must contain exactly the 46 managed tailrocks repositories."
   }
 }
 

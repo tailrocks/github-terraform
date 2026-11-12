@@ -82,7 +82,7 @@ variable "repository_policies" {
       visibility      = "public"
       required_checks = ["DCO", "Policy", "ci-required"]
     }
-    "homebrew-velnor" = {
+    "homebrew-velnor-legacy" = {
       visibility      = "public"
       required_checks = ["DCO", "Policy", "ci-required"]
     }
@@ -216,15 +216,20 @@ variable "repository_policies" {
       visibility      = "public"
       required_checks = ["DCO", "Required"]
     }
-    "velnor" = {
+    "velnor-actions-fixture-legacy" = {
       visibility      = "public"
       required_checks = ["DCO", "Policy", "ci-required"]
     }
-    "velnor-actions-fixture" = {
+    "velnor-apt-legacy" = {
       visibility      = "public"
       required_checks = ["DCO", "Policy", "ci-required"]
     }
-    "velnor-apt" = {
+    "velnor-lab" = {
+      # dco_only until the generated Rust CI workflow exists; then add its gate check.
+      visibility      = "public"
+      required_checks = ["DCO"]
+    }
+    "velnor-legacy" = {
       visibility      = "public"
       required_checks = ["DCO", "Policy", "ci-required"]
     }
@@ -254,9 +259,9 @@ variable "velnor_runner_group_repositories" {
     "tablerock",
     "termrock",
     "tracing-request-level",
-    "velnor",
-    "velnor-actions-fixture",
-    "velnor-apt",
+    "velnor-actions-fixture-legacy",
+    "velnor-apt-legacy",
+    "velnor-legacy",
   ]
 
   validation {

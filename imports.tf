@@ -71,8 +71,8 @@ import {
 }
 
 import {
-  to = module.repository_policy.github_repository.managed_settings["homebrew-velnor"]
-  id = "homebrew-velnor"
+  to = module.repository_policy.github_repository.managed_settings["homebrew-velnor-legacy"]
+  id = "homebrew-velnor-legacy"
 }
 
 import {
@@ -222,18 +222,18 @@ import {
   id = "tuiscotti"
 }
 import {
-  to = module.repository_policy.github_repository.managed_settings["velnor"]
-  id = "velnor"
+  to = module.repository_policy.github_repository.managed_settings["velnor-legacy"]
+  id = "velnor-legacy"
 }
 
 import {
-  to = module.repository_policy.github_repository.managed_settings["velnor-actions-fixture"]
-  id = "velnor-actions-fixture"
+  to = module.repository_policy.github_repository.managed_settings["velnor-actions-fixture-legacy"]
+  id = "velnor-actions-fixture-legacy"
 }
 
 import {
-  to = module.repository_policy.github_repository.managed_settings["velnor-apt"]
-  id = "velnor-apt"
+  to = module.repository_policy.github_repository.managed_settings["velnor-apt-legacy"]
+  id = "velnor-apt-legacy"
 }
 
 import {
@@ -293,8 +293,8 @@ import {
 }
 
 import {
-  to = module.repository_policy.github_repository_ruleset.protect_main["homebrew-velnor"]
-  id = "homebrew-velnor:23746087"
+  to = module.repository_policy.github_repository_ruleset.protect_main["homebrew-velnor-legacy"]
+  id = "homebrew-velnor-legacy:23746087"
 }
 
 import {
@@ -437,18 +437,18 @@ import {
 }
 
 import {
-  to = module.repository_policy.github_repository_ruleset.protect_main["velnor"]
-  id = "velnor:19573071"
+  to = module.repository_policy.github_repository_ruleset.protect_main["velnor-legacy"]
+  id = "velnor-legacy:19573071"
 }
 
 import {
-  to = module.repository_policy.github_repository_ruleset.protect_main["velnor-actions-fixture"]
-  id = "velnor-actions-fixture:19572977"
+  to = module.repository_policy.github_repository_ruleset.protect_main["velnor-actions-fixture-legacy"]
+  id = "velnor-actions-fixture-legacy:19572977"
 }
 
 import {
-  to = module.repository_policy.github_repository_ruleset.protect_main["velnor-apt"]
-  id = "velnor-apt:19572991"
+  to = module.repository_policy.github_repository_ruleset.protect_main["velnor-apt-legacy"]
+  id = "velnor-apt-legacy:19572991"
 }
 
 import {
@@ -503,8 +503,8 @@ import {
 }
 
 import {
-  to = module.repository_policy.github_repository_ruleset.protect_tags["homebrew-velnor"]
-  id = "homebrew-velnor:23746066"
+  to = module.repository_policy.github_repository_ruleset.protect_tags["homebrew-velnor-legacy"]
+  id = "homebrew-velnor-legacy:23746066"
 }
 
 import {
@@ -646,18 +646,18 @@ import {
 }
 
 import {
-  to = module.repository_policy.github_repository_ruleset.protect_tags["velnor"]
-  id = "velnor:19573007"
+  to = module.repository_policy.github_repository_ruleset.protect_tags["velnor-legacy"]
+  id = "velnor-legacy:19573007"
 }
 
 import {
-  to = module.repository_policy.github_repository_ruleset.protect_tags["velnor-actions-fixture"]
-  id = "velnor-actions-fixture:19572996"
+  to = module.repository_policy.github_repository_ruleset.protect_tags["velnor-actions-fixture-legacy"]
+  id = "velnor-actions-fixture-legacy:19572996"
 }
 
 import {
-  to = module.repository_policy.github_repository_ruleset.protect_tags["velnor-apt"]
-  id = "velnor-apt:19572989"
+  to = module.repository_policy.github_repository_ruleset.protect_tags["velnor-apt-legacy"]
+  id = "velnor-apt-legacy:19572989"
 }
 
 import {
@@ -673,4 +673,19 @@ import {
 import {
   to = module.repository_policy.github_repository_ruleset.protect_tags["velnor-new"]
   id = "velnor-new:24397132"
+}
+
+import {
+  to = module.repository_policy.github_repository.managed_settings["velnor-lab"]
+  id = "velnor-lab"
+}
+
+import {
+  to = module.repository_policy.github_repository_ruleset.protect_main["velnor-lab"]
+  id = "velnor-lab:27119695"
+}
+
+import {
+  to = module.repository_policy.github_repository_ruleset.protect_tags["velnor-lab"]
+  id = "velnor-lab:27119696"
 }
