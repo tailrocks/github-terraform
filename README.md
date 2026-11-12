@@ -1,7 +1,7 @@
 # github-terraform
 
 Manages GitHub repository settings and branch/tag protection for the
-`tailrocks` organization: 45 repositories, each with repository merge
+`tailrocks` organization: 46 repositories, each with repository merge
 settings plus `protect-main` and `protect-tags` rulesets.
 
 ## Layout
