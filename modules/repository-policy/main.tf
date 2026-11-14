@@ -36,6 +36,10 @@ resource "github_repository" "managed_settings" {
   allow_update_branch    = false
   delete_branch_on_merge = true
 
+  # TODO: pull_request_creation_policy = "collaborators_only" is set on every repository through the REST API
+  # until the provider supports it: https://github.com/integrations/terraform-provider-github/pull/3479
+  # Then add it here and widen the provider constraint in versions.tf and this module.
+
   lifecycle {
     prevent_destroy = true
     ignore_changes = [
