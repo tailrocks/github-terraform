@@ -689,3 +689,14 @@ import {
   to = module.repository_policy.github_repository_ruleset.protect_tags["velnor-lab"]
   id = "velnor-lab:27119696"
 }
+
+# Existing tag-creation ruleset imports
+import {
+  to = module.repository_policy.github_repository_ruleset.tag_creation["velnor-new/release-tags"]
+  id = "velnor-new:27276267"
+}
+
+import {
+  to = module.repository_policy.github_repository_ruleset.tag_creation["velnor-new/sdk-preview-owner-creation"]
+  id = "velnor-new:26696396"
+}

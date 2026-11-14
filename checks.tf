@@ -137,3 +137,15 @@ check "zero_bypass_actors" {
     error_message = "No repository may declare bypass actors on its protect-main ruleset."
   }
 }
+
+check "velnor_new_release_tags_reserved" {
+  assert {
+    condition = (
+      toset(var.repository_policies["velnor-new"].tag_creation_rulesets["release-tags"].include) == toset([
+        "refs/tags/rust-ci-v*", "refs/tags/velnor-ci-v*", "refs/tags/velnor-gen-v*",
+      ]) &&
+      length(var.repository_policies["velnor-new"].tag_creation_rulesets["release-tags"].bypass_user_ids) == 1
+    )
+    error_message = "tailrocks/velnor-new must keep the release-tags ruleset: rust-ci-v*, velnor-ci-v*, and velnor-gen-v* tags, created only by one bypass user (tailrocks/velnor-new#682)."
+  }
+}

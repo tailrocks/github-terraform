@@ -14,6 +14,18 @@ terraform {
 
 locals {
   managed_repositories = toset(keys(var.repository_policies))
+
+  # Keyed "<repository>/<ruleset name>".
+  tag_creation_rulesets = merge([
+    for repository, policy in var.repository_policies : {
+      for name, ruleset in policy.tag_creation_rulesets : "${repository}/${name}" => {
+        repository      = repository
+        name            = name
+        include         = ruleset.include
+        bypass_user_ids = ruleset.bypass_user_ids
+      }
+    }
+  ]...)
 }
 
 # Repository-level merge settings (Tier 1 enforcement across all repos)
@@ -96,7 +108,7 @@ resource "github_repository_ruleset" "protect_main" {
     dynamic "required_status_checks" {
       for_each = length(var.repository_policies[each.value].required_checks) > 0 ? [1] : []
       content {
-        strict_required_status_checks_policy = false
+        strict_required_status_checks_policy = var.repository_policies[each.value].strict_required_status_checks
         do_not_enforce_on_create             = false
 
         dynamic "required_check" {
@@ -129,5 +141,36 @@ resource "github_repository_ruleset" "protect_tags" {
   rules {
     deletion         = true
     non_fast_forward = true
+    update           = var.repository_policies[each.value].protect_tags_update
+  }
+}
+
+# Tag rulesets that let only the listed users create matching tags
+resource "github_repository_ruleset" "tag_creation" {
+  for_each = local.tag_creation_rulesets
+
+  name        = each.value.name
+  target      = "tag"
+  enforcement = "active"
+  repository  = github_repository.managed_settings[each.value.repository].name
+
+  conditions {
+    ref_name {
+      include = each.value.include
+      exclude = []
+    }
+  }
+
+  dynamic "bypass_actors" {
+    for_each = each.value.bypass_user_ids
+    content {
+      actor_id    = bypass_actors.value
+      actor_type  = "User"
+      bypass_mode = "always"
+    }
+  }
+
+  rules {
+    creation = true
   }
 }
