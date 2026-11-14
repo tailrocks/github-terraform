@@ -58,7 +58,7 @@ check "no_ci_exception_allowlist_is_explicit" {
 check "self_protection_enforced" {
   assert {
     condition     = contains(keys(var.repository_policies), "github-terraform")
-    error_message = "tailrocks/github-terraform must remain in the managed repository inventory; every inventory entry receives both rulesets."
+    error_message = "tailrocks/github-terraform must remain in the managed repository inventory; every public inventory entry receives both rulesets."
   }
 }
 

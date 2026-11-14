@@ -24,7 +24,7 @@ import {
   id = "3"
 }
 
-# Managed repository settings imports
+# Managed repository settings imports (archived repositories are not managed, so they have none)
 import {
   to = module.repository_policy.github_repository.managed_settings["cloudflare-tofu"]
   id = "cloudflare-tofu"
@@ -68,11 +68,6 @@ import {
 import {
   to = module.repository_policy.github_repository.managed_settings["homebrew-tablerock"]
   id = "homebrew-tablerock"
-}
-
-import {
-  to = module.repository_policy.github_repository.managed_settings["homebrew-velnor-legacy"]
-  id = "homebrew-velnor-legacy"
 }
 
 import {
@@ -221,21 +216,6 @@ import {
   to = module.repository_policy.github_repository.managed_settings["tuiscotti"]
   id = "tuiscotti"
 }
-import {
-  to = module.repository_policy.github_repository.managed_settings["velnor-legacy"]
-  id = "velnor-legacy"
-}
-
-import {
-  to = module.repository_policy.github_repository.managed_settings["velnor-actions-fixture-legacy"]
-  id = "velnor-actions-fixture-legacy"
-}
-
-import {
-  to = module.repository_policy.github_repository.managed_settings["velnor-apt-legacy"]
-  id = "velnor-apt-legacy"
-}
-
 import {
   to = module.repository_policy.github_repository.managed_settings["velnor-new"]
   id = "velnor-new"
@@ -699,4 +679,15 @@ import {
 import {
   to = module.repository_policy.github_repository_ruleset.tag_creation["velnor-new/sdk-preview-owner-creation"]
   id = "velnor-new:26696396"
+}
+
+# Existing terminal-components-claude rulesets
+import {
+  to = module.repository_policy.github_repository_ruleset.protect_main["terminal-components-claude"]
+  id = "terminal-components-claude:24883153"
+}
+
+import {
+  to = module.repository_policy.github_repository_ruleset.protect_tags["terminal-components-claude"]
+  id = "terminal-components-claude:24883130"
 }

@@ -2,8 +2,8 @@
 # SPDX-License-Identifier: Apache-2.0
 
 output "managed_repositories" {
-  description = "Set of managed repository names (inventory keys)"
-  value       = local.managed_repositories
+  description = "Set of inventory repository names, including archived ones"
+  value       = local.inventory_repositories
 }
 
 output "repository_settings" {
@@ -32,7 +32,7 @@ output "required_check_contexts" {
 output "repository_ids" {
   description = "Map of repository name to repository ID"
   value = {
-    for k, v in github_repository.managed_settings : k => v.repo_id
+    for k, v in merge(github_repository.managed_settings, data.github_repository.archived) : k => v.repo_id
   }
 }
 
