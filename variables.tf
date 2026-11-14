@@ -20,6 +20,9 @@ variable "repository_policies" {
     visibility      = string
     required_checks = list(string)
     no_ci_reason    = optional(string)
+    # Archived repositories are read-only on GitHub: their settings are not managed
+    # and only their rulesets are tracked.
+    archived = optional(bool, false)
     # Require branches to be up to date with the default branch before merging.
     strict_required_status_checks = optional(bool, false)
     # Also block moving existing tags (the update rule) in protect-tags.
@@ -99,6 +102,7 @@ variable "repository_policies" {
       required_checks = ["DCO", "Required"]
     }
     "homebrew-velnor-legacy" = {
+      archived = true
       # local.check_templates.dco_required
       visibility      = "public"
       required_checks = ["DCO", "Required"]
@@ -158,6 +162,8 @@ variable "repository_policies" {
       required_checks = ["DCO", "Required"]
     }
     "tailrocks-asd-ste100-skills" = {
+      # Private on the free plan: GitHub refuses rulesets here (403 "Upgrade to GitHub Pro"),
+      # so the module declares none for it. Check list kept for the day it goes public.
       # local.check_templates.required_only
       visibility      = "private"
       required_checks = ["Required"]
@@ -243,10 +249,12 @@ variable "repository_policies" {
       required_checks = ["DCO", "Required"]
     }
     "velnor-actions-fixture-legacy" = {
+      archived        = true
       visibility      = "public"
       required_checks = ["DCO", "Policy", "ci-required"]
     }
     "velnor-apt-legacy" = {
+      archived = true
       # local.check_templates.dco_required
       visibility      = "public"
       required_checks = ["DCO", "Required"]
@@ -257,6 +265,7 @@ variable "repository_policies" {
       required_checks = ["DCO"]
     }
     "velnor-legacy" = {
+      archived = true
       # local.check_templates.dco_required
       visibility      = "public"
       required_checks = ["DCO", "Required"]

@@ -3,7 +3,10 @@
 Manages GitHub repository settings and branch/tag protection for the
 `tailrocks` organization: 46 repositories, each with repository merge
 settings plus `protect-main` and `protect-tags` rulesets, and optional
-per-repository tag-creation rulesets.
+per-repository tag-creation rulesets. Two exceptions: archived repositories
+(`archived = true`) get no managed settings, because GitHub refuses changes to
+them, and private repositories get no rulesets, because the free plan returns
+403 for them.
 
 ## Layout
 
@@ -38,12 +41,16 @@ settings, Actions policies, and runner group in `organization.tf`.
    in `mandatory_target_repositories_present` in `checks.tf` (updating its
    count and message).
 2. Add one import triple (settings + `protect_main` + `protect_tags`) to
-   `imports.tf` using the live numeric ruleset IDs.
+   `imports.tf` using the live numeric ruleset IDs. A private repository gets
+   only the settings import; an archived one gets only the two ruleset imports.
 
 ## Per-repository options
 
 Each `repository_policies` entry may also set:
 
+- `archived` (default `false`): set it for a repository that is archived on
+  GitHub. The module then skips its settings and reads its ID through a data
+  source; its rulesets stay managed.
 - `strict_required_status_checks` (default `false`): require the branch to be
   up to date with the default branch before merging.
 - `protect_tags_update` (default `false`): add the `update` rule to

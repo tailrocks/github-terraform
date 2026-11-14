@@ -7,6 +7,9 @@ variable "repository_policies" {
     visibility      = string # "public" | "private"
     required_checks = list(string)
     no_ci_reason    = optional(string)
+    # Archived repositories are read-only on GitHub: their settings are not managed
+    # and only their rulesets are tracked.
+    archived = optional(bool, false)
     # Require branches to be up to date with the default branch before merging.
     strict_required_status_checks = optional(bool, false)
     # Also block moving existing tags (the update rule) in protect-tags.

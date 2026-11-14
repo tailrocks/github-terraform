@@ -13,7 +13,25 @@ terraform {
 }
 
 locals {
-  managed_repositories = toset(keys(var.repository_policies))
+  # Every inventory key; archived repositories are read-only on GitHub, so only the
+  # active ones get managed settings.
+  inventory_repositories = toset(keys(var.repository_policies))
+  managed_repositories = toset([
+    for name, policy in var.repository_policies : name if !policy.archived
+  ])
+  archived_repositories = setsubtract(local.inventory_repositories, local.managed_repositories)
+
+  # A private repository on the free plan cannot have rulesets: the rulesets API
+  # answers 403 "Upgrade to GitHub Pro".
+  ruleset_repositories = toset([
+    for name, policy in var.repository_policies : name if policy.visibility == "public"
+  ])
+
+  # Repository names for rulesets, taken from the settings resource when it exists.
+  repository_names = merge(
+    { for name, repo in github_repository.managed_settings : name => repo.name },
+    { for name, repo in data.github_repository.archived : name => repo.name },
+  )
 
   # Keyed "<repository>/<ruleset name>".
   tag_creation_rulesets = merge([
@@ -26,6 +44,13 @@ locals {
       }
     }
   ]...)
+}
+
+# Archived repositories: read only, so that their IDs stay available without any write.
+data "github_repository" "archived" {
+  for_each = local.archived_repositories
+
+  name = each.value
 }
 
 # Repository-level merge settings (Tier 1 enforcement across all repos)
@@ -74,12 +99,12 @@ resource "github_repository" "managed_settings" {
 
 # Branch ruleset on main / default branch (Tier 2 ref protection)
 resource "github_repository_ruleset" "protect_main" {
-  for_each = local.managed_repositories
+  for_each = local.ruleset_repositories
 
   name        = "protect-main"
   target      = "branch"
   enforcement = "active"
-  repository  = github_repository.managed_settings[each.value].name
+  repository  = local.repository_names[each.value]
 
   conditions {
     ref_name {
@@ -124,12 +149,12 @@ resource "github_repository_ruleset" "protect_main" {
 
 # Tag ruleset protecting all tags
 resource "github_repository_ruleset" "protect_tags" {
-  for_each = local.managed_repositories
+  for_each = local.ruleset_repositories
 
   name        = "protect-tags"
   target      = "tag"
   enforcement = "active"
-  repository  = github_repository.managed_settings[each.value].name
+  repository  = local.repository_names[each.value]
 
   conditions {
     ref_name {
@@ -152,7 +177,7 @@ resource "github_repository_ruleset" "tag_creation" {
   name        = each.value.name
   target      = "tag"
   enforcement = "active"
-  repository  = github_repository.managed_settings[each.value.repository].name
+  repository  = local.repository_names[each.value.repository]
 
   conditions {
     ref_name {
