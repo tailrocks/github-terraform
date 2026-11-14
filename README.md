@@ -2,7 +2,8 @@
 
 Manages GitHub repository settings and branch/tag protection for the
 `tailrocks` organization: 46 repositories, each with repository merge
-settings plus `protect-main` and `protect-tags` rulesets.
+settings plus `protect-main` and `protect-tags` rulesets, and optional
+per-repository tag-creation rulesets.
 
 ## Layout
 
@@ -28,6 +29,7 @@ settings, Actions policies, and runner group in `organization.tf`.
 
 1. Add one entry to `repository_policies` in `variables.tf`, copying a check
    list from `locals.tf` (`dco_policy_ci` = `["DCO", "Policy", "ci-required"]`,
+   `dco_required` = `["DCO", "Required"]`,
    `control` = `["Control / Required"]`, `required_only` = `["Required"]`,
    `dco_only` = `["DCO"]`, `policy` = `["Policy"]`); bespoke checks inline
    with a comment citing the producing workflow. Repos with no CI use
@@ -37,6 +39,19 @@ settings, Actions policies, and runner group in `organization.tf`.
    count and message).
 2. Add one import triple (settings + `protect_main` + `protect_tags`) to
    `imports.tf` using the live numeric ruleset IDs.
+
+## Per-repository options
+
+Each `repository_policies` entry may also set:
+
+- `strict_required_status_checks` (default `false`): require the branch to be
+  up to date with the default branch before merging.
+- `protect_tags_update` (default `false`): add the `update` rule to
+  `protect-tags`, so that existing tags cannot move.
+- `tag_creation_rulesets` (default `{}`): extra tag rulesets, keyed by ruleset
+  name, with the `creation` rule for the `include` patterns and an `always`
+  bypass for each user in `bypass_user_ids`. Import each existing ruleset as
+  `tag_creation["<repository>/<ruleset name>"]` in `imports.tf`.
 
 ## Organization overlays
 

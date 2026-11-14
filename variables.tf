@@ -20,6 +20,16 @@ variable "repository_policies" {
     visibility      = string
     required_checks = list(string)
     no_ci_reason    = optional(string)
+    # Require branches to be up to date with the default branch before merging.
+    strict_required_status_checks = optional(bool, false)
+    # Also block moving existing tags (the update rule) in protect-tags.
+    protect_tags_update = optional(bool, false)
+    # Extra tag rulesets, keyed by ruleset name, that restrict tag creation for the
+    # include patterns to the listed user IDs.
+    tag_creation_rulesets = optional(map(object({
+      include         = list(string)
+      bypass_user_ids = list(number)
+    })), {})
   }))
 
   validation {
@@ -59,32 +69,39 @@ variable "repository_policies" {
       required_checks = ["Policy"]
     }
     "holla" = {
+      # local.check_templates.dco_required
       visibility      = "public"
-      required_checks = ["DCO", "Policy", "ci-required"]
+      required_checks = ["DCO", "Required"]
     }
     "holla-apt" = {
+      # local.check_templates.dco_required
       visibility      = "public"
-      required_checks = ["DCO", "Policy", "ci-required"]
+      required_checks = ["DCO", "Required"]
     }
     "homebrew-holla" = {
+      # local.check_templates.dco_required
       visibility      = "public"
-      required_checks = ["DCO", "Policy", "ci-required"]
+      required_checks = ["DCO", "Required"]
     }
     "homebrew-parallax" = {
+      # local.check_templates.dco_required
       visibility      = "public"
-      required_checks = ["DCO", "Policy", "ci-required"]
+      required_checks = ["DCO", "Required"]
     }
     "homebrew-ruxel" = {
+      # local.check_templates.dco_required
       visibility      = "public"
-      required_checks = ["DCO", "Policy", "ci-required"]
+      required_checks = ["DCO", "Required"]
     }
     "homebrew-tablerock" = {
+      # local.check_templates.dco_required
       visibility      = "public"
-      required_checks = ["DCO", "Policy", "ci-required"]
+      required_checks = ["DCO", "Required"]
     }
     "homebrew-velnor-legacy" = {
+      # local.check_templates.dco_required
       visibility      = "public"
-      required_checks = ["DCO", "Policy", "ci-required"]
+      required_checks = ["DCO", "Required"]
     }
     "jambalaya" = {
       visibility      = "public"
@@ -92,16 +109,19 @@ variable "repository_policies" {
       no_ci_reason    = "Live protect-main ruleset carries no required status-check rule; no CI workflow emits a status context."
     }
     "parallax" = {
+      # local.check_templates.dco_required
       visibility      = "public"
-      required_checks = ["DCO", "Policy", "ci-required"]
+      required_checks = ["DCO", "Required"]
     }
     "parallax-telemetry-playground" = {
+      # local.check_templates.dco_required
       visibility      = "public"
-      required_checks = ["DCO", "Policy", "ci-required"]
+      required_checks = ["DCO", "Required"]
     }
     "pg-bigdecimal" = {
+      # local.check_templates.dco_required
       visibility      = "public"
-      required_checks = ["DCO", "Policy", "ci-required"]
+      required_checks = ["DCO", "Required"]
     }
     "pgquill" = {
       visibility      = "public"
@@ -123,16 +143,19 @@ variable "repository_policies" {
       no_ci_reason    = "No CI workflow emits a status context on the default branch; only tag-push release checks exist."
     }
     "ruxel" = {
+      # local.check_templates.dco_required
       visibility      = "public"
-      required_checks = ["DCO", "Policy", "ci-required"]
+      required_checks = ["DCO", "Required"]
     }
     "schemalane" = {
+      # local.check_templates.dco_required
       visibility      = "public"
-      required_checks = ["DCO", "Policy", "ci-required"]
+      required_checks = ["DCO", "Required"]
     }
     "tablerock" = {
+      # local.check_templates.dco_required
       visibility      = "public"
-      required_checks = ["DCO", "Policy", "ci-required"]
+      required_checks = ["DCO", "Required"]
     }
     "tailrocks-asd-ste100-skills" = {
       # local.check_templates.required_only
@@ -200,16 +223,19 @@ variable "repository_policies" {
       required_checks = ["Required"]
     }
     "termpane" = {
+      visibility          = "public"
+      required_checks     = ["DCO", "Required"]
+      protect_tags_update = true
+    }
+    "termrock" = {
+      # local.check_templates.dco_required
       visibility      = "public"
       required_checks = ["DCO", "Required"]
     }
-    "termrock" = {
-      visibility      = "public"
-      required_checks = ["DCO", "Policy", "ci-required"]
-    }
     "tracing-request-level" = {
+      # local.check_templates.dco_required
       visibility      = "public"
-      required_checks = ["DCO", "Policy", "ci-required"]
+      required_checks = ["DCO", "Required"]
     }
     "tuiscotti" = {
       # Bespoke: matches live protect-main ruleset 23746094 required contexts (DCO + Required).
@@ -221,8 +247,9 @@ variable "repository_policies" {
       required_checks = ["DCO", "Policy", "ci-required"]
     }
     "velnor-apt-legacy" = {
+      # local.check_templates.dco_required
       visibility      = "public"
-      required_checks = ["DCO", "Policy", "ci-required"]
+      required_checks = ["DCO", "Required"]
     }
     "velnor-lab" = {
       # dco_only until the generated Rust CI workflow exists; then add its gate check.
@@ -230,12 +257,27 @@ variable "repository_policies" {
       required_checks = ["DCO"]
     }
     "velnor-legacy" = {
+      # local.check_templates.dco_required
       visibility      = "public"
-      required_checks = ["DCO", "Policy", "ci-required"]
+      required_checks = ["DCO", "Required"]
     }
     "velnor-new" = {
-      visibility      = "public"
-      required_checks = ["Required"]
+      visibility                    = "public"
+      required_checks               = ["Required"]
+      strict_required_status_checks = true
+      protect_tags_update           = true
+      tag_creation_rulesets = {
+        # Only the owner may create release tags (tailrocks/velnor-new#682).
+        # The velnor-release GitHub App replaces this bypass later.
+        "release-tags" = {
+          include         = ["refs/tags/rust-ci-v*", "refs/tags/velnor-ci-v*", "refs/tags/velnor-gen-v*"]
+          bypass_user_ids = [139017] # donbeave
+        }
+        "sdk-preview-owner-creation" = {
+          include         = ["refs/tags/sdk-preview-*"]
+          bypass_user_ids = [139017] # donbeave
+        }
+      }
     }
     "vision" = {
       visibility      = "public"

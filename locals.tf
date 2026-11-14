@@ -8,6 +8,7 @@ locals {
   # with a comment citing the producing workflow.
   check_templates = {
     dco_policy_ci = ["DCO", "Policy", "ci-required"]
+    dco_required  = ["DCO", "Required"]
     control       = ["Control / Required"]
     required_only = ["Required"]
     dco_only      = ["DCO"]
