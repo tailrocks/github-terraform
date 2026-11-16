@@ -260,9 +260,10 @@ variable "repository_policies" {
       required_checks = ["DCO", "Required"]
     }
     "velnor-lab" = {
-      # dco_only until the generated Rust CI workflow exists; then add its gate check.
-      visibility      = "public"
-      required_checks = ["DCO"]
+      # local.check_templates.dco_required
+      visibility          = "public"
+      required_checks     = ["DCO", "Required"]
+      protect_tags_update = true
     }
     "velnor-legacy" = {
       archived = true
