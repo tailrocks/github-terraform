@@ -272,12 +272,13 @@ variable "repository_policies" {
       required_checks = ["DCO", "Required"]
     }
     "velnor-new" = {
-      # Bespoke: after tailrocks/velnor-new#604 the new rust-ci.yml reports "Required" and
-      # the old ci.yml renames its aggregate check to "ci-required"; "Required verdict" is
-      # the other live protect-main ruleset 24396608 context, kept and re-confirmed once
-      # both workflows are final.
+      # Bespoke: during the transition after tailrocks/velnor-new#604 the new Rust
+      # workflow keeps the check name "rust-required" and the old ci.yml keeps "Required"
+      # and "Required verdict"; the rename to a single name happens later, when
+      # tailrocks/velnor-new#608 removes the old engine's Rust CI path. "Required
+      # verdict" is the other live protect-main ruleset 24396608 context.
       visibility                    = "public"
-      required_checks               = ["DCO", "Required", "Required verdict", "ci-required"]
+      required_checks               = ["DCO", "Required", "Required verdict", "rust-required"]
       strict_required_status_checks = true
       protect_tags_update           = true
       tag_creation_rulesets = {
