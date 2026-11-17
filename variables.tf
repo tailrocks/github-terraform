@@ -272,11 +272,12 @@ variable "repository_policies" {
       required_checks = ["DCO", "Required"]
     }
     "velnor-new" = {
-      # Bespoke: "Required" and "Required verdict" are the live protect-main ruleset 24396608
-      # contexts reported by velnor-new's ci.yml; "rust-required" is the check the new
-      # generator's rust-ci.yml reports (tailrocks/velnor-new#604).
+      # Bespoke: after tailrocks/velnor-new#604 the new rust-ci.yml reports "Required" and
+      # the old ci.yml renames its aggregate check to "ci-required"; "Required verdict" is
+      # the other live protect-main ruleset 24396608 context, kept and re-confirmed once
+      # both workflows are final.
       visibility                    = "public"
-      required_checks               = ["Required", "Required verdict", "rust-required"]
+      required_checks               = ["DCO", "Required", "Required verdict", "ci-required"]
       strict_required_status_checks = true
       protect_tags_update           = true
       tag_creation_rulesets = {
