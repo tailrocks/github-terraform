@@ -20,6 +20,16 @@ variable "repository_policies" {
       include         = list(string)
       bypass_user_ids = list(number)
     })), {})
+    # Merge queue on the default branch. null (the default) leaves the queue off.
+    merge_queue = optional(object({
+      grouping_strategy                 = string
+      max_entries_to_build              = number
+      max_entries_to_merge              = number
+      min_entries_to_merge              = number
+      min_entries_to_merge_wait_minutes = number
+      check_response_timeout_minutes    = number
+      merge_method                      = string
+    }))
   }))
 
   validation {
