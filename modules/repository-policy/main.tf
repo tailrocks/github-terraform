@@ -130,6 +130,19 @@ resource "github_repository_ruleset" "protect_main" {
       required_review_thread_resolution = true
     }
 
+    dynamic "merge_queue" {
+      for_each = var.repository_policies[each.value].merge_queue == null ? [] : [var.repository_policies[each.value].merge_queue]
+      content {
+        grouping_strategy                 = merge_queue.value.grouping_strategy
+        max_entries_to_build              = merge_queue.value.max_entries_to_build
+        max_entries_to_merge              = merge_queue.value.max_entries_to_merge
+        min_entries_to_merge              = merge_queue.value.min_entries_to_merge
+        min_entries_to_merge_wait_minutes = merge_queue.value.min_entries_to_merge_wait_minutes
+        check_response_timeout_minutes    = merge_queue.value.check_response_timeout_minutes
+        merge_method                      = merge_queue.value.merge_method
+      }
+    }
+
     dynamic "required_status_checks" {
       for_each = length(var.repository_policies[each.value].required_checks) > 0 ? [1] : []
       content {

@@ -33,6 +33,16 @@ variable "repository_policies" {
       include         = list(string)
       bypass_user_ids = list(number)
     })), {})
+    # Merge queue on the default branch. null (the default) leaves the queue off.
+    merge_queue = optional(object({
+      grouping_strategy                 = string
+      max_entries_to_build              = number
+      max_entries_to_merge              = number
+      min_entries_to_merge              = number
+      min_entries_to_merge_wait_minutes = number
+      check_response_timeout_minutes    = number
+      merge_method                      = string
+    }))
   }))
 
   validation {
@@ -272,10 +282,20 @@ variable "repository_policies" {
       required_checks = ["DCO", "Required"]
     }
     "velnor-new" = {
-      visibility                    = "public"
-      required_checks               = ["Required"]
-      strict_required_status_checks = true
-      protect_tags_update           = true
+      visibility          = "public"
+      required_checks     = ["Required", "Required verdict"]
+      protect_tags_update = true
+      # Batched queue (owner decision 2026-11-18): 13 runners fit about one full CI run,
+      # so only the newest entry of a group must pass and up to 10 PRs merge per run.
+      merge_queue = {
+        grouping_strategy                 = "HEADGREEN"
+        max_entries_to_build              = 2
+        max_entries_to_merge              = 10
+        min_entries_to_merge              = 1
+        min_entries_to_merge_wait_minutes = 5
+        check_response_timeout_minutes    = 90
+        merge_method                      = "SQUASH"
+      }
       tag_creation_rulesets = {
         # Only the owner may create release tags (tailrocks/velnor-new#682).
         # The velnor-release GitHub App replaces this bypass later.
