@@ -289,7 +289,7 @@ variable "repository_policies" {
       # so only the newest entry of a group must pass and up to 10 PRs merge per run.
       merge_queue = {
         grouping_strategy                 = "HEADGREEN"
-        max_entries_to_build              = 2
+        max_entries_to_build              = 4
         max_entries_to_merge              = 10
         min_entries_to_merge              = 1
         min_entries_to_merge_wait_minutes = 5
