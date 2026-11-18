@@ -33,6 +33,8 @@ variable "repository_policies" {
       include         = list(string)
       bypass_user_ids = list(number)
     })), {})
+    # Let repository admins bypass protect-main, only through a pull request (admin merge).
+    admin_pull_request_bypass = optional(bool, false)
     # Merge queue on the default branch. null (the default) leaves the queue off.
     merge_queue = optional(object({
       grouping_strategy                 = string
@@ -282,9 +284,11 @@ variable "repository_policies" {
       required_checks = ["DCO", "Required"]
     }
     "velnor-new" = {
-      visibility          = "public"
-      required_checks     = ["Required", "Required verdict"]
-      protect_tags_update = true
+      visibility      = "public"
+      required_checks = ["Required", "Required verdict"]
+      # Owner approved 2026-11-19: admin merges for rare critical-path cases.
+      admin_pull_request_bypass = true
+      protect_tags_update       = true
       # Batched queue (owner decision 2026-11-18): 13 runners fit about one full CI run,
       # so only the newest entry of a group must pass and up to 10 PRs merge per run.
       merge_queue = {

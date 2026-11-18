@@ -113,8 +113,18 @@ resource "github_repository_ruleset" "protect_main" {
     }
   }
 
-  # MANDATORY INVARIANT: Zero standing bypasses on core protections.
+  # MANDATORY INVARIANT: Zero standing bypasses on core protections,
+  # except the explicit admin_pull_request_bypass opt-in (pull_request mode only: no direct pushes).
   # Direct pushes, non-squash integration, force pushes, and deletion are blocked for all actors.
+
+  dynamic "bypass_actors" {
+    for_each = var.repository_policies[each.value].admin_pull_request_bypass ? [1] : []
+    content {
+      actor_id    = 5 # RepositoryRole: repository admin
+      actor_type  = "RepositoryRole"
+      bypass_mode = "pull_request"
+    }
+  }
 
   rules {
     deletion                = true

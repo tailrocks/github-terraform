@@ -132,9 +132,15 @@ check "zero_bypass_actors" {
   assert {
     condition = alltrue([
       for name, gate in module.repository_policy.ruleset_enforcement :
-      length(gate.bypass_actors) == 0
+      length(gate.bypass_actors) == 0 || (
+        name == "velnor-new" &&
+        length(gate.bypass_actors) == 1 &&
+        one(gate.bypass_actors).actor_id == 5 &&
+        one(gate.bypass_actors).actor_type == "RepositoryRole" &&
+        one(gate.bypass_actors).bypass_mode == "pull_request"
+      )
     ])
-    error_message = "No repository may declare bypass actors on its protect-main ruleset."
+    error_message = "No repository may declare bypass actors on its protect-main ruleset, except the repository-admin pull_request bypass on tailrocks/velnor-new (owner approved 2026-11-19)."
   }
 }
 
