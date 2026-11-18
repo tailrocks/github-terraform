@@ -20,6 +20,8 @@ variable "repository_policies" {
       include         = list(string)
       bypass_user_ids = list(number)
     })), {})
+    # Let repository admins bypass protect-main, only through a pull request (admin merge).
+    admin_pull_request_bypass = optional(bool, false)
     # Merge queue on the default branch. null (the default) leaves the queue off.
     merge_queue = optional(object({
       grouping_strategy                 = string
