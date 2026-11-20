@@ -48,6 +48,10 @@ settings, Actions policies, and runner group in `organization.tf`.
 
 Each `repository_policies` entry may also set:
 
+- `merge_settings` (default `null`): the merge policy. `null` is the organization
+  policy (squash-only, delete branch on merge, linear history, PR_TITLE/PR_BODY).
+  Only `termrock` overrides it, to keep the merge-commit policy of the repository
+  it was renamed from. `checks.tf` pins that exception list.
 - `archived` (default `false`): set it for a repository that is archived on
   GitHub. The module then skips its settings and reads its ID through a data
   source; its rulesets stay managed.

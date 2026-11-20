@@ -30,6 +30,20 @@ variable "repository_policies" {
       check_response_timeout_minutes    = number
       merge_method                      = string
     }))
+    # Merge policy override. null (the default) keeps the organization policy:
+    # squash-only, delete branch on merge, linear history. Set only with a reason.
+    merge_settings = optional(object({
+      allow_squash_merge          = bool
+      allow_merge_commit          = bool
+      allow_rebase_merge          = bool
+      delete_branch_on_merge      = bool
+      squash_merge_commit_title   = string
+      squash_merge_commit_message = string
+      merge_commit_title          = optional(string)
+      merge_commit_message        = optional(string)
+      allowed_merge_methods       = list(string)
+      required_linear_history     = bool
+    }))
   }))
 
   validation {

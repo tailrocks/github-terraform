@@ -21,6 +21,25 @@ locals {
   ])
   archived_repositories = setsubtract(local.inventory_repositories, local.managed_repositories)
 
+  # Organization merge policy, used unless a repository sets merge_settings.
+  canonical_merge_settings = {
+    allow_squash_merge          = true
+    allow_merge_commit          = false
+    allow_rebase_merge          = false
+    delete_branch_on_merge      = true
+    squash_merge_commit_title   = "PR_TITLE"
+    squash_merge_commit_message = "PR_BODY"
+    merge_commit_title          = null
+    merge_commit_message        = null
+    allowed_merge_methods       = ["squash"]
+    required_linear_history     = true
+  }
+
+  merge_settings = {
+    for name, policy in var.repository_policies :
+    name => policy.merge_settings != null ? policy.merge_settings : local.canonical_merge_settings
+  }
+
   # A private repository on the free plan cannot have rulesets: the rulesets API
   # answers 403 "Upgrade to GitHub Pro".
   ruleset_repositories = toset([
@@ -60,18 +79,18 @@ resource "github_repository" "managed_settings" {
   name       = each.value
   visibility = var.repository_policies[each.value].visibility
 
-  # Strict squash-only merge policy
-  allow_squash_merge = true
-  allow_merge_commit = false
-  allow_rebase_merge = false
-
-  # Standard commit title and body format
-  squash_merge_commit_title   = "PR_TITLE"
-  squash_merge_commit_message = "PR_BODY"
+  # Merge policy: organization default (squash-only) or the repository's merge_settings.
+  allow_squash_merge          = local.merge_settings[each.value].allow_squash_merge
+  allow_merge_commit          = local.merge_settings[each.value].allow_merge_commit
+  allow_rebase_merge          = local.merge_settings[each.value].allow_rebase_merge
+  squash_merge_commit_title   = local.merge_settings[each.value].squash_merge_commit_title
+  squash_merge_commit_message = local.merge_settings[each.value].squash_merge_commit_message
+  merge_commit_title          = local.merge_settings[each.value].merge_commit_title
+  merge_commit_message        = local.merge_settings[each.value].merge_commit_message
 
   # Keep GitHub from offering the pull-request branch-update action.
   allow_update_branch    = false
-  delete_branch_on_merge = true
+  delete_branch_on_merge = local.merge_settings[each.value].delete_branch_on_merge
 
   # TODO: pull_request_creation_policy = "collaborators_only" is set on every repository through the REST API
   # until the provider supports it: https://github.com/integrations/terraform-provider-github/pull/3479
@@ -119,10 +138,10 @@ resource "github_repository_ruleset" "protect_main" {
   rules {
     deletion                = true
     non_fast_forward        = true
-    required_linear_history = true
+    required_linear_history = local.merge_settings[each.value].required_linear_history
 
     pull_request {
-      allowed_merge_methods             = ["squash"]
+      allowed_merge_methods             = local.merge_settings[each.value].allowed_merge_methods
       required_approving_review_count   = 0
       dismiss_stale_reviews_on_push     = true
       require_last_push_approval        = false

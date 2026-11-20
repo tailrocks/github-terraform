@@ -43,6 +43,20 @@ variable "repository_policies" {
       check_response_timeout_minutes    = number
       merge_method                      = string
     }))
+    # Merge policy override. null (the default) keeps the organization policy:
+    # squash-only, delete branch on merge, linear history. Set only with a reason.
+    merge_settings = optional(object({
+      allow_squash_merge          = bool
+      allow_merge_commit          = bool
+      allow_rebase_merge          = bool
+      delete_branch_on_merge      = bool
+      squash_merge_commit_title   = string
+      squash_merge_commit_message = string
+      merge_commit_title          = optional(string)
+      merge_commit_message        = optional(string)
+      allowed_merge_methods       = list(string)
+      required_linear_history     = bool
+    }))
   }))
 
   validation {
@@ -244,10 +258,22 @@ variable "repository_policies" {
       protect_tags_update = true
     }
     "termrock" = {
-      # tailrocks/termrock is the former terminal-components-baseline. It has no
-      # DCO status (only the "Required" check-run), so DCO is not required here.
+      # Former terminal-components-baseline. Settings are its live values (read 2026-11-20);
+      # it has no rulesets and no required checks today. "Required verdict" is the gate on main.
       visibility      = "public"
-      required_checks = ["Required"]
+      required_checks = ["Required verdict"]
+      merge_settings = {
+        allow_squash_merge          = true
+        allow_merge_commit          = true
+        allow_rebase_merge          = true
+        delete_branch_on_merge      = false
+        squash_merge_commit_title   = "COMMIT_OR_PR_TITLE"
+        squash_merge_commit_message = "COMMIT_MESSAGES"
+        merge_commit_title          = "MERGE_MESSAGE"
+        merge_commit_message        = "PR_TITLE"
+        allowed_merge_methods       = ["merge", "squash", "rebase"]
+        required_linear_history     = false
+      }
     }
     "termrock-legacy" = {
       # Former tailrocks/termrock, archived: only its rulesets are managed.

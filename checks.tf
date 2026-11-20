@@ -92,12 +92,23 @@ check "update_branch_suggestions_disabled" {
   }
 }
 
+check "merge_settings_overrides_explicit" {
+  assert {
+    condition = toset([
+      for name, policy in var.repository_policies : name
+      if policy.merge_settings != null
+    ]) == toset(["termrock"])
+    error_message = "Only termrock (merge commits, live settings) may override the merge policy with merge_settings."
+  }
+}
+
 check "delete_branch_on_merge_mandate" {
   assert {
     condition = alltrue([
       for k, v in module.repository_policy.repository_settings : v.delete_branch_on_merge == true
+      if var.repository_policies[k].merge_settings == null
     ])
-    error_message = "All managed repositories must enforce delete_branch_on_merge = true."
+    error_message = "All managed repositories without a merge_settings override must enforce delete_branch_on_merge = true."
   }
 }
 
@@ -111,8 +122,9 @@ check "squash_only_merge_mandate" {
         v.squash_merge_commit_title == "PR_TITLE" &&
         v.squash_merge_commit_message == "PR_BODY"
       )
+      if var.repository_policies[k].merge_settings == null
     ])
-    error_message = "All managed repositories must enforce canonical squash-only merge policy."
+    error_message = "All managed repositories without a merge_settings override must enforce canonical squash-only merge policy."
   }
 }
 
