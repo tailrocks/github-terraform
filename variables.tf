@@ -346,7 +346,11 @@ variable "repository_policies" {
         # Only the owner may create release tags (tailrocks/velnor-new#682).
         # The velnor-release GitHub App replaces this bypass later.
         "release-tags" = {
-          include         = ["refs/tags/rust-ci-v*", "refs/tags/velnor-ci-v*", "refs/tags/velnor-gen-v*"]
+          # #1429: group-prefixed tags. rust-ci-v* stays until the transition ends.
+          include = [
+            "refs/tags/rust-ci-v*", "refs/tags/velnor-ci-v*", "refs/tags/velnor-gen-v*",
+            "refs/tags/tools-v*", "refs/tags/runner-v*", "refs/tags/actions-v*",
+          ]
           bypass_user_ids = [139017] # donbeave
         }
         "sdk-preview-owner-creation" = {
