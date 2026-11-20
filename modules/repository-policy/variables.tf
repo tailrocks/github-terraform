@@ -20,6 +20,13 @@ variable "repository_policies" {
       include         = list(string)
       bypass_user_ids = list(number)
     })), {})
+    # Protect-main is always managed for public repositories. false skips protect-tags.
+    protect_tags = optional(bool, true)
+    # Require resolved review threads on protect-main. false drops that requirement.
+    review_thread_resolution = optional(bool, true)
+    # App ID that must report every required check on protect-main (15368 = GitHub Actions).
+    # null accepts any source.
+    required_check_source_id = optional(number)
     # Merge queue on the default branch. null (the default) leaves the queue off.
     merge_queue = optional(object({
       grouping_strategy                 = string
@@ -29,6 +36,20 @@ variable "repository_policies" {
       min_entries_to_merge_wait_minutes = number
       check_response_timeout_minutes    = number
       merge_method                      = string
+    }))
+    # Merge policy override. null (the default) keeps the organization policy:
+    # squash-only, delete branch on merge, linear history. Set only with a reason.
+    merge_settings = optional(object({
+      allow_squash_merge          = bool
+      allow_merge_commit          = bool
+      allow_rebase_merge          = bool
+      delete_branch_on_merge      = bool
+      squash_merge_commit_title   = string
+      squash_merge_commit_message = string
+      merge_commit_title          = optional(string)
+      merge_commit_message        = optional(string)
+      allowed_merge_methods       = list(string)
+      required_linear_history     = bool
     }))
   }))
 

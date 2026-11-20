@@ -19,11 +19,11 @@ check "mandatory_target_repositories_present" {
       "tailrocks-roadmap-skills", "tailrocks-rust-skills",
       "tailrocks-skill-authoring-skills", "tailrocks-skills",
       "tailrocks-sqldiff", "tailrocks-typescript-skills",
-      "terminal-components-claude", "termpane", "termrock",
+      "terminal-components-claude", "termpane", "termrock", "termrock-legacy",
       "tracing-request-level", "tuiscotti", "velnor-actions-fixture-legacy",
       "velnor-apt-legacy", "velnor-lab", "velnor-legacy", "velnor-new", "vision",
     ])
-    error_message = "repository_policies must contain exactly the 46 managed tailrocks repositories."
+    error_message = "repository_policies must contain exactly the 47 managed tailrocks repositories."
   }
 }
 
@@ -92,12 +92,34 @@ check "update_branch_suggestions_disabled" {
   }
 }
 
+check "merge_settings_overrides_explicit" {
+  assert {
+    condition = toset([
+      for name, policy in var.repository_policies : name
+      if policy.merge_settings != null
+    ]) == toset(["termrock"])
+    error_message = "Only termrock (merge commits, live settings) may override the merge policy with merge_settings."
+  }
+}
+
+check "overrides_are_explicit" {
+  assert {
+    condition = alltrue([
+      toset([for name, policy in var.repository_policies : name if !policy.protect_tags]) == toset(["termrock"]),
+      toset([for name, policy in var.repository_policies : name if !policy.review_thread_resolution]) == toset(["termrock"]),
+      toset([for name, policy in var.repository_policies : name if policy.required_check_source_id != null]) == toset(["termrock"]),
+    ])
+    error_message = "Only termrock (terminal-components-baseline) may skip protect-tags, skip review-thread resolution, or pin a required-check source."
+  }
+}
+
 check "delete_branch_on_merge_mandate" {
   assert {
     condition = alltrue([
       for k, v in module.repository_policy.repository_settings : v.delete_branch_on_merge == true
+      if var.repository_policies[k].merge_settings == null
     ])
-    error_message = "All managed repositories must enforce delete_branch_on_merge = true."
+    error_message = "All managed repositories without a merge_settings override must enforce delete_branch_on_merge = true."
   }
 }
 
@@ -111,8 +133,9 @@ check "squash_only_merge_mandate" {
         v.squash_merge_commit_title == "PR_TITLE" &&
         v.squash_merge_commit_message == "PR_BODY"
       )
+      if var.repository_policies[k].merge_settings == null
     ])
-    error_message = "All managed repositories must enforce canonical squash-only merge policy."
+    error_message = "All managed repositories without a merge_settings override must enforce canonical squash-only merge policy."
   }
 }
 
@@ -121,10 +144,10 @@ check "thread_resolution_and_active_enforcement" {
     condition = alltrue([
       for name, gate in module.repository_policy.ruleset_enforcement :
       gate.enforcement == "active" &&
-      gate.tags_enforcement == "active" &&
-      gate.required_review_thread_resolution == true
+      (!var.repository_policies[name].protect_tags || gate.tags_enforcement == "active") &&
+      gate.required_review_thread_resolution == var.repository_policies[name].review_thread_resolution
     ])
-    error_message = "All protect-main/protect-tags rulesets must enforce active with required review-thread resolution."
+    error_message = "All protect-main/protect-tags rulesets must enforce active, with review-thread resolution as configured per repository."
   }
 }
 

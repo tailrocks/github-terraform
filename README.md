@@ -1,7 +1,7 @@
 # github-terraform
 
 Manages GitHub repository settings and branch/tag protection for the
-`tailrocks` organization: 46 repositories, each with repository merge
+`tailrocks` organization: 47 repositories, each with repository merge
 settings plus `protect-main` and `protect-tags` rulesets, and optional
 per-repository tag-creation rulesets. Two exceptions: archived repositories
 (`archived = true`) get no managed settings, because GitHub refuses changes to
@@ -48,6 +48,16 @@ settings, Actions policies, and runner group in `organization.tf`.
 
 Each `repository_policies` entry may also set:
 
+- `protect_tags` (default `true`): set `false` to skip the protect-tags ruleset.
+  Only `termrock` does (TODO in `variables.tf`).
+- `review_thread_resolution` (default `true`): set `false` to drop the requirement
+  to resolve review threads on protect-main. Only `termrock` does.
+- `required_check_source_id` (default `null`): app ID that must report each required
+  check on protect-main. `15368` is GitHub Actions. Only `termrock` sets it.
+- `merge_settings` (default `null`): the merge policy. `null` is the organization
+  policy (squash-only, delete branch on merge, linear history, PR_TITLE/PR_BODY).
+  Only `termrock` overrides it, to keep the merge-commit policy of the repository
+  it was renamed from. `checks.tf` pins that exception list.
 - `archived` (default `false`): set it for a repository that is archived on
   GitHub. The module then skips its settings and reads its ID through a data
   source; its rulesets stay managed.

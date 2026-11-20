@@ -43,6 +43,27 @@ variable "repository_policies" {
       check_response_timeout_minutes    = number
       merge_method                      = string
     }))
+    # Protect-main is always managed for public repositories. false skips protect-tags.
+    protect_tags = optional(bool, true)
+    # Require resolved review threads on protect-main. false drops that requirement.
+    review_thread_resolution = optional(bool, true)
+    # App ID that must report every required check on protect-main (15368 = GitHub Actions).
+    # null accepts any source.
+    required_check_source_id = optional(number)
+    # Merge policy override. null (the default) keeps the organization policy:
+    # squash-only, delete branch on merge, linear history. Set only with a reason.
+    merge_settings = optional(object({
+      allow_squash_merge          = bool
+      allow_merge_commit          = bool
+      allow_rebase_merge          = bool
+      delete_branch_on_merge      = bool
+      squash_merge_commit_title   = string
+      squash_merge_commit_message = string
+      merge_commit_title          = optional(string)
+      merge_commit_message        = optional(string)
+      allowed_merge_methods       = list(string)
+      required_linear_history     = bool
+    }))
   }))
 
   validation {
@@ -244,7 +265,32 @@ variable "repository_policies" {
       protect_tags_update = true
     }
     "termrock" = {
+      # Former terminal-components-baseline. Merge settings are its live values (read 2026-11-20).
+      # Protect-main only, by security review: requires the "Required" check from GitHub Actions,
+      # blocks force-push and deletion, and needs no approvals or thread resolution, because bots
+      # and agents merge after CI. TODO: protect-tags is skipped (protect_tags = false); decide later.
+      visibility               = "public"
+      required_checks          = ["Required"]
+      protect_tags             = false
+      review_thread_resolution = false
+      required_check_source_id = 15368 # GitHub Actions
+      merge_settings = {
+        allow_squash_merge          = true
+        allow_merge_commit          = true
+        allow_rebase_merge          = true
+        delete_branch_on_merge      = false
+        squash_merge_commit_title   = "COMMIT_OR_PR_TITLE"
+        squash_merge_commit_message = "COMMIT_MESSAGES"
+        merge_commit_title          = "MERGE_MESSAGE"
+        merge_commit_message        = "PR_TITLE"
+        allowed_merge_methods       = ["merge", "squash", "rebase"]
+        required_linear_history     = false
+      }
+    }
+    "termrock-legacy" = {
+      # Former tailrocks/termrock, archived: only its rulesets are managed.
       # local.check_templates.dco_required
+      archived        = true
       visibility      = "public"
       required_checks = ["DCO", "Required"]
     }
@@ -329,7 +375,7 @@ variable "velnor_runner_group_repositories" {
     "ruxel",
     "schemalane",
     "tablerock",
-    "termrock",
+    "termrock-legacy",
     "tracing-request-level",
     "velnor-actions-fixture-legacy",
     "velnor-apt-legacy",
