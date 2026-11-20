@@ -48,6 +48,8 @@ settings, Actions policies, and runner group in `organization.tf`.
 
 Each `repository_policies` entry may also set:
 
+- `rulesets` (default `true`): set `false` to skip the protect-main and protect-tags
+  rulesets. Only `termrock` does, until its CI migration (TODO in `variables.tf`).
 - `merge_settings` (default `null`): the merge policy. `null` is the organization
   policy (squash-only, delete branch on merge, linear history, PR_TITLE/PR_BODY).
   Only `termrock` overrides it, to keep the merge-commit policy of the repository

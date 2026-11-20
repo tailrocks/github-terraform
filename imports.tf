@@ -410,8 +410,9 @@ import {
 
 # Former tailrocks/termrock (repository ID 1302045151). Its rulesets were state entries keyed
 # "termrock", a key that now belongs to terminal-components-baseline, so they are imported under
-# "termrock-legacy" by the GitHub ruleset IDs. The stale "termrock" entries drop out on refresh and
-# nothing is destroyed on GitHub.
+# "termrock-legacy" by the GitHub ruleset IDs. The stale "termrock" state entries must be removed
+# from state before the apply (tofu state rm, see the apply procedure). State removal does not
+# touch GitHub. Without it, a plan would try to delete the legacy rulesets.
 import {
   to = module.repository_policy.github_repository_ruleset.protect_main["termrock-legacy"]
   id = "termrock-legacy:19573043"

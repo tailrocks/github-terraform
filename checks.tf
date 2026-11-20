@@ -102,6 +102,16 @@ check "merge_settings_overrides_explicit" {
   }
 }
 
+check "rulesets_exception_is_explicit" {
+  assert {
+    condition = toset([
+      for name, policy in var.repository_policies : name
+      if !policy.rulesets
+    ]) == toset(["termrock"])
+    error_message = "Only termrock (terminal-components-baseline, until its CI migration) may skip its protect-main and protect-tags rulesets."
+  }
+}
+
 check "delete_branch_on_merge_mandate" {
   assert {
     condition = alltrue([

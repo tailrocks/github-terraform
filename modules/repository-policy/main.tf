@@ -43,7 +43,7 @@ locals {
   # A private repository on the free plan cannot have rulesets: the rulesets API
   # answers 403 "Upgrade to GitHub Pro".
   ruleset_repositories = toset([
-    for name, policy in var.repository_policies : name if policy.visibility == "public"
+    for name, policy in var.repository_policies : name if policy.visibility == "public" && policy.rulesets
   ])
 
   # Repository names for rulesets, taken from the settings resource when it exists.

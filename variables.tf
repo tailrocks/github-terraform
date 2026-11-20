@@ -43,6 +43,9 @@ variable "repository_policies" {
       check_response_timeout_minutes    = number
       merge_method                      = string
     }))
+    # Protect-main and protect-tags rulesets. false skips both for this repository
+    # (only termrock uses it, see checks.tf rulesets_exception_is_explicit).
+    rulesets = optional(bool, true)
     # Merge policy override. null (the default) keeps the organization policy:
     # squash-only, delete branch on merge, linear history. Set only with a reason.
     merge_settings = optional(object({
@@ -258,9 +261,12 @@ variable "repository_policies" {
       protect_tags_update = true
     }
     "termrock" = {
-      # Former terminal-components-baseline. Settings are its live values (read 2026-11-20);
-      # it has no rulesets and no required checks today. "Required verdict" is the gate on main.
+      # Former terminal-components-baseline. Settings are its live values (read 2026-11-20).
+      # TODO (follow-up after TCB moves its CI from velnor-actions to velnor-gen): set
+      # rulesets = true. "Required verdict" is the intended gate, but the migration may rename
+      # the gating check, so no ruleset is created until then. Today TCB has no rulesets.
       visibility      = "public"
+      rulesets        = false
       required_checks = ["Required verdict"]
       merge_settings = {
         allow_squash_merge          = true

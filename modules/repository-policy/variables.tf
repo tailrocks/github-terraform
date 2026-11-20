@@ -20,6 +20,9 @@ variable "repository_policies" {
       include         = list(string)
       bypass_user_ids = list(number)
     })), {})
+    # Protect-main and protect-tags rulesets. false skips both for this repository
+    # (only termrock uses it, see checks.tf rulesets_exception_is_explicit).
+    rulesets = optional(bool, true)
     # Merge queue on the default branch. null (the default) leaves the queue off.
     merge_queue = optional(object({
       grouping_strategy                 = string
