@@ -244,7 +244,15 @@ variable "repository_policies" {
       protect_tags_update = true
     }
     "termrock" = {
+      # tailrocks/termrock is the former terminal-components-baseline. It has no
+      # DCO status (only the "Required" check-run), so DCO is not required here.
+      visibility      = "public"
+      required_checks = ["Required"]
+    }
+    "termrock-legacy" = {
+      # Former tailrocks/termrock, archived: only its rulesets are managed.
       # local.check_templates.dco_required
+      archived        = true
       visibility      = "public"
       required_checks = ["DCO", "Required"]
     }
@@ -329,7 +337,7 @@ variable "velnor_runner_group_repositories" {
     "ruxel",
     "schemalane",
     "tablerock",
-    "termrock",
+    "termrock-legacy",
     "tracing-request-level",
     "velnor-actions-fixture-legacy",
     "velnor-apt-legacy",

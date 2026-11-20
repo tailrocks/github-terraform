@@ -202,6 +202,8 @@ import {
   id = "termpane"
 }
 
+# "termrock" is now terminal-components-baseline (renamed from there). Apply only after
+# both GitHub renames: gh api repos/tailrocks/termrock must return id 1441726463.
 import {
   to = module.repository_policy.github_repository.managed_settings["termrock"]
   id = "termrock"
@@ -406,9 +408,13 @@ import {
   id = "tuiscotti:23746094"
 }
 
+# Former tailrocks/termrock (repository ID 1302045151). Its rulesets were state entries keyed
+# "termrock", a key that now belongs to terminal-components-baseline, so they are imported under
+# "termrock-legacy" by the GitHub ruleset IDs. The stale "termrock" entries drop out on refresh and
+# nothing is destroyed on GitHub.
 import {
-  to = module.repository_policy.github_repository_ruleset.protect_main["termrock"]
-  id = "termrock:19573043"
+  to = module.repository_policy.github_repository_ruleset.protect_main["termrock-legacy"]
+  id = "termrock-legacy:19573043"
 }
 
 import {
@@ -616,8 +622,8 @@ import {
   id = "tuiscotti:23746052"
 }
 import {
-  to = module.repository_policy.github_repository_ruleset.protect_tags["termrock"]
-  id = "termrock:19573026"
+  to = module.repository_policy.github_repository_ruleset.protect_tags["termrock-legacy"]
+  id = "termrock-legacy:19573026"
 }
 
 import {
