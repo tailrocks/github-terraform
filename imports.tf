@@ -698,3 +698,19 @@ import {
   to = module.repository_policy.github_repository_ruleset.protect_tags["terminal-components-claude"]
   id = "terminal-components-claude:24883130"
 }
+
+# Existing velnor-new release environment and its deployment policies
+import {
+  to = github_repository_environment.velnor_new_release
+  id = "velnor-new:release"
+}
+
+import {
+  to = github_repository_environment_deployment_policy.velnor_new_release_main
+  id = "velnor-new:release:66739721"
+}
+
+import {
+  to = github_repository_environment_deployment_policy.velnor_new_release_tools_tags
+  id = "velnor-new:release:67467710"
+}

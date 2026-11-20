@@ -328,8 +328,9 @@ variable "repository_policies" {
       required_checks = ["DCO", "Required"]
     }
     "velnor-new" = {
+      # Live ruleset 24396608 requires only "Required" (checked 2026-11-20).
       visibility          = "public"
-      required_checks     = ["Required", "Required verdict"]
+      required_checks     = ["Required"]
       protect_tags_update = true
       # Batched queue (owner decision 2026-11-18): 13 runners fit about one full CI run,
       # so only the newest entry of a group must pass and up to 10 PRs merge per run.
