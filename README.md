@@ -48,8 +48,12 @@ settings, Actions policies, and runner group in `organization.tf`.
 
 Each `repository_policies` entry may also set:
 
-- `rulesets` (default `true`): set `false` to skip the protect-main and protect-tags
-  rulesets. Only `termrock` does, until its CI migration (TODO in `variables.tf`).
+- `protect_tags` (default `true`): set `false` to skip the protect-tags ruleset.
+  Only `termrock` does (TODO in `variables.tf`).
+- `review_thread_resolution` (default `true`): set `false` to drop the requirement
+  to resolve review threads on protect-main. Only `termrock` does.
+- `required_check_source_id` (default `null`): app ID that must report each required
+  check on protect-main. `15368` is GitHub Actions. Only `termrock` sets it.
 - `merge_settings` (default `null`): the merge policy. `null` is the organization
   policy (squash-only, delete branch on merge, linear history, PR_TITLE/PR_BODY).
   Only `termrock` overrides it, to keep the merge-commit policy of the repository

@@ -43,9 +43,13 @@ variable "repository_policies" {
       check_response_timeout_minutes    = number
       merge_method                      = string
     }))
-    # Protect-main and protect-tags rulesets. false skips both for this repository
-    # (only termrock uses it, see checks.tf rulesets_exception_is_explicit).
-    rulesets = optional(bool, true)
+    # Protect-main is always managed for public repositories. false skips protect-tags.
+    protect_tags = optional(bool, true)
+    # Require resolved review threads on protect-main. false drops that requirement.
+    review_thread_resolution = optional(bool, true)
+    # App ID that must report every required check on protect-main (15368 = GitHub Actions).
+    # null accepts any source.
+    required_check_source_id = optional(number)
     # Merge policy override. null (the default) keeps the organization policy:
     # squash-only, delete branch on merge, linear history. Set only with a reason.
     merge_settings = optional(object({
@@ -261,13 +265,15 @@ variable "repository_policies" {
       protect_tags_update = true
     }
     "termrock" = {
-      # Former terminal-components-baseline. Settings are its live values (read 2026-11-20).
-      # TODO (follow-up after TCB moves its CI from velnor-actions to velnor-gen): set
-      # rulesets = true. "Required verdict" is the intended gate, but the migration may rename
-      # the gating check, so no ruleset is created until then. Today TCB has no rulesets.
-      visibility      = "public"
-      rulesets        = false
-      required_checks = ["Required verdict"]
+      # Former terminal-components-baseline. Merge settings are its live values (read 2026-11-20).
+      # Protect-main only, by security review: requires the "Required" check from GitHub Actions,
+      # blocks force-push and deletion, and needs no approvals or thread resolution, because bots
+      # and agents merge after CI. TODO: protect-tags is skipped (protect_tags = false); decide later.
+      visibility               = "public"
+      required_checks          = ["Required"]
+      protect_tags             = false
+      review_thread_resolution = false
+      required_check_source_id = 15368 # GitHub Actions
       merge_settings = {
         allow_squash_merge          = true
         allow_merge_commit          = true

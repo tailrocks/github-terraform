@@ -41,7 +41,7 @@ output "ruleset_enforcement" {
   value = {
     for k, v in github_repository_ruleset.protect_main : k => {
       enforcement                       = v.enforcement
-      tags_enforcement                  = github_repository_ruleset.protect_tags[k].enforcement
+      tags_enforcement                  = try(github_repository_ruleset.protect_tags[k].enforcement, null)
       required_review_thread_resolution = v.rules[0].pull_request[0].required_review_thread_resolution
       bypass_actors                     = v.bypass_actors
     }
@@ -53,7 +53,7 @@ output "ruleset_pull_request" {
   value = {
     for k, v in github_repository_ruleset.protect_main : k => {
       enforcement                       = v.enforcement
-      tags_enforcement                  = github_repository_ruleset.protect_tags[k].enforcement
+      tags_enforcement                  = try(github_repository_ruleset.protect_tags[k].enforcement, null)
       required_review_thread_resolution = v.rules[0].pull_request[0].required_review_thread_resolution
       allowed_merge_methods             = v.rules[0].pull_request[0].allowed_merge_methods
     }

@@ -102,13 +102,14 @@ check "merge_settings_overrides_explicit" {
   }
 }
 
-check "rulesets_exception_is_explicit" {
+check "overrides_are_explicit" {
   assert {
-    condition = toset([
-      for name, policy in var.repository_policies : name
-      if !policy.rulesets
-    ]) == toset(["termrock"])
-    error_message = "Only termrock (terminal-components-baseline, until its CI migration) may skip its protect-main and protect-tags rulesets."
+    condition = alltrue([
+      toset([for name, policy in var.repository_policies : name if !policy.protect_tags]) == toset(["termrock"]),
+      toset([for name, policy in var.repository_policies : name if !policy.review_thread_resolution]) == toset(["termrock"]),
+      toset([for name, policy in var.repository_policies : name if policy.required_check_source_id != null]) == toset(["termrock"]),
+    ])
+    error_message = "Only termrock (terminal-components-baseline) may skip protect-tags, skip review-thread resolution, or pin a required-check source."
   }
 }
 
@@ -143,10 +144,10 @@ check "thread_resolution_and_active_enforcement" {
     condition = alltrue([
       for name, gate in module.repository_policy.ruleset_enforcement :
       gate.enforcement == "active" &&
-      gate.tags_enforcement == "active" &&
-      gate.required_review_thread_resolution == true
+      (!var.repository_policies[name].protect_tags || gate.tags_enforcement == "active") &&
+      gate.required_review_thread_resolution == var.repository_policies[name].review_thread_resolution
     ])
-    error_message = "All protect-main/protect-tags rulesets must enforce active with required review-thread resolution."
+    error_message = "All protect-main/protect-tags rulesets must enforce active, with review-thread resolution as configured per repository."
   }
 }
 

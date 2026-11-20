@@ -43,7 +43,12 @@ locals {
   # A private repository on the free plan cannot have rulesets: the rulesets API
   # answers 403 "Upgrade to GitHub Pro".
   ruleset_repositories = toset([
-    for name, policy in var.repository_policies : name if policy.visibility == "public" && policy.rulesets
+    for name, policy in var.repository_policies : name if policy.visibility == "public"
+  ])
+
+  # protect-tags is skipped for repositories that set protect_tags = false.
+  tag_ruleset_repositories = toset([
+    for name, policy in var.repository_policies : name if policy.visibility == "public" && policy.protect_tags
   ])
 
   # Repository names for rulesets, taken from the settings resource when it exists.
@@ -146,7 +151,7 @@ resource "github_repository_ruleset" "protect_main" {
       dismiss_stale_reviews_on_push     = true
       require_last_push_approval        = false
       require_code_owner_review         = false
-      required_review_thread_resolution = true
+      required_review_thread_resolution = var.repository_policies[each.value].review_thread_resolution
     }
 
     dynamic "merge_queue" {
@@ -171,7 +176,8 @@ resource "github_repository_ruleset" "protect_main" {
         dynamic "required_check" {
           for_each = var.repository_policies[each.value].required_checks
           content {
-            context = required_check.value
+            context        = required_check.value
+            integration_id = var.repository_policies[each.value].required_check_source_id
           }
         }
       }
@@ -181,7 +187,7 @@ resource "github_repository_ruleset" "protect_main" {
 
 # Tag ruleset protecting all tags
 resource "github_repository_ruleset" "protect_tags" {
-  for_each = local.ruleset_repositories
+  for_each = local.tag_ruleset_repositories
 
   name        = "protect-tags"
   target      = "tag"
