@@ -193,6 +193,11 @@ import {
 }
 
 import {
+  to = module.repository_policy.github_repository.managed_settings["taskrock"]
+  id = "taskrock"
+}
+
+import {
   to = module.repository_policy.github_repository.managed_settings["terminal-components-claude"]
   id = "terminal-components-claude"
 }

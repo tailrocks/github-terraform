@@ -255,6 +255,11 @@ variable "repository_policies" {
       visibility      = "public"
       required_checks = ["Required"]
     }
+    "taskrock" = {
+      # local.check_templates.dco_required
+      visibility      = "public"
+      required_checks = ["DCO", "Required"]
+    }
     "terminal-components-claude" = {
       visibility      = "public"
       required_checks = ["Required"]
