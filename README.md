@@ -1,7 +1,7 @@
 # github-terraform
 
 Manages GitHub repository settings and branch/tag protection for the
-`tailrocks` organization: 47 repositories, each with repository merge
+`tailrocks` organization: 48 repositories, each with repository merge
 settings plus `protect-main` and `protect-tags` rulesets, and optional
 per-repository tag-creation rulesets. Two exceptions: archived repositories
 (`archived = true`) get no managed settings, because GitHub refuses changes to
