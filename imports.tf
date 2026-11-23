@@ -404,6 +404,11 @@ import {
 }
 
 import {
+  to = module.repository_policy.github_repository_ruleset.protect_main["taskrock"]
+  id = "taskrock:27881180"
+}
+
+import {
   to = module.repository_policy.github_repository_ruleset.protect_main["termpane"]
   id = "termpane:23746101"
 }
@@ -616,6 +621,11 @@ import {
 import {
   to = module.repository_policy.github_repository_ruleset.protect_tags["tailrocks-typescript-skills"]
   id = "tailrocks-typescript-skills:23746078"
+}
+
+import {
+  to = module.repository_policy.github_repository_ruleset.protect_tags["taskrock"]
+  id = "taskrock:27881179"
 }
 
 import {
