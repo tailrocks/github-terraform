@@ -1,11 +1,51 @@
 # SPDX-FileCopyrightText: 2026 Alexey Zhokhov
 # SPDX-License-Identifier: Apache-2.0
 
+min_version = { hard = "2026.11.1", soft = "2026.11.12" }
+
 [tools]
 opentofu = "1.13.1"
+# The macOS velnor-gen pin below builds from source with Cargo, and mise installs every
+# project tool before any task runs, so Rust is pinned here; velnor-gen refuses an `os`
+# filter on it. The generated CI jobs install only the tools they name.
+rust = "1.100.0"
+# Workflow linting: the generated Jactionlint job installs these pins.
+jactionlint = "2.6.0"
+shellcheck = "0.11.0"
+# velnor-gen writes the CI workflow. Linux takes the release asset. The
+# release has no macOS asset, so macOS builds the same commit from source.
+# `matching` (not a glob `asset_pattern`) keeps the asset choice arch-aware: a
+# glob locks the x86_64 archive into the linux-arm64 slots of mise.lock.
+#
+# Update the generator to release <version> (for example 0.1.117):
+#   1. Set the release tag below to `tools-v<version>` and the cargo `rev:`
+#      to the commit of that tag
+#      (`gh api repos/tailrocks/velnor-new/commits/tools-v<version> --jq .sha`).
+#   2. `mise install`, so the new binary is the one that runs.
+#   3. `velnor-gen --root . pin-helper <version>` rewrites .velnor/rust-ci.lock.
+#   4. `mise lock --platform linux-arm64,linux-arm64-musl,linux-x64,linux-x64-musl,macos-arm64,macos-x64,windows-x64`
+#      refreshes mise.lock.
+#   5. `velnor-gen --root . generate`, then `velnor-gen --root . check --verify-release`.
+# The version here must equal the version in .velnor/rust-ci.lock.
+"github:tailrocks/velnor-new" = { version = "tools-v0.1.116", matching = "velnor-gen", os = ["linux"] }
+"cargo:https://github.com/tailrocks/velnor-new" = { version = "rev:5e3c38d6eca734106e0f2b0e677f9191be26c012", crate = "velnor-gen", os = ["macos"] }
 
 [settings]
 lockfile = true
+
+# The CI OpenTofu gate and its local equivalent: format, init without a backend against
+# the committed provider lock, validate.
+[tasks."check:tofu"]
+description = "Check OpenTofu formatting, initialisation against the provider lock, and validity"
+run = [
+  "tofu fmt -check -recursive -no-color",
+  "tofu init -backend=false -input=false -lockfile=readonly -no-color",
+  "tofu validate -no-color",
+]
+
+[tasks.workflows]
+description = "Fail when a generated workflow differs from velnor-gen output"
+run = "velnor-gen --root . check --verify-release"
 
 [tasks."tofu:plan"]
 description = "Run tofu plan"

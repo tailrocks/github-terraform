@@ -1,0 +1,25 @@
+# Generator input for velnor-gen. Run `velnor-gen --root . generate` after a change.
+# The repository has no Cargo workspace, so the generated workflow holds only the
+# plan, the lint jobs and the Required gate. The old engine ran on GitHub-hosted
+# ubuntu-26.04, so this does too, and a pull request from a fork runs there as well.
+runner = "ubuntu-26.04"
+hosted = true
+required_check = "Required"
+default_branch = "main"
+
+[[lint]]
+kind = "jactionlint"
+config = ".github/jactionlint.yaml"
+
+# The same three commands the old OpenToFu job ran, as one mise task so a
+# developer runs the exact gate with `mise run check:tofu`.
+[[lint]]
+kind = "mise-task"
+id = "tofu"
+name = "OpenTofu"
+task = "check:tofu"
+tools = ["opentofu"]
+timeout_minutes = 30
+
+[[lint]]
+kind = "generated-check"
