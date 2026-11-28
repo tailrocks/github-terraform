@@ -89,8 +89,26 @@ variable "repository_policies" {
   validation {
     condition = alltrue([
       for name, config in var.repository_policies :
-      !contains(config.required_checks, "DCO") || lookup(config.required_check_apps, "DCO", null) == 974774
+      config.archived || !contains(config.required_checks, "DCO") || lookup(config.required_check_apps, "DCO", null) == var.dco_app_id
     ])
-    error_message = "Every repository that requires DCO must pin it to the cncf/dco2 app (974774), or any workflow job named DCO can satisfy the requirement."
+    error_message = "Every non-archived repository that requires DCO must pin it to the cncf/dco2 app (${var.dco_app_id}), or any workflow job named DCO can satisfy the requirement."
+  }
+
+  validation {
+    condition = alltrue([
+      for name, config in var.repository_policies :
+      alltrue([for app_id in values(config.required_check_apps) : app_id == null ? true : app_id > 0])
+    ])
+    error_message = "Every required_check_apps value must be a positive app ID: 0 is the provider's unset value and would mean any source."
+  }
+}
+
+variable "dco_app_id" {
+  description = "ID of the cncf/dco2 GitHub App that must post DCO on every non-archived repository that requires it"
+  type        = number
+
+  validation {
+    condition     = var.dco_app_id > 0
+    error_message = "dco_app_id must be a positive app ID."
   }
 }

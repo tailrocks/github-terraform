@@ -99,9 +99,17 @@ variable "repository_policies" {
   validation {
     condition = alltrue([
       for repo in values(var.repository_policies) :
-      !contains(repo.required_checks, "DCO") || lookup(repo.required_check_apps, "DCO", null) == 974774
+      repo.archived || !contains(repo.required_checks, "DCO") || lookup(repo.required_check_apps, "DCO", null) == local.dco_app_id
     ])
-    error_message = "Every repository that requires DCO must pin it to the cncf/dco2 app (974774), or any workflow job named DCO can satisfy the requirement."
+    error_message = "Every non-archived repository that requires DCO must pin it to the cncf/dco2 app (${local.dco_app_id}), or any workflow job named DCO can satisfy the requirement."
+  }
+
+  validation {
+    condition = alltrue([
+      for repo in values(var.repository_policies) :
+      alltrue([for app_id in values(repo.required_check_apps) : app_id == null ? true : app_id > 0])
+    ])
+    error_message = "Every required_check_apps value must be a positive app ID: 0 is the provider's unset value and would mean any source."
   }
 
   # NOTE: variable defaults must be literals, so entries cannot reference
@@ -160,9 +168,8 @@ variable "repository_policies" {
     "homebrew-velnor-legacy" = {
       archived = true
       # local.check_templates.dco_required
-      visibility          = "public"
-      required_checks     = ["DCO", "Required"]
-      required_check_apps = { DCO = 974774 }
+      visibility      = "public"
+      required_checks = ["DCO", "Required"]
     }
     "jambalaya" = {
       visibility      = "public"
@@ -336,10 +343,9 @@ variable "repository_policies" {
     "termrock-legacy" = {
       # Former tailrocks/termrock, archived: only its rulesets are managed.
       # local.check_templates.dco_required
-      archived            = true
-      visibility          = "public"
-      required_checks     = ["DCO", "Required"]
-      required_check_apps = { DCO = 974774 }
+      archived        = true
+      visibility      = "public"
+      required_checks = ["DCO", "Required"]
     }
     "tracing-request-level" = {
       # local.check_templates.dco_required
@@ -354,17 +360,15 @@ variable "repository_policies" {
       required_check_apps = { DCO = 974774 }
     }
     "velnor-actions-fixture-legacy" = {
-      archived            = true
-      visibility          = "public"
-      required_checks     = ["DCO", "Policy", "ci-required"]
-      required_check_apps = { DCO = 974774 }
+      archived        = true
+      visibility      = "public"
+      required_checks = ["DCO", "Policy", "ci-required"]
     }
     "velnor-apt-legacy" = {
       archived = true
       # local.check_templates.dco_required
-      visibility          = "public"
-      required_checks     = ["DCO", "Required"]
-      required_check_apps = { DCO = 974774 }
+      visibility      = "public"
+      required_checks = ["DCO", "Required"]
     }
     "velnor-lab" = {
       # local.check_templates.dco_required
@@ -376,9 +380,8 @@ variable "repository_policies" {
     "velnor-legacy" = {
       archived = true
       # local.check_templates.dco_required
-      visibility          = "public"
-      required_checks     = ["DCO", "Required"]
-      required_check_apps = { DCO = 974774 }
+      visibility      = "public"
+      required_checks = ["DCO", "Required"]
     }
     "velnor-new" = {
       visibility          = "public"

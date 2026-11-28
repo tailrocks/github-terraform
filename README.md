@@ -59,7 +59,9 @@ Each `repository_policies` entry may also set:
 - `required_check_apps` (default `{}`): map from a required check context to the ID of
   the app that must post it on protect-main. `15368` is GitHub Actions and `974774`
   is the cncf/dco2 app. A check that is not listed accepts any source. Every
-  repository that requires `DCO` pins it to `974774` (a `variables.tf` validation, in the root and the module, enforces this);
+  non-archived repository that requires `DCO` pins it to `974774` (`local.dco_app_id`; a `variables.tf`
+  validation, in the root and the module, enforces this; archived repositories are exempt and keep DCO unpinned, as live);
+  every pinned ID must be positive, since `0` is the provider's unset value and means any source;
   only `termrock` pins another check (`Required` to `15368`). Read an app ID from
   live data, not from memory:
   `gh api repos/tailrocks/<repo>/commits/<sha>/check-runs --jq '.check_runs[] | {name, app: .app.slug, id: .app.id}'`.

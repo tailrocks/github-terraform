@@ -10,5 +10,6 @@ module "repository_policy" {
   source = "./modules/repository-policy"
 
   repository_policies = var.repository_policies
+  dco_app_id          = local.dco_app_id
 }
 
