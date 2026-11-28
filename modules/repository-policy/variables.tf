@@ -24,9 +24,10 @@ variable "repository_policies" {
     protect_tags = optional(bool, true)
     # Require resolved review threads on protect-main. false drops that requirement.
     review_thread_resolution = optional(bool, true)
-    # App ID that must report every required check on protect-main (15368 = GitHub Actions).
-    # null accepts any source.
-    required_check_source_id = optional(number)
+    # Required check context -> ID of the app that must post it on protect-main
+    # (15368 = GitHub Actions, 974774 = the cncf/dco2 app that posts DCO). A check
+    # that is not listed accepts any source.
+    required_check_apps = optional(map(number), {})
     # Merge queue on the default branch. null (the default) leaves the queue off.
     merge_queue = optional(object({
       grouping_strategy                 = string
@@ -75,5 +76,39 @@ variable "repository_policies" {
       )
     ])
     error_message = "Each entry must satisfy: non-empty blank-free required_checks with null no_ci_reason, XOR empty checks with non-empty no_ci_reason."
+  }
+
+  validation {
+    condition = alltrue([
+      for name, config in var.repository_policies :
+      length(setsubtract(keys(config.required_check_apps), config.required_checks)) == 0
+    ])
+    error_message = "Every required_check_apps key must be one of the repository's required_checks; a pin on a check that is not required is silently ignored."
+  }
+
+  validation {
+    condition = alltrue([
+      for name, config in var.repository_policies :
+      config.archived || !contains(config.required_checks, "DCO") || lookup(config.required_check_apps, "DCO", null) == var.dco_app_id
+    ])
+    error_message = "Every non-archived repository that requires DCO must pin it to the cncf/dco2 app (${var.dco_app_id}), or any workflow job named DCO can satisfy the requirement."
+  }
+
+  validation {
+    condition = alltrue([
+      for name, config in var.repository_policies :
+      alltrue([for app_id in values(config.required_check_apps) : coalesce(app_id, 0) > 0])
+    ])
+    error_message = "Every required_check_apps value must be a positive app ID: null and 0 both mean any source to the provider."
+  }
+}
+
+variable "dco_app_id" {
+  description = "ID of the cncf/dco2 GitHub App that must post DCO on every non-archived repository that requires it"
+  type        = number
+
+  validation {
+    condition     = var.dco_app_id > 0
+    error_message = "dco_app_id must be a positive app ID."
   }
 }
