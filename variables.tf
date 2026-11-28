@@ -311,10 +311,10 @@ variable "repository_policies" {
       required_checks     = ["DCO", "Required"]
       required_check_apps = { DCO = 974774 }
     }
-    # Bespoke: Check = .github/workflows/ci.yml job "check"; DCO = cncf/dco2 app.
     "taskrock-plugins" = {
+      # local.check_templates.dco_required (velnor-gen CI since taskrock-plugins#43)
       visibility          = "public"
-      required_checks     = ["Check", "DCO"]
+      required_checks     = ["DCO", "Required"]
       required_check_apps = { DCO = 974774 }
     }
     "terminal-components-claude" = {
