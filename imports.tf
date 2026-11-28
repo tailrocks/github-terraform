@@ -198,6 +198,11 @@ import {
 }
 
 import {
+  to = module.repository_policy.github_repository.managed_settings["taskrock-plugins"]
+  id = "taskrock-plugins"
+}
+
+import {
   to = module.repository_policy.github_repository.managed_settings["terminal-components-claude"]
   id = "terminal-components-claude"
 }
@@ -406,6 +411,11 @@ import {
 import {
   to = module.repository_policy.github_repository_ruleset.protect_main["taskrock"]
   id = "taskrock:27881180"
+}
+
+import {
+  to = module.repository_policy.github_repository_ruleset.protect_main["taskrock-plugins"]
+  id = "taskrock-plugins:28275397"
 }
 
 import {
@@ -626,6 +636,11 @@ import {
 import {
   to = module.repository_policy.github_repository_ruleset.protect_tags["taskrock"]
   id = "taskrock:27881179"
+}
+
+import {
+  to = module.repository_policy.github_repository_ruleset.protect_tags["taskrock-plugins"]
+  id = "taskrock-plugins:28275391"
 }
 
 import {

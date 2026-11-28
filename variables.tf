@@ -260,6 +260,10 @@ variable "repository_policies" {
       visibility      = "public"
       required_checks = ["DCO", "Required"]
     }
+    "taskrock-plugins" = {
+      visibility      = "public"
+      required_checks = ["Check", "DCO"]
+    }
     "terminal-components-claude" = {
       visibility      = "public"
       required_checks = ["Required"]
