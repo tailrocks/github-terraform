@@ -1,7 +1,7 @@
 # github-terraform
 
 Manages GitHub repository settings and branch/tag protection for the
-`tailrocks` organization: 48 repositories, each with repository merge
+`tailrocks` organization: 49 repositories, each with repository merge
 settings plus `protect-main` and `protect-tags` rulesets, and optional
 per-repository tag-creation rulesets. Two exceptions: archived repositories
 (`archived = true`) get no managed settings, because GitHub refuses changes to
@@ -43,6 +43,10 @@ settings, Actions policies, and runner group in `organization.tf`.
 2. Add one import triple (settings + `protect_main` + `protect_tags`) to
    `imports.tf` using the live numeric ruleset IDs. A private repository gets
    only the settings import; an archived one gets only the two ruleset imports.
+3. Set the pull-request creation policy, which the provider cannot manage yet
+   (integrations/terraform-provider-github#3479):
+   `gh api -X PATCH repos/tailrocks/<repo> -f pull_request_creation_policy=collaborators_only`.
+   Check it with `gh api repos/tailrocks/<repo> --jq .pull_request_creation_policy`.
 
 ## Per-repository options
 

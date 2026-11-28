@@ -19,11 +19,12 @@ check "mandatory_target_repositories_present" {
       "tailrocks-roadmap-skills", "tailrocks-rust-skills",
       "tailrocks-skill-authoring-skills", "tailrocks-skills",
       "tailrocks-sqldiff", "tailrocks-typescript-skills", "taskrock",
+      "taskrock-plugins",
       "terminal-components-claude", "termpane", "termrock", "termrock-legacy",
       "tracing-request-level", "tuiscotti", "velnor-actions-fixture-legacy",
       "velnor-apt-legacy", "velnor-lab", "velnor-legacy", "velnor-new", "vision",
     ])
-    error_message = "repository_policies must contain exactly the 48 managed tailrocks repositories."
+    error_message = "repository_policies must contain exactly the 49 managed tailrocks repositories."
   }
 }
 
