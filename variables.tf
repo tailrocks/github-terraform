@@ -88,6 +88,22 @@ variable "repository_policies" {
     error_message = "Each repository must declare non-empty required checks or a non-empty no_ci_reason for an explicit no-CI exception."
   }
 
+  validation {
+    condition = alltrue([
+      for repo in values(var.repository_policies) :
+      length(setsubtract(keys(repo.required_check_apps), repo.required_checks)) == 0
+    ])
+    error_message = "Every required_check_apps key must be one of the repository's required_checks; a pin on a check that is not required is silently ignored."
+  }
+
+  validation {
+    condition = alltrue([
+      for repo in values(var.repository_policies) :
+      !contains(repo.required_checks, "DCO") || lookup(repo.required_check_apps, "DCO", null) == 974774
+    ])
+    error_message = "Every repository that requires DCO must pin it to the cncf/dco2 app (974774), or any workflow job named DCO can satisfy the requirement."
+  }
+
   # NOTE: variable defaults must be literals, so entries cannot reference
   # local.check_templates. Keep these lists in sync with locals.tf templates.
   default = {

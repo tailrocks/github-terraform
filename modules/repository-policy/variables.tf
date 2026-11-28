@@ -77,4 +77,20 @@ variable "repository_policies" {
     ])
     error_message = "Each entry must satisfy: non-empty blank-free required_checks with null no_ci_reason, XOR empty checks with non-empty no_ci_reason."
   }
+
+  validation {
+    condition = alltrue([
+      for name, config in var.repository_policies :
+      length(setsubtract(keys(config.required_check_apps), config.required_checks)) == 0
+    ])
+    error_message = "Every required_check_apps key must be one of the repository's required_checks; a pin on a check that is not required is silently ignored."
+  }
+
+  validation {
+    condition = alltrue([
+      for name, config in var.repository_policies :
+      !contains(config.required_checks, "DCO") || lookup(config.required_check_apps, "DCO", null) == 974774
+    ])
+    error_message = "Every repository that requires DCO must pin it to the cncf/dco2 app (974774), or any workflow job named DCO can satisfy the requirement."
+  }
 }

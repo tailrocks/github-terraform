@@ -114,28 +114,6 @@ check "overrides_are_explicit" {
   }
 }
 
-check "required_check_apps_name_required_checks" {
-  assert {
-    condition = alltrue([
-      for name, policy in var.repository_policies :
-      length(setsubtract(keys(policy.required_check_apps), policy.required_checks)) == 0
-    ])
-    error_message = "Every required_check_apps key must be one of the repository's required_checks; a pin on a check that is not required is silently ignored."
-  }
-}
-
-check "dco_pinned_to_dco2_app" {
-  assert {
-    condition = alltrue([
-      for name, policy in var.repository_policies :
-      contains(policy.required_checks, "DCO")
-      ? try(policy.required_check_apps["DCO"] == 974774, false)
-      : !contains(keys(policy.required_check_apps), "DCO")
-    ])
-    error_message = "Every repository that requires DCO must pin it to the cncf/dco2 app (974774), or any workflow job named DCO can satisfy the requirement."
-  }
-}
-
 check "delete_branch_on_merge_mandate" {
   assert {
     condition = alltrue([
