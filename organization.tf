@@ -49,13 +49,17 @@ resource "github_actions_organization_workflow_permissions" "tailrocks" {
   can_approve_pull_request_reviews = true
 }
 
-resource "github_actions_runner_group" "velnor_trusted" {
-  name                       = "velnor-trusted"
+# GitHub assigns the group IDs; imports.tf imports each group by its ID.
+resource "github_actions_runner_group" "velnor" {
+  for_each = var.velnor_runner_groups
+
+  name                       = each.key
   visibility                 = "selected"
   allows_public_repositories = true
-  restricted_to_workflows    = false
+  restricted_to_workflows    = length(each.value.selected_workflows) > 0
+  selected_workflows         = each.value.selected_workflows
   selected_repository_ids = [
-    for name in var.velnor_runner_group_repositories :
+    for name in each.value.repositories :
     module.repository_policy.repository_ids[name]
   ]
 }
