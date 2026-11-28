@@ -177,7 +177,7 @@ resource "github_repository_ruleset" "protect_main" {
           for_each = var.repository_policies[each.value].required_checks
           content {
             context        = required_check.value
-            integration_id = var.repository_policies[each.value].required_check_source_id
+            integration_id = lookup(var.repository_policies[each.value].required_check_apps, required_check.value, null)
           }
         }
       }

@@ -728,3 +728,9 @@ import {
   to = module.repository_policy.github_repository_ruleset.protect_tags["terminal-components-claude"]
   id = "terminal-components-claude:24883130"
 }
+
+# Existing termrock protect-main ruleset (it has no protect-tags: protect_tags = false)
+import {
+  to = module.repository_policy.github_repository_ruleset.protect_main["termrock"]
+  id = "termrock:27758259"
+}

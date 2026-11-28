@@ -47,9 +47,10 @@ variable "repository_policies" {
     protect_tags = optional(bool, true)
     # Require resolved review threads on protect-main. false drops that requirement.
     review_thread_resolution = optional(bool, true)
-    # App ID that must report every required check on protect-main (15368 = GitHub Actions).
-    # null accepts any source.
-    required_check_source_id = optional(number)
+    # Required check context -> ID of the app that must post it on protect-main
+    # (15368 = GitHub Actions, 974774 = the cncf/dco2 app that posts DCO). A check
+    # that is not listed accepts any source.
+    required_check_apps = optional(map(number), {})
     # Merge policy override. null (the default) keeps the organization policy:
     # squash-only, delete branch on merge, linear history. Set only with a reason.
     merge_settings = optional(object({
@@ -91,12 +92,14 @@ variable "repository_policies" {
   # local.check_templates. Keep these lists in sync with locals.tf templates.
   default = {
     "cloudflare-tofu" = {
-      visibility      = "public"
-      required_checks = ["DCO"]
+      visibility          = "public"
+      required_checks     = ["DCO"]
+      required_check_apps = { DCO = 974774 }
     }
     "github-terraform" = {
-      visibility      = "public"
-      required_checks = ["DCO", "Required"]
+      visibility          = "public"
+      required_checks     = ["DCO", "Required"]
+      required_check_apps = { DCO = 974774 }
     }
     "graphql-java-datetime" = {
       visibility      = "public"
@@ -104,39 +107,46 @@ variable "repository_policies" {
     }
     "holla" = {
       # local.check_templates.dco_required
-      visibility      = "public"
-      required_checks = ["DCO", "Required"]
+      visibility          = "public"
+      required_checks     = ["DCO", "Required"]
+      required_check_apps = { DCO = 974774 }
     }
     "holla-apt" = {
       # local.check_templates.dco_required
-      visibility      = "public"
-      required_checks = ["DCO", "Required"]
+      visibility          = "public"
+      required_checks     = ["DCO", "Required"]
+      required_check_apps = { DCO = 974774 }
     }
     "homebrew-holla" = {
       # local.check_templates.dco_required
-      visibility      = "public"
-      required_checks = ["DCO", "Required"]
+      visibility          = "public"
+      required_checks     = ["DCO", "Required"]
+      required_check_apps = { DCO = 974774 }
     }
     "homebrew-parallax" = {
       # local.check_templates.dco_required
-      visibility      = "public"
-      required_checks = ["DCO", "Required"]
+      visibility          = "public"
+      required_checks     = ["DCO", "Required"]
+      required_check_apps = { DCO = 974774 }
     }
     "homebrew-ruxel" = {
       # local.check_templates.dco_required
-      visibility      = "public"
-      required_checks = ["DCO", "Required"]
+      visibility          = "public"
+      required_checks     = ["DCO", "Required"]
+      required_check_apps = { DCO = 974774 }
     }
     "homebrew-tablerock" = {
       # local.check_templates.dco_required
-      visibility      = "public"
-      required_checks = ["DCO", "Required"]
+      visibility          = "public"
+      required_checks     = ["DCO", "Required"]
+      required_check_apps = { DCO = 974774 }
     }
     "homebrew-velnor-legacy" = {
       archived = true
       # local.check_templates.dco_required
-      visibility      = "public"
-      required_checks = ["DCO", "Required"]
+      visibility          = "public"
+      required_checks     = ["DCO", "Required"]
+      required_check_apps = { DCO = 974774 }
     }
     "jambalaya" = {
       visibility      = "public"
@@ -145,18 +155,21 @@ variable "repository_policies" {
     }
     "parallax" = {
       # local.check_templates.dco_required
-      visibility      = "public"
-      required_checks = ["DCO", "Required"]
+      visibility          = "public"
+      required_checks     = ["DCO", "Required"]
+      required_check_apps = { DCO = 974774 }
     }
     "parallax-telemetry-playground" = {
       # local.check_templates.dco_required
-      visibility      = "public"
-      required_checks = ["DCO", "Required"]
+      visibility          = "public"
+      required_checks     = ["DCO", "Required"]
+      required_check_apps = { DCO = 974774 }
     }
     "pg-bigdecimal" = {
       # local.check_templates.dco_required
-      visibility      = "public"
-      required_checks = ["DCO", "Required"]
+      visibility          = "public"
+      required_checks     = ["DCO", "Required"]
+      required_check_apps = { DCO = 974774 }
     }
     "pgquill" = {
       visibility      = "public"
@@ -179,18 +192,21 @@ variable "repository_policies" {
     }
     "ruxel" = {
       # local.check_templates.dco_required
-      visibility      = "public"
-      required_checks = ["DCO", "Required"]
+      visibility          = "public"
+      required_checks     = ["DCO", "Required"]
+      required_check_apps = { DCO = 974774 }
     }
     "schemalane" = {
       # local.check_templates.dco_required
-      visibility      = "public"
-      required_checks = ["DCO", "Required"]
+      visibility          = "public"
+      required_checks     = ["DCO", "Required"]
+      required_check_apps = { DCO = 974774 }
     }
     "tablerock" = {
       # local.check_templates.dco_required
-      visibility      = "public"
-      required_checks = ["DCO", "Required"]
+      visibility          = "public"
+      required_checks     = ["DCO", "Required"]
+      required_check_apps = { DCO = 974774 }
     }
     "tailrocks-asd-ste100-skills" = {
       # Private on the free plan: GitHub refuses rulesets here (403 "Upgrade to GitHub Pro"),
@@ -243,8 +259,9 @@ variable "repository_policies" {
       required_checks = ["Required"]
     }
     "tailrocks-skills" = {
-      visibility      = "public"
-      required_checks = ["DCO"]
+      visibility          = "public"
+      required_checks     = ["DCO"]
+      required_check_apps = { DCO = 974774 }
     }
     "tailrocks-sqldiff" = {
       visibility      = "public"
@@ -257,13 +274,15 @@ variable "repository_policies" {
     }
     "taskrock" = {
       # local.check_templates.dco_required
-      visibility      = "public"
-      required_checks = ["DCO", "Required"]
+      visibility          = "public"
+      required_checks     = ["DCO", "Required"]
+      required_check_apps = { DCO = 974774 }
     }
     # Bespoke: Check = .github/workflows/ci.yml job "check"; DCO = cncf/dco2 app.
     "taskrock-plugins" = {
-      visibility      = "public"
-      required_checks = ["Check", "DCO"]
+      visibility          = "public"
+      required_checks     = ["Check", "DCO"]
+      required_check_apps = { DCO = 974774 }
     }
     "terminal-components-claude" = {
       visibility      = "public"
@@ -272,6 +291,7 @@ variable "repository_policies" {
     "termpane" = {
       visibility          = "public"
       required_checks     = ["DCO", "Required"]
+      required_check_apps = { DCO = 974774 }
       protect_tags_update = true
     }
     "termrock" = {
@@ -283,7 +303,7 @@ variable "repository_policies" {
       required_checks          = ["Required"]
       protect_tags             = false
       review_thread_resolution = false
-      required_check_source_id = 15368 # GitHub Actions
+      required_check_apps      = { Required = 15368 } # GitHub Actions
       merge_settings = {
         allow_squash_merge          = true
         allow_merge_commit          = true
@@ -300,42 +320,49 @@ variable "repository_policies" {
     "termrock-legacy" = {
       # Former tailrocks/termrock, archived: only its rulesets are managed.
       # local.check_templates.dco_required
-      archived        = true
-      visibility      = "public"
-      required_checks = ["DCO", "Required"]
+      archived            = true
+      visibility          = "public"
+      required_checks     = ["DCO", "Required"]
+      required_check_apps = { DCO = 974774 }
     }
     "tracing-request-level" = {
       # local.check_templates.dco_required
-      visibility      = "public"
-      required_checks = ["DCO", "Required"]
+      visibility          = "public"
+      required_checks     = ["DCO", "Required"]
+      required_check_apps = { DCO = 974774 }
     }
     "tuiscotti" = {
       # Bespoke: matches live protect-main ruleset 23746094 required contexts (DCO + Required).
-      visibility      = "public"
-      required_checks = ["DCO", "Required"]
+      visibility          = "public"
+      required_checks     = ["DCO", "Required"]
+      required_check_apps = { DCO = 974774 }
     }
     "velnor-actions-fixture-legacy" = {
-      archived        = true
-      visibility      = "public"
-      required_checks = ["DCO", "Policy", "ci-required"]
+      archived            = true
+      visibility          = "public"
+      required_checks     = ["DCO", "Policy", "ci-required"]
+      required_check_apps = { DCO = 974774 }
     }
     "velnor-apt-legacy" = {
       archived = true
       # local.check_templates.dco_required
-      visibility      = "public"
-      required_checks = ["DCO", "Required"]
+      visibility          = "public"
+      required_checks     = ["DCO", "Required"]
+      required_check_apps = { DCO = 974774 }
     }
     "velnor-lab" = {
       # local.check_templates.dco_required
       visibility          = "public"
       required_checks     = ["DCO", "Required"]
+      required_check_apps = { DCO = 974774 }
       protect_tags_update = true
     }
     "velnor-legacy" = {
       archived = true
       # local.check_templates.dco_required
-      visibility      = "public"
-      required_checks = ["DCO", "Required"]
+      visibility          = "public"
+      required_checks     = ["DCO", "Required"]
+      required_check_apps = { DCO = 974774 }
     }
     "velnor-new" = {
       visibility          = "public"

@@ -24,9 +24,10 @@ variable "repository_policies" {
     protect_tags = optional(bool, true)
     # Require resolved review threads on protect-main. false drops that requirement.
     review_thread_resolution = optional(bool, true)
-    # App ID that must report every required check on protect-main (15368 = GitHub Actions).
-    # null accepts any source.
-    required_check_source_id = optional(number)
+    # Required check context -> ID of the app that must post it on protect-main
+    # (15368 = GitHub Actions, 974774 = the cncf/dco2 app that posts DCO). A check
+    # that is not listed accepts any source.
+    required_check_apps = optional(map(number), {})
     # Merge queue on the default branch. null (the default) leaves the queue off.
     merge_queue = optional(object({
       grouping_strategy                 = string
