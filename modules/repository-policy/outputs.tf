@@ -43,7 +43,6 @@ output "ruleset_enforcement" {
       enforcement                       = v.enforcement
       tags_enforcement                  = try(github_repository_ruleset.protect_tags[k].enforcement, null)
       required_review_thread_resolution = v.rules[0].pull_request[0].required_review_thread_resolution
-      bypass_actors                     = v.bypass_actors
     }
   }
 }

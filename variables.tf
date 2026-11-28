@@ -28,10 +28,11 @@ variable "repository_policies" {
     # Also block moving existing tags (the update rule) in protect-tags.
     protect_tags_update = optional(bool, false)
     # Extra tag rulesets, keyed by ruleset name, that restrict tag creation for the
-    # include patterns to the listed user IDs.
+    # include patterns to the listed user IDs and GitHub App (Integration) IDs.
     tag_creation_rulesets = optional(map(object({
       include         = list(string)
       bypass_user_ids = list(number)
+      bypass_app_ids  = optional(list(number), [])
     })), {})
     # Let repository admins bypass protect-main, only through a pull request (admin merge).
     admin_pull_request_bypass = optional(bool, false)
@@ -118,10 +119,40 @@ variable "repository_policies" {
     # Checks pinned to GitHub Actions (app 15368) beyond DCO. An error, not a check block, so a
     # stale override that drops the pin fails the plan instead of loosening the live ruleset.
     condition = alltrue([
-      for name, context in { termrock = "Required", ruxel = "Acceptance local" } :
+      for name, context in { termrock = "Required", ruxel = "Acceptance local", velnor-new = "Required" } :
       !contains(keys(var.repository_policies), name) || lookup(var.repository_policies[name].required_check_apps, context, null) == 15368
     ])
-    error_message = "termrock Required and ruxel Acceptance local must stay pinned to GitHub Actions (app 15368)."
+    error_message = "termrock Required, ruxel Acceptance local and velnor-new Required must stay pinned to GitHub Actions (app 15368)."
+  }
+
+  validation {
+    # An error, not a check block, so that a stale override fails the plan instead of widening
+    # who may merge into the default branch past the rules.
+    condition = alltrue([
+      for name, repo in var.repository_policies :
+      !repo.admin_pull_request_bypass || name == "velnor-new"
+    ])
+    error_message = "Only velnor-new may set admin_pull_request_bypass (owner approved 2026-11-19): it lets repository admins merge a pull request past protect-main."
+  }
+
+  validation {
+    # An error, not a check block: the release tags of velnor-new are created by the owner and
+    # by the velnor-release GitHub App, nobody else (tailrocks/velnor-new#682). tools-v* is the
+    # family tag the release environment trusts, so it must be covered. The patterns equal those
+    # of velnor-new's own scripts/tag-ruleset-drift.mjs. Tag immutability (protect_tags and
+    # protect_tags_update) is required here too: an override must not drop the update and
+    # deletion rules that keep an existing release tag from being moved.
+    condition = !contains(keys(var.repository_policies), "velnor-new") || try(
+      var.repository_policies["velnor-new"].protect_tags &&
+      var.repository_policies["velnor-new"].protect_tags_update &&
+      toset(var.repository_policies["velnor-new"].tag_creation_rulesets["release-tags"].include) == toset([
+        "refs/tags/rust-ci-v*", "refs/tags/velnor-ci-v*", "refs/tags/velnor-gen-v*", "refs/tags/tools-v*",
+      ]) &&
+      toset(var.repository_policies["velnor-new"].tag_creation_rulesets["release-tags"].bypass_user_ids) == toset([139017]) &&
+      toset(var.repository_policies["velnor-new"].tag_creation_rulesets["release-tags"].bypass_app_ids) == toset([5762496]),
+      false,
+    )
+    error_message = "tailrocks/velnor-new must keep the release-tags ruleset: rust-ci-v*, velnor-ci-v*, velnor-gen-v* and tools-v* tags, created only by the owner (user 139017) and the velnor-release App (5762496), with protect_tags and protect_tags_update true (tailrocks/velnor-new#682)."
   }
 
   # NOTE: variable defaults must be literals, so entries cannot reference
@@ -396,9 +427,12 @@ variable "repository_policies" {
       required_checks = ["DCO", "Required"]
     }
     "velnor-new" = {
-      # Live ruleset 24396608 requires only "Required" (checked 2026-11-28).
-      visibility      = "public"
-      required_checks = ["Required"]
+      # Live ruleset 24396608 requires only "Required" (checked 2026-11-28), and pins it to
+      # GitHub Actions: the check-runs of the last merged pull requests and of their merge_group
+      # commits all name app 15368.
+      visibility          = "public"
+      required_checks     = ["Required"]
+      required_check_apps = { Required = 15368 } # GitHub Actions
       # Owner approved 2026-11-19: admin merges for rare critical-path cases.
       admin_pull_request_bypass = true
       protect_tags_update       = true
@@ -414,11 +448,16 @@ variable "repository_policies" {
         merge_method                      = "SQUASH"
       }
       tag_creation_rulesets = {
-        # Only the owner may create release tags (tailrocks/velnor-new#682).
-        # The velnor-release GitHub App replaces this bypass later.
+        # Only the owner and the velnor-release GitHub App may create release tags
+        # (tailrocks/velnor-new#682). The owner pushes the tools-v* tags that start the release
+        # workflow; the App token creates a family tag the job finds missing. tools-v* is the
+        # family tag of .velnor/release.toml. runner-v* is not released (release-plz.toml
+        # release = false) and actions-v* went with the old engine (#1459), so neither is
+        # reserved, as in velnor-new's tag-ruleset-drift.mjs. Prefix list first proposed in #65.
         "release-tags" = {
-          include         = ["refs/tags/rust-ci-v*", "refs/tags/velnor-ci-v*", "refs/tags/velnor-gen-v*"]
-          bypass_user_ids = [139017] # donbeave
+          include         = ["refs/tags/rust-ci-v*", "refs/tags/velnor-ci-v*", "refs/tags/velnor-gen-v*", "refs/tags/tools-v*"]
+          bypass_user_ids = [139017]  # donbeave
+          bypass_app_ids  = [5762496] # velnor-release
         }
         "sdk-preview-owner-creation" = {
           include         = ["refs/tags/sdk-preview-*"]
@@ -449,7 +488,6 @@ variable "velnor_runner_groups" {
       repositories = ["velnor-new"]
       selected_workflows = [
         "tailrocks/velnor-new/.github/workflows/qualification.yml@refs/heads/main",
-        "tailrocks/velnor-new/.github/workflows/rust-ci.yml@refs/heads/main",
       ]
     }
   }
@@ -460,5 +498,22 @@ variable "velnor_runner_groups" {
       keys(var.repository_policies),
     )) == 0
     error_message = "velnor_runner_groups repositories must be a subset of repository_policies."
+  }
+
+  validation {
+    # An empty list means any workflow, so any workflow of velnor-new would run on the trusted group.
+    condition     = length(lookup(var.velnor_runner_groups, "velnor-ci-trusted", { repositories = [], selected_workflows = ["-"] }).selected_workflows) > 0
+    error_message = "velnor-ci-trusted must keep a non-empty selected_workflows allowlist: an empty list lets every workflow of its repositories use the group."
+  }
+
+  validation {
+    # A workflow reference on any other ref (a staging branch, a tag) is writable by whoever can
+    # push there, and that code would then run on the trusted group. Only the protected default
+    # branch qualifies.
+    condition = alltrue([
+      for workflow in lookup(var.velnor_runner_groups, "velnor-ci-trusted", { repositories = [], selected_workflows = [] }).selected_workflows :
+      endswith(workflow, "@refs/heads/main")
+    ])
+    error_message = "Every velnor-ci-trusted selected_workflows entry must be pinned to refs/heads/main (owner/repo/path@refs/heads/main): any other ref is writable outside the protected branch."
   }
 }
