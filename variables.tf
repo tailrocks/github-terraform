@@ -191,9 +191,9 @@ variable "repository_policies" {
       no_ci_reason    = "No CI workflow emits a status context on the default branch; only tag-push release checks exist."
     }
     "ruxel" = {
-      # local.check_templates.dco_required
+      # Acceptance local is posted by GitHub Actions (ruxel acceptance job).
       visibility          = "public"
-      required_checks     = ["DCO", "Required"]
+      required_checks     = ["DCO", "Required", "Acceptance local"]
       required_check_apps = { DCO = 974774 }
     }
     "schemalane" = {
