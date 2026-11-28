@@ -108,9 +108,9 @@ check "overrides_are_explicit" {
     condition = alltrue([
       toset([for name, policy in var.repository_policies : name if !policy.protect_tags]) == toset(["termrock"]),
       toset([for name, policy in var.repository_policies : name if !policy.review_thread_resolution]) == toset(["termrock"]),
-      toset([for name, policy in var.repository_policies : name if length(setsubtract(keys(policy.required_check_apps), ["DCO"])) > 0]) == toset(["termrock"]),
+      toset([for name, policy in var.repository_policies : name if length(setsubtract(keys(policy.required_check_apps), ["DCO"])) > 0]) == toset(["ruxel", "termrock"]),
     ])
-    error_message = "Only termrock (terminal-components-baseline) may skip protect-tags, skip review-thread resolution, or pin a required check other than DCO to an app."
+    error_message = "Only termrock (terminal-components-baseline) may skip protect-tags, skip review-thread resolution, or pin a required check other than DCO to an app (ruxel pins Acceptance local)."
   }
 }
 

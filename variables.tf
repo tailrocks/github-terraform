@@ -112,6 +112,16 @@ variable "repository_policies" {
     error_message = "Every required_check_apps value must be a positive app ID: null and 0 both mean any source to the provider."
   }
 
+  validation {
+    # Checks pinned to GitHub Actions (app 15368) beyond DCO. An error, not a check block, so a
+    # stale override that drops the pin fails the plan instead of loosening the live ruleset.
+    condition = alltrue([
+      for name, context in { termrock = "Required", ruxel = "Acceptance local" } :
+      !contains(keys(var.repository_policies), name) || lookup(var.repository_policies[name].required_check_apps, context, null) == 15368
+    ])
+    error_message = "termrock Required and ruxel Acceptance local must stay pinned to GitHub Actions (app 15368)."
+  }
+
   # NOTE: variable defaults must be literals, so entries cannot reference
   # local.check_templates. Keep these lists in sync with locals.tf templates.
   default = {
@@ -217,7 +227,7 @@ variable "repository_policies" {
       # Acceptance local is posted by GitHub Actions (ruxel acceptance job).
       visibility          = "public"
       required_checks     = ["DCO", "Required", "Acceptance local"]
-      required_check_apps = { DCO = 974774 }
+      required_check_apps = { DCO = 974774, "Acceptance local" = 15368 }
     }
     "schemalane" = {
       # local.check_templates.dco_required
