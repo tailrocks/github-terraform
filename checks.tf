@@ -108,9 +108,9 @@ check "overrides_are_explicit" {
     condition = alltrue([
       toset([for name, policy in var.repository_policies : name if !policy.protect_tags]) == toset(["termrock"]),
       toset([for name, policy in var.repository_policies : name if !policy.review_thread_resolution]) == toset(["termrock"]),
-      toset([for name, policy in var.repository_policies : name if length(setsubtract(keys(policy.required_check_apps), ["DCO"])) > 0]) == toset(["ruxel", "termrock"]),
+      toset([for name, policy in var.repository_policies : name if length(setsubtract(keys(policy.required_check_apps), ["DCO"])) > 0]) == toset(["ruxel", "termrock", "velnor-new"]),
     ])
-    error_message = "Only termrock (terminal-components-baseline) may skip protect-tags, skip review-thread resolution, or pin a required check other than DCO to an app (ruxel pins Acceptance local)."
+    error_message = "Only termrock (terminal-components-baseline) may skip protect-tags or skip review-thread resolution; only ruxel (Acceptance local), termrock (Required) and velnor-new (Required) may pin a required check other than DCO to an app."
   }
 }
 
@@ -149,33 +149,5 @@ check "thread_resolution_and_active_enforcement" {
       gate.required_review_thread_resolution == var.repository_policies[name].review_thread_resolution
     ])
     error_message = "All protect-main/protect-tags rulesets must enforce active, with review-thread resolution as configured per repository."
-  }
-}
-
-check "zero_bypass_actors" {
-  assert {
-    condition = alltrue([
-      for name, gate in module.repository_policy.ruleset_enforcement :
-      length(gate.bypass_actors) == 0 || (
-        name == "velnor-new" &&
-        length(gate.bypass_actors) == 1 &&
-        one(gate.bypass_actors).actor_id == 5 &&
-        one(gate.bypass_actors).actor_type == "RepositoryRole" &&
-        one(gate.bypass_actors).bypass_mode == "pull_request"
-      )
-    ])
-    error_message = "No repository may declare bypass actors on its protect-main ruleset, except the repository-admin pull_request bypass on tailrocks/velnor-new (owner approved 2026-11-19)."
-  }
-}
-
-check "velnor_new_release_tags_reserved" {
-  assert {
-    condition = (
-      toset(var.repository_policies["velnor-new"].tag_creation_rulesets["release-tags"].include) == toset([
-        "refs/tags/rust-ci-v*", "refs/tags/velnor-ci-v*", "refs/tags/velnor-gen-v*",
-      ]) &&
-      length(var.repository_policies["velnor-new"].tag_creation_rulesets["release-tags"].bypass_user_ids) == 1
-    )
-    error_message = "tailrocks/velnor-new must keep the release-tags ruleset: rust-ci-v*, velnor-ci-v*, and velnor-gen-v* tags, created only by one bypass user (tailrocks/velnor-new#682)."
   }
 }

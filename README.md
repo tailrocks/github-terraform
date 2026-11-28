@@ -66,7 +66,8 @@ Each `repository_policies` entry may also set:
   non-archived repository that requires `DCO` pins it to `974774` (`local.dco_app_id`; a `variables.tf`
   validation, in the root and the module, enforces this; archived repositories are exempt and keep DCO unpinned, as live);
   every pinned ID must be positive, since `0` is the provider's unset value and means any source;
-  only `termrock` pins another check (`Required` to `15368`). Read an app ID from
+  only `termrock` and `velnor-new` pin `Required` to `15368`, and `ruxel` pins `Acceptance local` to `15368`
+  (a `variables.tf` validation keeps all three pinned). Read an app ID from
   live data, not from memory:
   `gh api repos/tailrocks/<repo>/commits/<sha>/check-runs --jq '.check_runs[] | {name, app: .app.slug, id: .app.id}'`.
 - `merge_settings` (default `null`): the merge policy. `null` is the organization
@@ -75,8 +76,8 @@ Each `repository_policies` entry may also set:
   it was renamed from. `checks.tf` pins that exception list.
 - `admin_pull_request_bypass` (default `false`): let repository admins bypass
   protect-main through a pull request only (actor `RepositoryRole` 5, mode
-  `pull_request`), never by direct push. Only `velnor-new` sets it; `checks.tf`
-  pins that exception.
+  `pull_request`), never by direct push. Only `velnor-new` sets it; this
+  is enforced by a `variables.tf` validation (an input error, not a warn-only check).
 - `archived` (default `false`): set it for a repository that is archived on
   GitHub. The module then skips its settings and reads its ID through a data
   source; its rulesets stay managed.
@@ -86,7 +87,8 @@ Each `repository_policies` entry may also set:
   `protect-tags`, so that existing tags cannot move.
 - `tag_creation_rulesets` (default `{}`): extra tag rulesets, keyed by ruleset
   name, with the `creation` rule for the `include` patterns and an `always`
-  bypass for each user in `bypass_user_ids`. Import each existing ruleset as
+  bypass for each user in `bypass_user_ids` and each GitHub App in
+  `bypass_app_ids` (actor type `Integration`). Import each existing ruleset as
   `tag_creation["<repository>/<ruleset name>"]` in `imports.tf`.
 
 ## Organization overlays
@@ -98,7 +100,8 @@ Each `repository_policies` entry may also set:
   groups `velnor-ci` and `velnor-ci-trusted` (`var.velnor_runner_groups`: each
   group has a repository list that must be a subset of `repository_policies`;
   a non-empty `selected_workflows` list also restricts the group to those
-  workflows). Import a group by its numeric ID in `imports.tf`.
+  workflows; `velnor-ci-trusted` must keep a non-empty list, enforced by a
+  `variables.tf` validation). Import a group by its numeric ID in `imports.tf`.
 - GitHub does not expose organization package-creation visibility through the
   REST API or the Terraform GitHub provider; manage those settings in
   **Organization settings → Packages**. Making a package public is

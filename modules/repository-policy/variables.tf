@@ -15,10 +15,11 @@ variable "repository_policies" {
     # Also block moving existing tags (the update rule) in protect-tags.
     protect_tags_update = optional(bool, false)
     # Extra tag rulesets, keyed by ruleset name, that restrict tag creation for the
-    # include patterns to the listed user IDs.
+    # include patterns to the listed user IDs and GitHub App (Integration) IDs.
     tag_creation_rulesets = optional(map(object({
       include         = list(string)
       bypass_user_ids = list(number)
+      bypass_app_ids  = optional(list(number), [])
     })), {})
     # Protect-main is always managed for public repositories. false skips protect-tags.
     protect_tags = optional(bool, true)

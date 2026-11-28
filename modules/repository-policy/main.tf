@@ -65,6 +65,7 @@ locals {
         name            = name
         include         = ruleset.include
         bypass_user_ids = ruleset.bypass_user_ids
+        bypass_app_ids  = ruleset.bypass_app_ids
       }
     }
   ]...)
@@ -228,7 +229,7 @@ resource "github_repository_ruleset" "protect_tags" {
   }
 }
 
-# Tag rulesets that let only the listed users create matching tags
+# Tag rulesets that let only the listed users and GitHub Apps create matching tags
 resource "github_repository_ruleset" "tag_creation" {
   for_each = local.tag_creation_rulesets
 
@@ -249,6 +250,15 @@ resource "github_repository_ruleset" "tag_creation" {
     content {
       actor_id    = bypass_actors.value
       actor_type  = "User"
+      bypass_mode = "always"
+    }
+  }
+
+  dynamic "bypass_actors" {
+    for_each = each.value.bypass_app_ids
+    content {
+      actor_id    = bypass_actors.value
+      actor_type  = "Integration"
       bypass_mode = "always"
     }
   }
