@@ -97,9 +97,9 @@ variable "repository_policies" {
   validation {
     condition = alltrue([
       for name, config in var.repository_policies :
-      alltrue([for app_id in values(config.required_check_apps) : app_id == null ? true : app_id > 0])
+      alltrue([for app_id in values(config.required_check_apps) : coalesce(app_id, 0) > 0])
     ])
-    error_message = "Every required_check_apps value must be a positive app ID: 0 is the provider's unset value and would mean any source."
+    error_message = "Every required_check_apps value must be a positive app ID: null and 0 both mean any source to the provider."
   }
 }
 

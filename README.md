@@ -35,7 +35,9 @@ settings, Actions policies, and runner group in `organization.tf`.
    `dco_required` = `["DCO", "Required"]`,
    `control` = `["Control / Required"]`, `required_only` = `["Required"]`,
    `dco_only` = `["DCO"]`, `policy` = `["Policy"]`); bespoke checks inline
-   with a comment citing the producing workflow. Repos with no CI use
+   with a comment citing the producing workflow. A repository that requires `DCO`
+   and is not archived must also set `required_check_apps = { DCO = 974774 }`
+   (the cncf/dco2 app; `tofu plan` fails otherwise). Repos with no CI use
    `required_checks = []` plus a non-empty `no_ci_reason` and extend the
    allowlist check in `checks.tf`. Always add the name to the mandatory list
    in `mandatory_target_repositories_present` in `checks.tf` (updating its

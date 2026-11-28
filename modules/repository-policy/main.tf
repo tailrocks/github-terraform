@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 terraform {
-  required_version = ">= 1.5"
+  required_version = ">= 1.9"
 
   required_providers {
     github = {
@@ -75,6 +75,16 @@ data "github_repository" "archived" {
   for_each = local.archived_repositories
 
   name = each.value
+
+  # The inventory flag exempts these repositories from writes and from the DCO pin, so it
+  # must match GitHub: a repository reopened on GitHub but still marked archived here
+  # would keep an unpinned DCO gate.
+  lifecycle {
+    postcondition {
+      condition     = self.archived
+      error_message = "${each.value} is marked archived = true in repository_policies but is not archived on GitHub; remove the flag and pin its checks."
+    }
+  }
 }
 
 # Repository-level merge settings (Tier 1 enforcement across all repos)
