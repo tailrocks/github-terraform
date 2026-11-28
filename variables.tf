@@ -394,8 +394,13 @@ variable "repository_policies" {
       required_checks = ["DCO", "Required"]
     }
     "velnor-new" = {
+      # Bespoke: during the transition after tailrocks/velnor-new#604 the new Rust
+      # workflow keeps the check name "rust-required" and the old ci.yml keeps "Required"
+      # and "Required verdict"; the rename to a single name happens later, when
+      # tailrocks/velnor-new#608 removes the old engine's Rust CI path. "Required
+      # verdict" is the other live protect-main ruleset 24396608 context.
       visibility          = "public"
-      required_checks     = ["Required", "Required verdict"]
+      required_checks     = ["DCO", "Required", "Required verdict", "rust-required"]
       protect_tags_update = true
       # Batched queue (owner decision 2026-11-18): 13 runners fit about one full CI run,
       # so only the newest entry of a group must pass and up to 10 PRs merge per run.
