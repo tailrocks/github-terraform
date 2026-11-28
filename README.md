@@ -14,7 +14,9 @@ them, and private repositories get no rulesets, because the free plan returns
 - `locals.tf` — `check_templates` copy-paste source for check lists.
 - `repositories.tf` — `module.repository_policy` wiring.
 - `organization.tf` — organization settings, Actions/workflow permissions,
-  and the `velnor-trusted` runner group.
+  and the Velnor runner groups.
+- `environments.tf` — the `velnor-new` `release` deployment environment (branch
+  `main` and tag `tools-v*` deployments).
 - `modules/repository-policy/` — shared policy module (identical across orgs).
 - `checks.tf` — invariant guards (no scripts).
 - `imports.tf` — bootstrap import triples (one per repo: settings + 2 rulesets).
@@ -71,6 +73,10 @@ Each `repository_policies` entry may also set:
   policy (squash-only, delete branch on merge, linear history, PR_TITLE/PR_BODY).
   Only `termrock` overrides it, to keep the merge-commit policy of the repository
   it was renamed from. `checks.tf` pins that exception list.
+- `admin_pull_request_bypass` (default `false`): let repository admins bypass
+  protect-main through a pull request only (actor `RepositoryRole` 5, mode
+  `pull_request`), never by direct push. Only `velnor-new` sets it; `checks.tf`
+  pins that exception.
 - `archived` (default `false`): set it for a repository that is archived on
   GitHub. The module then skips its settings and reads its ID through a data
   source; its rulesets stay managed.
@@ -88,10 +94,11 @@ Each `repository_policies` entry may also set:
 - `organization.tf` manages the org profile (`github_organization_settings`),
   Actions availability/allow policy (`github_actions_organization_permissions`),
   default `GITHUB_TOKEN` workflow permissions
-  (`github_actions_organization_workflow_permissions`), and the
-  `velnor-trusted` runner group restricted to
-  `var.velnor_runner_group_repositories` (must be a subset of
-  `repository_policies`).
+  (`github_actions_organization_workflow_permissions`), and the Velnor runner
+  groups `velnor-ci` and `velnor-ci-trusted` (`var.velnor_runner_groups`: each
+  group has a repository list that must be a subset of `repository_policies`;
+  a non-empty `selected_workflows` list also restricts the group to those
+  workflows). Import a group by its numeric ID in `imports.tf`.
 - GitHub does not expose organization package-creation visibility through the
   REST API or the Terraform GitHub provider; manage those settings in
   **Organization settings → Packages**. Making a package public is

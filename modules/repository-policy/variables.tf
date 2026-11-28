@@ -28,6 +28,8 @@ variable "repository_policies" {
     # (15368 = GitHub Actions, 974774 = the cncf/dco2 app that posts DCO). A check
     # that is not listed accepts any source.
     required_check_apps = optional(map(number), {})
+    # Let repository admins bypass protect-main, only through a pull request (admin merge).
+    admin_pull_request_bypass = optional(bool, false)
     # Merge queue on the default branch. null (the default) leaves the queue off.
     merge_queue = optional(object({
       grouping_strategy                 = string

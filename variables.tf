@@ -33,6 +33,8 @@ variable "repository_policies" {
       include         = list(string)
       bypass_user_ids = list(number)
     })), {})
+    # Let repository admins bypass protect-main, only through a pull request (admin merge).
+    admin_pull_request_bypass = optional(bool, false)
     # Merge queue on the default branch. null (the default) leaves the queue off.
     merge_queue = optional(object({
       grouping_strategy                 = string
@@ -394,15 +396,18 @@ variable "repository_policies" {
       required_checks = ["DCO", "Required"]
     }
     "velnor-new" = {
-      visibility          = "public"
-      required_checks     = ["Required", "Required verdict"]
-      protect_tags_update = true
-      # Batched queue (owner decision 2026-11-18): 13 runners fit about one full CI run,
-      # so only the newest entry of a group must pass and up to 10 PRs merge per run.
+      # Live ruleset 24396608 requires only "Required" (checked 2026-11-28).
+      visibility      = "public"
+      required_checks = ["Required"]
+      # Owner approved 2026-11-19: admin merges for rare critical-path cases.
+      admin_pull_request_bypass = true
+      protect_tags_update       = true
+      # Batched queue, as live (ruleset 24396608, read 2026-11-28): HEADGREEN, so only the newest
+      # entry of a group must pass; up to 5 entries build and 5 merge per run.
       merge_queue = {
         grouping_strategy                 = "HEADGREEN"
-        max_entries_to_build              = 2
-        max_entries_to_merge              = 10
+        max_entries_to_build              = 5
+        max_entries_to_merge              = 5
         min_entries_to_merge              = 1
         min_entries_to_merge_wait_minutes = 5
         check_response_timeout_minutes    = 90
@@ -429,27 +434,31 @@ variable "repository_policies" {
   }
 }
 
-variable "velnor_runner_group_repositories" {
-  description = "Repositories allowed to schedule jobs on the velnor-trusted Actions runner group."
-  type        = set(string)
-  default = [
-    "cloudflare-tofu",
-    "holla",
-    "parallax",
-    "parallax-telemetry-playground",
-    "pg-bigdecimal",
-    "ruxel",
-    "schemalane",
-    "tablerock",
-    "termrock-legacy",
-    "tracing-request-level",
-    "velnor-actions-fixture-legacy",
-    "velnor-apt-legacy",
-    "velnor-legacy",
-  ]
+variable "velnor_runner_groups" {
+  description = "Velnor Actions runner groups, keyed by group name. Each group is restricted to its repositories; a non-empty selected_workflows list also restricts it to those workflows (owner/repo/path@ref)."
+  type = map(object({
+    repositories       = set(string)
+    selected_workflows = optional(list(string), [])
+  }))
+  # Live groups 4 and 5, read 2026-11-28 from orgs/tailrocks/actions/runner-groups.
+  default = {
+    "velnor-ci" = {
+      repositories = ["ruxel", "termpane", "tuiscotti", "velnor-lab", "velnor-new"]
+    }
+    "velnor-ci-trusted" = {
+      repositories = ["velnor-new"]
+      selected_workflows = [
+        "tailrocks/velnor-new/.github/workflows/qualification.yml@refs/heads/main",
+        "tailrocks/velnor-new/.github/workflows/rust-ci.yml@refs/heads/main",
+      ]
+    }
+  }
 
   validation {
-    condition     = length(setsubtract(var.velnor_runner_group_repositories, keys(var.repository_policies))) == 0
-    error_message = "velnor_runner_group_repositories must be a subset of repository_policies."
+    condition = length(setsubtract(
+      toset(flatten([for group in var.velnor_runner_groups : tolist(group.repositories)])),
+      keys(var.repository_policies),
+    )) == 0
+    error_message = "velnor_runner_groups repositories must be a subset of repository_policies."
   }
 }

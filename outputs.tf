@@ -25,7 +25,7 @@ output "repository_ids" {
   value       = module.repository_policy.repository_ids
 }
 
-output "velnor_runner_group_repositories" {
-  value       = sort(tolist(var.velnor_runner_group_repositories))
-  description = "Repositories allowed to schedule jobs on the velnor-trusted runner group."
+output "velnor_runner_groups" {
+  value       = { for name, group in var.velnor_runner_groups : name => sort(tolist(group.repositories)) }
+  description = "Repositories allowed to schedule jobs on each Velnor runner group."
 }
