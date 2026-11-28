@@ -139,8 +139,12 @@ variable "repository_policies" {
     # An error, not a check block: the release tags of velnor-new are created by the owner and
     # by the velnor-release GitHub App, nobody else (tailrocks/velnor-new#682). tools-v* is the
     # family tag the release environment trusts, so it must be covered. The patterns equal those
-    # of velnor-new's own scripts/tag-ruleset-drift.mjs.
+    # of velnor-new's own scripts/tag-ruleset-drift.mjs. Tag immutability (protect_tags and
+    # protect_tags_update) is required here too: an override must not drop the update and
+    # deletion rules that keep an existing release tag from being moved.
     condition = !contains(keys(var.repository_policies), "velnor-new") || try(
+      var.repository_policies["velnor-new"].protect_tags &&
+      var.repository_policies["velnor-new"].protect_tags_update &&
       toset(var.repository_policies["velnor-new"].tag_creation_rulesets["release-tags"].include) == toset([
         "refs/tags/rust-ci-v*", "refs/tags/velnor-ci-v*", "refs/tags/velnor-gen-v*", "refs/tags/tools-v*",
       ]) &&
@@ -148,7 +152,7 @@ variable "repository_policies" {
       toset(var.repository_policies["velnor-new"].tag_creation_rulesets["release-tags"].bypass_app_ids) == toset([5762496]),
       false,
     )
-    error_message = "tailrocks/velnor-new must keep the release-tags ruleset: rust-ci-v*, velnor-ci-v*, velnor-gen-v* and tools-v* tags, created only by the owner (user 139017) and the velnor-release App (5762496) (tailrocks/velnor-new#682)."
+    error_message = "tailrocks/velnor-new must keep the release-tags ruleset: rust-ci-v*, velnor-ci-v*, velnor-gen-v* and tools-v* tags, created only by the owner (user 139017) and the velnor-release App (5762496), with protect_tags and protect_tags_update true (tailrocks/velnor-new#682)."
   }
 
   # NOTE: variable defaults must be literals, so entries cannot reference
@@ -500,5 +504,16 @@ variable "velnor_runner_groups" {
     # An empty list means any workflow, so any workflow of velnor-new would run on the trusted group.
     condition     = length(lookup(var.velnor_runner_groups, "velnor-ci-trusted", { repositories = [], selected_workflows = ["-"] }).selected_workflows) > 0
     error_message = "velnor-ci-trusted must keep a non-empty selected_workflows allowlist: an empty list lets every workflow of its repositories use the group."
+  }
+
+  validation {
+    # A workflow reference on any other ref (a staging branch, a tag) is writable by whoever can
+    # push there, and that code would then run on the trusted group. Only the protected default
+    # branch qualifies.
+    condition = alltrue([
+      for workflow in lookup(var.velnor_runner_groups, "velnor-ci-trusted", { repositories = [], selected_workflows = [] }).selected_workflows :
+      endswith(workflow, "@refs/heads/main")
+    ])
+    error_message = "Every velnor-ci-trusted selected_workflows entry must be pinned to refs/heads/main (owner/repo/path@refs/heads/main): any other ref is writable outside the protected branch."
   }
 }
