@@ -260,6 +260,7 @@ variable "repository_policies" {
       visibility      = "public"
       required_checks = ["DCO", "Required"]
     }
+    # Bespoke: Check = .github/workflows/ci.yml job "check"; DCO = cncf/dco2 app.
     "taskrock-plugins" = {
       visibility      = "public"
       required_checks = ["Check", "DCO"]
